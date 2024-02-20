@@ -32,32 +32,5 @@ docker compose up --build --no-start -d
 
 echo "BTC Fee Tracker installed!"
 
-# ask_seed_db() {
-#     read -r -p "Continue seeding DB with historic fee estimates from .csv file? [y/n]: " do_seed_db
-#     do_seed_db=${do_seed_db,,} # Convert input to lowercase
-# }
-
-# while true; do
-#     ask_seed_db
-
-#     case $do_seed_db in
-#     y)
-#         if lib.seed_db; then
-#             echo "DB seeded successfully."
-#             break
-#         else
-#             echo "Error: Failed to seed DB. Please check the logs for more details."
-#             exit 1
-#         fi
-#         ;;
-#     n)
-#         echo "DB seeding skipped."
-#         ;;
-#     *)
-#         echo "Invalid input. Please enter 'y' or 'n'."
-#         ;;
-#     esac
-# done
-
 exit 0
 }

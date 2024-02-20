@@ -6,6 +6,7 @@ export root_dir
 . "$root_dir/.env"
 . "$root_dir/scripts/setup.core"
 . "$root_dir/scripts/start.core"
+. "$root_dir/scripts/stop.core"
 
 CLI_NAME="BTC Fee Tracker"
 CLI_VERSION="0.1.1"
@@ -54,6 +55,10 @@ setup)
     ;;
 start)
     core.start
+    exit 0
+    ;;
+stop)
+    core.stop
     exit 0
     ;;
 # ... [Any other cases you might have previously]
