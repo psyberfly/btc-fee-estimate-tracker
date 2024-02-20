@@ -1,0 +1,58 @@
+body {
+  font-family: 'Helvetica Neue', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: rgb(255, 255, 255);
+}
+
+h1 {
+  color: #000000;
+}
+
+button {
+  background-color: rgb(216, 14, 81);
+  border: none;
+  color: rgb(255, 255, 255);
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  font-family: 'Courier New', Courier, monospace;
+  margin: 4px 2px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+.nav {
+  width: 15%;
+  background: #d1d1d1;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  box-shadow: -2px 0px 5px rgba(0, 0, 0, 0.1); /* Shadow on the left side */
+  border-right: 1px solid #ccc; /* Border on the right side */
+}
+
+
+.nav button {
+  margin-bottom: 10px;
+}
+
+.view {
+  flex-grow: 1;
+  padding: 10px;
+  background: rgb(228, 228, 228);
+}
+
+.title-bar {
+  background: #dddddd;
+  padding: 10px;
+  text-align: center;
+  box-shadow: 0px 10px 20px -3px rgba(0, 0, 0, 0.3), 0px 4px 6px -2px rgba(0, 0, 0, 0.1);
+  border-bottom: 1px solid #ccc;
+}

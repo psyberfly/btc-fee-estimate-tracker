@@ -2,8 +2,9 @@
 
 import React from 'react';
 import { Line } from 'react-chartjs-2';
-import { options, dataFeeIndexChart } from '../App';
+import { options } from './chart_data';
 
-export function FeeIndexChartPage() {
+
+export function ChartFeeIndex() {
   return <Line options={options} data={dataFeeIndexChart} />;
 }

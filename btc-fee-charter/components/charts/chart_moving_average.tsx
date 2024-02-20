@@ -1,8 +1,8 @@
 
 import React from 'react';
 import { Line } from 'react-chartjs-2';
-import { options, dataMovingAverageChart } from '../App';
+import { options, } from './chart_data';
 
-export function MovingAverageChartPage() {
+export function ChartMovingAverage() {
   return <Line options={options} data={dataMovingAverageChart} />;
 }
