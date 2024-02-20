@@ -1,7 +1,5 @@
 import express, { Request, Response } from "express";
-//import { PgStore } from "./db";
 import { router as serviceRouter } from "../service/service_provider/router";
-import path from "path";
 import helmet from "helmet";
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -27,4 +25,3 @@ export async function runServer() {
     process.exit(1);
   }
 }
-//20:17:44 0|main  | /home/anorak/Anorak/SatoshiPortal/btc-fee-watcher/dist/infra

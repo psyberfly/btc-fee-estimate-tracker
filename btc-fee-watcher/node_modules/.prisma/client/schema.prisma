@@ -1,0 +1,37 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DB_URL")
+}
+
+model FeeEstimate {
+  id          Int       @id @default(autoincrement())
+  time        DateTime
+  satsPerByte Decimal
+  feeIndex    FeeIndex?
+}
+
+model MovingAverage {
+  id          Int        @id @default(autoincrement())
+  last365Days Decimal
+  last30Days  Decimal
+  createdAt   DateTime   @default(now())
+  feeIndex    FeeIndex[]
+}
+
+model FeeIndex {
+  id               Int           @id @default(autoincrement())
+  feeEstimateId    Int           @unique
+  feeEstimate      FeeEstimate   @relation(fields: [feeEstimateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  movingAverageId  Int
+  movingAverage    MovingAverage @relation(fields: [movingAverageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  ratioLast365Days Decimal
+  ratioLast30Days  Decimal
+  createdAt        DateTime      @default(now())
+}

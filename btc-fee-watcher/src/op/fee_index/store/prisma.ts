@@ -1,4 +1,4 @@
-import { FeeEstimate, FeeIndex, MovingAverage } from "@prisma/client";
+import { FeeIndex } from "@prisma/client";
 import { handleError } from "../../../lib/errors/e";
 import { prisma } from "../../../main";
 import { IndexResponse } from "../interface";

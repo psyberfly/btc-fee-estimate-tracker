@@ -12,8 +12,8 @@ import {
 } from 'chart.js';
 import { makeApiCall } from './lib/network/network';
 import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
-import { FeeIndexChartPage } from './fee_index_chart';
-import { MovingAverageChartPage } from './moving_avg_chart';
+import { FeeIndexChartPage } from './charts/fee_index_chart';
+import { MovingAverageChartPage } from './charts/moving_avg_chart';
 
 
 ChartJS.register(
@@ -100,13 +100,8 @@ feeIndexHistory.forEach(element => {
 
 });
 
-
-
-
-//const labelsMovingAverage = feeIndexHistory.map(element => element.movingAverage.last30Days)
-
 export const dataFeeIndexChart = {
-  // labels: labels30Day,
+  
   datasets: [
     {
       label: 'Current Fee Estimate : Moving Average last 30 days',
@@ -126,7 +121,7 @@ export const dataFeeIndexChart = {
 };
 
 export const dataMovingAverageChart = {
-  // labels: labels30Day,
+
   datasets: [
     {
       label: 'Fee Estimate Moving Average last 30 days',
@@ -159,7 +154,3 @@ export function App() {
   );
 }
 
-
-// export function App() {
-//   return <Line options={options} data={data} />;
-// }

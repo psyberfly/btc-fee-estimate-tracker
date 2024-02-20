@@ -1,8 +1,5 @@
-import { query } from "express";
-//import { PgStore } from "../../infra/db";
 import { IMovingAverageOp } from "./interface";
 import { FeeOp } from "../fee_estimate/fee_estimate";
-//import { MovingAverageStore } from "./store/pg";
 import { handleError } from "../../lib/errors/e";
 import { MovingAverage } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";

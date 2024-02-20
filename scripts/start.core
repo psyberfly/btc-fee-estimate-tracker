@@ -1,0 +1,12 @@
+#!/bin/bash
+set -e 
+
+function core.start(){
+cd $root_dir
+
+echo "Starting service..."
+
+docker compose start 
+
+exit 0
+}
