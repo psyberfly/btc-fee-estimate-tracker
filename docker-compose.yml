@@ -48,3 +48,5 @@ volumes:
       type: none
       device: $POSTGRES_VOLUME_PATH
       o: bind
+     
+     

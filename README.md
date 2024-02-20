@@ -14,4 +14,5 @@ A docker compose service to run:
 ## To Do:
 1. Auth
 2. SSL for deployment
-3. DB seeding via Watcher (.csv?)
+3. DB seeding via Watcher (.csv?) Can this be API based instead of file?
+4. If needed: In compose make user the service admin to access volume/ for backup/restore?
