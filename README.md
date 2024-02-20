@@ -1,5 +1,5 @@
 # BTC Fee Estimate Tracker
-Project in early dev
+**Status: alpha**  
 
 A docker compose service to run:
 1. [BTC Fee Estimate Watcher](btc-fee-watcher/README.md)
