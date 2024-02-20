@@ -1,4 +1,5 @@
 # BTC Fee Estimate Tracker
+Project in early dev
 
 A docker compose service to run:
 1. [BTC Fee Estimate Watcher](btc-fee-watcher/README.md)
@@ -9,3 +10,8 @@ A docker compose service to run:
 1. cd ./scripts/
 2. sudo sh bft 
 3. use the CLI to setup, start the service.
+
+## To Do:
+1. Auth
+2. SSL for deployment
+3. DB seeding via Watcher (.csv?)
