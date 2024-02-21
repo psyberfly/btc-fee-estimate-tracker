@@ -4,6 +4,7 @@ import { chartOptions, fetchChartDataFeeIndex } from "./src/chart_data/chart_dat
 import { Line } from 'react-chartjs-2';
 import TimerangeSelector from './src/components/dropdown/dropdown';
 import ChartView from "./src/components/chart_view/chart_view";
+import ChartView2 from './src/components/chart_view/chart_view2';
 
 const App = () => {
 
@@ -53,6 +54,34 @@ const App = () => {
 
 
 
+  //   return (
+  //     <div>
+  //       <div className="title-bar">
+  //         <h1>BTC Fee Estimate Tracker</h1>
+  //       </div>
+  //       <div style={{ display: 'flex' }}>
+  //         <div className="nav">
+  //           <h2>Charts</h2>
+  //           <button onClick={() => handleClick(chart1)}>{chart1}</button>
+  //           <button onClick={() => handleClick(chart2)}>{chart2}</button>
+  //           {/* Add more buttons for additional views */}
+  //         </div>
+  //         {haveData ? (
+  //           <ChartView
+  //             handleClick={handleClick}
+  //             renderChart={renderChart}
+  //             handleTimeRangeChange={handleTimeRangeChange}
+  //             TimerangeSelector={TimerangeSelector}
+
+  //           />
+  //         ) : (
+  //           <div>Loading...</div>
+  //         )}
+  //       </div>
+  //     </div>
+  //   );
+  // };
+
   return (
     <div>
       <div className="title-bar">
@@ -65,19 +94,9 @@ const App = () => {
           <button onClick={() => handleClick(chart2)}>{chart2}</button>
           {/* Add more buttons for additional views */}
         </div>
-        {haveData ? (
-          <ChartView
-            
-            renderChart={renderChart}
-            handleTimeRangeChange={handleTimeRangeChange}
-            TimerangeSelector={TimerangeSelector}
-            handleClick={handleClick}
-            chart1={chart1}
-            chart2={chart2}
-          />
-        ) : (
-          <div>Loading...</div>
-        )}
+        <ChartView2
+        />
+
       </div>
     </div>
   );

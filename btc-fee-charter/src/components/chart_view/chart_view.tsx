@@ -2,7 +2,10 @@
 
 import React from 'react';
 
-const ChartView = ({ renderChart, handleTimeRangeChange, TimerangeSelector, handleClick, chart1, chart2 }) => {
+const ChartView = ({ renderChart, handleTimeRangeChange, TimerangeSelector, handleClick }) => {
+
+
+    
     return (
         <div className="view" style={{ padding: '30px 30px' }}>
             <div className="dropdown">

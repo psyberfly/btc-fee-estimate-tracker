@@ -1,6 +1,5 @@
 import { makeApiCall } from "../lib/network/network";
 import { IndexResponse } from "./interface";
-import "chartjs-adapter-date-fns";
 import {
   CategoryScale,
   Chart,
@@ -17,7 +16,6 @@ import {
   Title,
   Tooltip,
 } from "chart.js";
-
 ChartJS.register(
   CategoryScale,
   LinearScale,
@@ -30,6 +28,12 @@ ChartJS.register(
   Filler,
   TimeScale,
 );
+import "chartjs-adapter-date-fns";
+import gradient from "chartjs-plugin-gradient";
+Chart.register(gradient);
+
+import annotationPlugin from "chartjs-plugin-annotation";
+Chart.register(annotationPlugin);
 
 const verticalLinePlugin = {
   id: "verticalLine",
@@ -62,7 +66,6 @@ Chart.defaults.elements.line.borderWidth = 1.5;
 Chart.defaults.elements.line.tension = 0;
 Chart.defaults.scales.time.adapters.date = { "timezone": "UTC" };
 Chart.defaults.backgroundColor = "rgb(255,255,255)";
-// Chart.defaults.color = "rgb(255,255,255)";
 Chart.defaults.scale.ticks.color = "rgb(255,255,255)";
 Chart.defaults.scale.grid.color = "rgba(199, 199, 199, 0.2)";
 
@@ -76,6 +79,22 @@ export const chartOptions = {
       type: "time" as const,
       time: {
         unit: "hour" as const,
+      },
+      title: {
+        display: true,
+        text: "time",
+        color: titleColor,
+        font: { size: 14 },
+      },
+    },
+    y: {
+      min: 0,
+      max: 2,
+      title: {
+        display: true,
+        text: "current fee est / moving average",
+        color: titleColor,
+        font: { size: 14 },
       },
     },
   },
@@ -118,7 +137,7 @@ export const chartOptions = {
       position: "top" as const,
       align: "start" as const,
       padding: { "top": 0, "bottom": 30 },
-      text: "Current Fee Estimate/Fee Estimate Moving Average",
+      text: "current fee estimate / fee estimate moving average",
       color: subtitleColor,
       font: {
         family: "'Courier New', monospace",
@@ -130,7 +149,19 @@ export const chartOptions = {
       lineWidth: 1.5, // Customize the line width
       lineColor: "rgba(255, 0, 0, 0.75)", // Customize the line color
     },
+    annotation: {
+      annotations: {
+        line1: {
+          type: "line" as const,
+          yMin: 1,
+          yMax: 1,
+          borderColor: subtitleColor,
+          borderWidth: 1,
+        },
+      },
+    },
     filler: {},
+    gradient: {},
   },
 };
 
@@ -183,26 +214,37 @@ export async function fetchChartDataFeeIndex() {
   const dataSetFeeIndex = {
     datasets: [
       {
-        fill: {
-          value: 1,
-          above: "rgba(255,0,0,0.1)", // Area will be red above the origin
-          below: "rgba(0, 255, 0,0.1)",
-        },
-        label: "Last 30 days",
-        data: dataSet30Day,
-        borderColor: "rgb(254, 112, 2)",
-        scales: {
-          x: {
-            type: "time",
-            time: {
-              unit: "day", // this can be 'second', 'minute', 'hour', 'day', 'week', 'month', 'year', etc.
-              displayFormats: {
-                day: "MMM D", // this will display the date as 'Jan 1', 'Feb 2', etc.
-              },
+        fill: true,
+        gradient: {
+          backgroundColor: {
+            axis: "y",
+            colors: {
+              0: "rgba(0,255,0,0.3)",
+              1: "rgba(255,255,0,0.3)",
+              2: "rgba(255,0,0,0.3)",
+            },
+          },
+          borderColor: {
+            axis: "y",
+            colors: {
+              0: "rgb(0,255,0)",
+              1: "rgb(255,255,0)",
+              2: "rgb(255,0,0)",
             },
           },
         },
-        //backgroundColor: "rgba(255, 99, 132, 0.5)",
+
+        // fill: {
+        //   //value: 1,
+        //   //above: "rgba(255,0,0,0.1)", // Area will be red above the origin
+        //   //  mode: +1,
+        //   //value: 1,
+        //   //below: "rgba(0, 255, 0,0.1)",
+        // },
+
+        label: "Last 30 days",
+        data: dataSet30Day,
+        // borderColor: "rgb(254, 112, 2)",
       },
       // {
       //   label: "Last 365 days",

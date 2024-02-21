@@ -33,7 +33,7 @@ export async function runIndexWatcher() {
       } else {
         console.log("Moving Average already exists for today.");
       }
-    }, ONE_MINUTE_MS //change to 24 hours for prod
+    }, ONE_DAY_MS //change to 24 hours for prod
     );
 
     // every 10 mins (block):
@@ -69,7 +69,7 @@ export async function runIndexWatcher() {
       console.log("Index alert broadcasted");
 
       // update chart
-    }, ONE_MINUTE_MS //change to ten mins for prod
+    }, TEN_MINUTES_MS //change to ten mins for prod
       //TEN_MINUTES_MS
     );
   } catch (error) {
