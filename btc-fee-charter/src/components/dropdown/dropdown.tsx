@@ -5,8 +5,7 @@ const TimerangeSelector = ({ options, onChange }) => {
   return (
     <div className="dropdown">
       <label htmlFor="timeRange">
-        {/* <i className="material-icons">access_time</i> Clock icon */}
-        Time Range:
+        Range:
       </label>
       <select id="timeRange" onChange={onChange}>
         {options.map((option, index) => (

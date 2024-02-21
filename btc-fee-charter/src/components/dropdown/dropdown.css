@@ -3,7 +3,7 @@
 
 .dropdown {
   position: absolute;
-  top: 0.5%;
+  top: 2%;
   right: 2%;
   padding: 5px 5px;
 }
@@ -11,6 +11,8 @@
 .dropdown label {
   margin-right: 5px;
   padding: 5px;
+  color: var(--text-color);
+  font-family: var(--font-family);
 }
 
 .dropdown select {
@@ -21,17 +23,18 @@
   border: 1.5px solid var(--secondary-color);
   border-radius: 3px;
   outline: none;
-  
+
 }
 
- .dropdown select:hover {
+.dropdown select:hover {
   text-decoration: underline;
   /* color: var(--hover-color);   */
 
-} 
+}
 
 .dropdown label i {
-  margin-right: 5px; /* Adjust margin as needed */
+  margin-right: 5px;
+  /* Adjust margin as needed */
 }
 
 
@@ -43,4 +46,3 @@
   padding: 5px 5px;
   cursor: pointer;
 } */
-
