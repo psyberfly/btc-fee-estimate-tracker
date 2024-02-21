@@ -1,7 +1,7 @@
 import React from 'react';
 import './dropdown.css'; // Import the CSS file for DropdownButton styling
 
-const TimerangeSelector = ({ options, onChange }) => {
+const TimeUnitSelector = ({ options, onChange }) => {
   return (
     <div className="dropdown">
       <label htmlFor="timeRange">
@@ -16,4 +16,4 @@ const TimerangeSelector = ({ options, onChange }) => {
   );
 }
 
-export default TimerangeSelector;
+export default TimeUnitSelector;

@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import './src/components/styles.css';
-import { chartOptions, fetchChartDataFeeIndex } from "./src/chart_data/chart_data";
+import { getChartOptions, fetchChartDataFeeIndex } from "./src/chart_data/chart_data";
 import { Line } from 'react-chartjs-2';
-import TimerangeSelector from './src/components/dropdown/dropdown';
+import TimeUnitSelector from './src/components/dropdown/dropdown';
 import ChartView from "./src/components/chart_view/chart_view";
 import ChartView2 from './src/components/chart_view/chart_view2';
+import ChartContainer from './src/components/chart_view/chart_container';
+import DemoChartContainer from './src/components/chart_view/demo_chart_container';
 
 const App = () => {
 
@@ -40,17 +42,17 @@ const App = () => {
   };
 
 
-  const renderChart = () => {
-    switch (view) {
-      case chart1:
-        return <Line options={chartOptions} data={chartDataFeeIndex} />;
-      case chart2:
-        return "Unmapped option";
-      // Add more cases for additional views
-      default:
-        return null; // Return null if the selected view is not defined
-    }
-  };
+  // const renderChart = () => {
+  //   switch (view) {
+  //     case chart1:
+  //       return <Line options={chartOptions} data={chartDataFeeIndex} />;
+  //     case chart2:
+  //       return "Unmapped option";
+  //     // Add more cases for additional views
+  //     default:
+  //       return null; // Return null if the selected view is not defined
+  //   }
+  // };
 
 
 
@@ -94,9 +96,7 @@ const App = () => {
           <button onClick={() => handleClick(chart2)}>{chart2}</button>
           {/* Add more buttons for additional views */}
         </div>
-        <ChartView2
-        />
-
+        <DemoChartContainer />
       </div>
     </div>
   );

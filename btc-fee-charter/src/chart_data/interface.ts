@@ -1,3 +1,10 @@
+import type { ChartData, ChartOptions } from 'chart.js';
+
+interface LineChartProps {
+  options: ChartOptions<'line'>;
+  data: ChartData<'line'>;
+}
+
 export interface IndexResponse {
   timestamp: Date;
   feeEstimateMovingAverageRatio: {

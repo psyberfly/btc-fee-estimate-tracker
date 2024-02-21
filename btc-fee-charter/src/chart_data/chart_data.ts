@@ -69,100 +69,100 @@ Chart.defaults.backgroundColor = "rgb(255,255,255)";
 Chart.defaults.scale.ticks.color = "rgb(255,255,255)";
 Chart.defaults.scale.grid.color = "rgba(199, 199, 199, 0.2)";
 
-//match with componenets/styles.css
-const titleColor = "rgb(211, 211, 211)";
-const subtitleColor = "rgb(190,190,190)";
 
-export const chartOptions = {
-  scales: {
-    x: {
-      type: "time" as const,
-      time: {
-        unit: "hour" as const,
-      },
-      title: {
-        display: true,
-        text: "time",
-        color: titleColor,
-        font: { size: 14 },
-      },
-    },
-    y: {
-      min: 0,
-      max: 2,
-      title: {
-        display: true,
-        text: "current fee est / moving average",
-        color: titleColor,
-        font: { size: 14 },
-      },
-    },
-  },
-  responsive: true,
-  plugins: {
-    legend: {
-      align: "start" as const,
-      position: "bottom" as const,
-      fill: true as const,
-      labels: {
-        //color: "rgb(255,0,0)",
-        pointStyleWidth: 40,
-        usePointStyle: true,
-        pointStyle: "rectRounded" as const,
-      },
-    },
-    interaction: {
-      mode: "index",
-      intersect: false,
-    },
-    tooltip: {
-      enabled: true,
-      //  mode: 'index', // Display tooltips at nearest data point across lines
-      intersect: false, // Display tooltips for all points, not just hovered ones
-    },
-    title: {
-      display: true,
-      position: "top" as const,
-      align: "start" as const,
-      padding: { "top": 0, "bottom": 10 },
-      text: "Fee Estimate Index",
-      color: titleColor,
-      font: {
-        family: "'Courier New', monospace",
-        size: 20,
-      },
-    },
-    subtitle: {
-      display: true,
-      position: "top" as const,
-      align: "start" as const,
-      padding: { "top": 0, "bottom": 30 },
-      text: "current fee estimate / fee estimate moving average",
-      color: subtitleColor,
-      font: {
-        family: "'Courier New', monospace",
-        size: 14, // Set the desired font size here
-      },
-    },
+export const getChartOptions = (timeUnit) => {
+  // Define title and subtitle colors
+  const titleColor = "rgb(211, 211, 211)";
+  const subtitleColor = "rgb(190, 190, 190)";
 
-    verticalLine: {
-      lineWidth: 1.5, // Customize the line width
-      lineColor: "rgba(255, 0, 0, 0.75)", // Customize the line color
-    },
-    annotation: {
-      annotations: {
-        line1: {
-          type: "line" as const,
-          yMin: 1,
-          yMax: 1,
-          borderColor: subtitleColor,
-          borderWidth: 1,
+  return {
+    scales: {
+      x: {
+        type: "time" as const,
+        time: {
+          unit: timeUnit,
+        },
+        title: {
+          display: true,
+          text: "time" as const,
+          color: titleColor,
+          font: { size: 14 },
+        },
+      },
+      y: {
+        min: 0,
+        max: 2,
+        title: {
+          display: true,
+          text: "current fee est / moving average" as const,
+          color: titleColor,
+          font: { size: 14 },
         },
       },
     },
-    filler: {},
-    gradient: {},
-  },
+    responsive: true,
+    plugins: {
+      legend: {
+        align: "start" as const,
+        position: "bottom" as const,
+        fill: true,
+        labels: {
+          pointStyleWidth: 40,
+          usePointStyle: true,
+          pointStyle: "rectRounded" as const,
+        },
+      },
+      interaction: {
+        mode: "index" as const,
+        intersect: false,
+      },
+      tooltip: {
+        enabled: true,
+        intersect: false,
+      },
+      title: {
+        display: true,
+        position: "top" as const,
+        align: "start" as const,
+        padding: { top: 0, bottom: 10 },
+        text: "Fee Estimate Index" as const,
+        color: titleColor,
+        font: {
+          family: "'Courier New', monospace" as const,
+          size: 20,
+        },
+      },
+      subtitle: {
+        display: true,
+        position: "top" as const,
+        align: "start" as const,
+        padding: { top: 0, bottom: 30 },
+        text: "current fee estimate / fee estimate moving average" as const,
+        color: subtitleColor,
+        font: {
+          family: "'Courier New', monospace" as const,
+          size: 14,
+        },
+      },
+      verticalLine: {
+        lineWidth: 1.5,
+        lineColor: "rgba(255, 0, 0, 0.75)" as const,
+      },
+      annotation: {
+        annotations: {
+          line1: {
+            type: "line" as const,
+            yMin: 1,
+            yMax: 1,
+            borderColor: subtitleColor,
+            borderWidth: 1,
+          },
+        },
+      },
+      filler: {},
+      gradient: {},
+    },
+  };
 };
 
 export async function fetchChartDataFeeIndex() {
