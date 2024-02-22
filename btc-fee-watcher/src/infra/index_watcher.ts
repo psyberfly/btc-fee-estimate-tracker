@@ -1,9 +1,12 @@
 import { handleError } from "../lib/errors/e";
 import { ONE_DAY_MS, ONE_MINUTE_MS, TEN_MINUTES_MS } from "../lib/time/time";
-import { FeeOp } from "../op/fee_estimate/fee_estimate";
-import { IndexOp } from "../op/fee_index/fee_index";
-import { MovingAverageOp } from "../op/moving_average/moving_average";
+import { FeeOp } from "../ops/fee_estimate/fee_estimate";
+import { IndexOp } from "../ops/fee_index/fee_index";
+import { MovingAverageOp } from "../ops/moving_average/moving_average";
 import { AlertStreamServer } from "./ws";
+
+export const indexWatchInterval = TEN_MINUTES_MS;
+export const movingAverageWatchInterval = ONE_DAY_MS;
 
 export async function runIndexWatcher() {
   try {
@@ -11,14 +14,14 @@ export async function runIndexWatcher() {
     const movingAverageOp = new MovingAverageOp();
     const indexOp = new IndexOp();
     const port: string = process.env.WSS_PORT;
-    const path: string = process.env.WSS_PATH;
+    const baseApiRoute = "/api/v1";
 
-    const alertStreamServer = new AlertStreamServer(port, path);
+    const alertStreamServer = new AlertStreamServer(port, baseApiRoute);
 
     // every day:
     setInterval(async () => {
       console.log("Updating Moving Average...");
-      const today = new Date().toISOString()
+      const today = new Date().toISOString();
       const isExistMovingAvgToday = await movingAverageOp.checkExists(today);
 
       if (!isExistMovingAvgToday) {
@@ -33,7 +36,7 @@ export async function runIndexWatcher() {
       } else {
         console.log("Moving Average already exists for today.");
       }
-    }, ONE_DAY_MS //change to 24 hours for prod
+    }, movingAverageWatchInterval //change to 24 hours for prod
     );
 
     // every 10 mins (block):
@@ -69,7 +72,7 @@ export async function runIndexWatcher() {
       console.log("Index alert broadcasted");
 
       // update chart
-    }, TEN_MINUTES_MS //change to ten mins for prod
+    }, movingAverageWatchInterval //change to ten mins for prod
       //TEN_MINUTES_MS
     );
   } catch (error) {

@@ -7,6 +7,7 @@ export interface IndexResponse {
     last30Days: number;
   };
   currentFeeEstimate: {
+    time:Date;
     satsPerByte: number;
   };
   movingAverage: {

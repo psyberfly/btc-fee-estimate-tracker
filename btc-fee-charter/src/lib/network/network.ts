@@ -1,4 +1,4 @@
-import axios, { AxiosResponse, Method } from "axios";
+import axios, { Axios, AxiosError, AxiosResponse, Method } from "axios";
 
 export async function makeApiCall(
   url: string,
@@ -17,7 +17,10 @@ export async function makeApiCall(
     const responseData = response.data;
     return responseData;
   } catch (error) {
-    console.error("Network Lib: Error making API call!");
-    return (error);
+    console.error(`Network Lib: Error making API call!`);
+    if (error instanceof AxiosError) {
+      console.log(error.code, error.message);
+    }
+    return error;
   }
 }

@@ -1,9 +1,9 @@
 import { handleError } from "../../lib/errors/e";
-import { IndexOp } from "../../op/fee_index/fee_index";
-import { IServiceProvider } from "./interface";
-import { IndexResponse } from "../../op/fee_index/interface";
+import { IndexOp } from "../../ops/fee_index/fee_index";
+import { IApiService } from "./interface";
+import { IndexResponse } from "../../ops/fee_index/interface";
 
-export class ServiceProvider implements IServiceProvider {
+export class ApiService implements IApiService {
   private indexOp = new IndexOp();
 
   async getIndex(): Promise<Error | IndexResponse> {
