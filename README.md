@@ -13,11 +13,12 @@ A docker compose service to run:
 
 ## To Do:
 Dev:
+Charter:
 1. Make the toggling of time unit of a Chart also update the range of data displayed on timeline. Currently only the unit changes, not range.
 2. Calculate the max y value in dataset and set yMax to that for different chart types.
 3. Figure out 30, 365 day charts
 
-Infra:
+Watcher:
 1. Auth
 2. SSL for deployment
 3. DB seeding via Watcher (.csv?) Can this be API based instead of file?
