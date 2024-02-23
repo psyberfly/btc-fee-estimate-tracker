@@ -5,39 +5,43 @@ import { DataOp } from './src/chart_data/data_op';
 import { ChartDatasetOp } from './src/chart_data/chart_dataset_op';
 import { ServiceChartType } from './src/chart_data/interface';
 
-//Type errors in React componenets caused because file is .tsx not .jsx
-
 const App = () => {
   const [allTimeData, setAllTimeData] = useState(null);
   const [chartType, setChartType] = useState(ServiceChartType.index);
-  const [chartData, setChartData] = useState(null); // New state for chart data
+  const [chartData, setChartData] = useState(null);
+  const [loading, setLoading] = useState(true); // State to track loading status
   const dataOp = new DataOp();
   const chartDataOp = new ChartDatasetOp();
 
   useEffect(() => {
-    const fetchDataAndSetDefaultChart = async () => {
+    const fetchData = async () => {
       try {
+        setLoading(true); // Set loading to true while fetching data
         const data = await dataOp.fetchAllTime();
         if (data instanceof Error) {
-          console.error(`Error fetching data.`)
-          throw (data);
+          console.error(`Error fetching data.`);
+          throw data;
         }
-       
         setAllTimeData(data);
         const defaultChartData = chartDataOp.getFromData(data, ServiceChartType.index);
         if (defaultChartData instanceof Error) {
-
+          console.error(`Error getting default chart data.`);
+          throw defaultChartData;
         }
-        setChartData(defaultChartData); // Set default chart data
+        setChartData(defaultChartData);
+        setLoading(false); // Set loading to false after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
+        setLoading(false); // Set loading to false in case of error
       }
     };
 
-    fetchDataAndSetDefaultChart(); // Fetch data and set default chart on component mount
-  }, []);
+    fetchData(); // Fetch data on component mount
 
-  // No changes needed in the rest of the component
+    const interval = setInterval(fetchData, 10 * 60 * 1000); // Fetch data every 10 minutes
+
+    return () => clearInterval(interval); // Clean up interval on component unmount
+  }, []);
 
   const handleClick = (selectedChartType) => {
     setChartType(selectedChartType);
@@ -48,9 +52,7 @@ const App = () => {
     }
 
     const chartData = chartDataOp.getFromData(allTimeData, selectedChartType);
-    setChartData(chartData); // Set chartData state
-
-    // To do: Update state or perform other actions based on chartData
+    setChartData(chartData);
   };
 
   return (
@@ -65,7 +67,11 @@ const App = () => {
           <button onClick={() => handleClick(ServiceChartType.movingAverage)}>{ServiceChartType.movingAverage}</button>
           <button onClick={() => handleClick(ServiceChartType.feeEstimate)}>{ServiceChartType.feeEstimate}</button>
         </div>
-        <ChartView dataset={chartData} chartType={chartType} /> {/* Pass chartData as a prop */}
+        {loading ? (
+          <div>Loading...</div>
+        ) : (
+          <ChartView dataset={chartData} chartType={chartType} />
+        )}
       </div>
     </div>
   );

@@ -283,7 +283,6 @@ const ChartView = ({ dataset, chartType }) => {
     const [selectedScale, setSelectedScale] = useState('day');
     // Remove chartData state since it will be received as a prop
     // const [chartData, setChartData] = useState(null);
-    const [loading, setLoading] = useState(true);
     const [chartInstance, setChartInstance] = useState(null);
 
     // useEffect to handle chart instance creation or update

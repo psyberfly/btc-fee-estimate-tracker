@@ -11,10 +11,6 @@ A docker compose service to run:
 2. sudo sh bft 
 3. use the CLI to setup, start the service.
 
-## To Do:
-Dev:
-Charter:
-4. Responsive
 
 Watcher:
 1. Auth

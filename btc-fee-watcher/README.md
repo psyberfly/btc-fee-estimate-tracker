@@ -33,8 +33,9 @@ Start service then test from terminal:
 ## WIP:
 
 ## To Do:
-1. currently last year's fee estimate history is loaded locally from csv file. CSV File is loaded by host via psql. Write an init procedure in server to load it. 
-2. Change intervals of IndexWatcher to prod internvals before deploying. 
+1. currently last year's fee estimate history is loaded locally from csv file. CSV File is loaded by host via psql. Write an init procedure in server to load it.
+2. Compute moving average once at onset of server if not yet done for today.
+3. Maybe historic data like fee estimates and moving averages should be stored by index of time/createdAt (with some mechanism like 1 for each day, or 1 for each 10 mins?) instead of serial id, so older data can be inserted? 
 
 ## Known Issues:
 1. Signing key for lib/http/handler.ts not generated:
