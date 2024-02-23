@@ -46,7 +46,7 @@ Chart.register(verticalLinePlugin);
 
 //This is of type ChartOptions<"line"> but TS compiler confuses Types with this lib.
 //INDEX CHART:
-const defaultChartOptions = (chartType: ServiceChartType) => {
+const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number) => {
     let yMin: number;
     let yMax: number;
     let yText: string;
@@ -55,24 +55,42 @@ const defaultChartOptions = (chartType: ServiceChartType) => {
     let subtitle: string;
 
 
+
+    if (yMaxInDataset >= 1 && yMaxInDataset <= 10) {
+        yMax = Math.ceil(yMaxInDataset);
+    }
+    else if (yMaxInDataset >= 10 && yMaxInDataset <= 100) {
+        yMax = (Math.ceil(yMaxInDataset / 10) * 10) + 5;
+        // Round up to the next whole multiple of 1
+    }
+    else if (yMaxInDataset >= 100 && yMaxInDataset <= 1000) {
+        yMax = (Math.ceil(yMaxInDataset / 10) * 10) + 10; // 
+    }
+    else if (yMaxInDataset >= 1000 && yMaxInDataset <= 10000) {
+        yMax = (Math.ceil(yMaxInDataset / 100) * 100) + 100// Round up to the nearest whole number
+    }
+    else {
+        yMax = Math.ceil(yMaxInDataset); // Round up to the nearest whole number
+    };
+
     switch (chartType) {
         case ServiceChartType.index:
             yMin = 0;
-            yMax = 2;
+            yMax = yMax;
             yText = "current fee est / moving average";
             title = "Fee Estimate Index"
             subtitle = "current fee estimate / fee estimate moving average";
             break;
         case ServiceChartType.movingAverage:
             yMin = 0;
-            yMax = 100;
+            yMax = yMax;
             yText = "sats/B";
             title = "Fee Estimate Moving Average"
             subtitle = "30 Day Moving Average";
             break;
         case ServiceChartType.feeEstimate:
             yMin = 0;
-            yMax = 100;
+            yMax = yMax;
             yText = "sats/B";
             title = "Fee Estimate History"
             subtitle = "mempool.space";
@@ -182,10 +200,13 @@ const ChartView = ({ dataset, chartType }) => {
             }
 
             if (chartContainer.current && dataset) {
+                const yMax: number = Math.max(...dataset.datasets.flatMap(dataset => dataset.data.map(dataPoint => dataPoint.y)));
+                const options = defaultChartOptions(chartType, yMax) as ChartOptions<"line">;
+
                 const newChartInstance = new Chart(chartContainer.current, {
                     type: 'line',
                     data: dataset,
-                    options: defaultChartOptions as ChartOptions<"line">
+                    options: options,
 
                 });
                 setChartInstance(newChartInstance);
@@ -203,7 +224,9 @@ const ChartView = ({ dataset, chartType }) => {
 
     useEffect(() => {
         if (chartInstance) {
-            const updatedOptions = defaultChartOptions(chartType);
+            const yMax: number = Math.max(...dataset.datasets.flatMap(dataset => dataset.data.map(dataPoint => dataPoint.y)));
+
+            const updatedOptions = defaultChartOptions(chartType, yMax);
             updatedOptions.scales!.x!["time"]["unit"] = selectedScale;
             chartInstance.options = updatedOptions;
             chartInstance.update();
