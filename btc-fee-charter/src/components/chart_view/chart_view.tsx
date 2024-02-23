@@ -46,15 +46,16 @@ Chart.register(verticalLinePlugin);
 
 //This is of type ChartOptions<"line"> but TS compiler confuses Types with this lib.
 //INDEX CHART:
-const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number) => {
+const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number, selectedRange: string) => {
     let yMin: number;
     let yMax: number;
     let yText: string;
     let xText: string = "time";
     let title: string;
     let subtitle: string;
-
-
+    let xMin: number;
+    let xMax: number;
+    let scale: string;
 
     if (yMaxInDataset >= 1 && yMaxInDataset <= 10) {
         yMax = Math.ceil(yMaxInDataset);
@@ -95,15 +96,91 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number)
             title = "Fee Estimate History"
             subtitle = "mempool.space";
             break;
+
+    }
+
+    function getMsSinceEpochXHoursAgo(hours) {
+        // Get the current time in milliseconds since epoch
+        const currentTime = Date.now();
+        // Calculate the time X hours ago (in milliseconds)
+        const timeXHoursAgo = currentTime - (hours * 3600 * 1000);
+        return timeXHoursAgo;
+    };
+
+
+    const getMsSinceEpochXDaysAgo = (days): number => {
+        const currentDate = new Date();
+        const thirtyDaysAgo = new Date(currentDate.getTime() - (days * 24 * 60 * 60 * 1000)); // Subtract 30 days in milliseconds
+        return thirtyDaysAgo.getTime(); // Returns the date 30 days ago in milliseconds since epoch
+    };
+
+    function getMsSinceEpochXMonthsAgo(months) {
+        const currentDate = new Date();
+        const targetDate = new Date(currentDate);
+
+        // Calculate the year and month X months ago
+        targetDate.setMonth(targetDate.getMonth() - months);
+
+        // Get the timestamp of the target date
+        const timestampXMonthsAgo = targetDate.getTime();
+
+        return timestampXMonthsAgo;
+    }
+
+    function getMsSinceEpochXYearsAgo(years) {
+        const currentDate = new Date();
+        const targetDate = new Date(currentDate);
+
+        // Calculate the year X years ago
+        targetDate.setFullYear(targetDate.getFullYear() - years);
+
+        // Get the timestamp of the target date
+        const timestampXYearsAgo = targetDate.getTime();
+
+        return timestampXYearsAgo;
+    }
+
+
+    //set xmin and xmax based on chosen range option
+    if (selectedRange === "hour") {
+        xMin = getMsSinceEpochXHoursAgo(1);
+        xMax = getMsSinceEpochXHoursAgo(0)
+        scale = "minute";
+    }
+
+    else if (selectedRange === "day") {
+        xMin = getMsSinceEpochXDaysAgo(1);
+        xMax = getMsSinceEpochXDaysAgo(0);
+        scale = "hour";
+    }
+
+    else if (selectedRange === "month") {
+        xMin = getMsSinceEpochXMonthsAgo(1);
+        xMax = getMsSinceEpochXMonthsAgo(0);
+        scale = "day";
+    }
+    else if (selectedRange === "year") {
+        xMin = getMsSinceEpochXYearsAgo(1);
+        xMax = getMsSinceEpochXYearsAgo(0);
+        scale = "month";
+    }
+    else {
+        xMin = getMsSinceEpochXDaysAgo(1);
+        xMax = getMsSinceEpochXDaysAgo(0);
+        scale = "hour";
     }
 
     return {
-
+        responsive: true,
+        animation: false,
         scales: {
             x: {
+                min: xMin,
+                max: xMax,
                 type: "time",
                 time: {
-                    unit: "hour",
+
+                    unit: scale,
                 },
                 title: {
                     display: true,
@@ -123,8 +200,16 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number)
                 },
             },
         },
-        responsive: true,
+
         plugins: {
+            crosshair: {
+                sync: {
+                    enabled: false
+                },
+                zoom: {
+                    enabled: false
+                }
+            },
             title: {
                 display: true,
                 position: "top" as const,
@@ -149,15 +234,21 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number)
                     size: 14,
                 },
             },
+            // interaction: {
+            //     mode: "x" as const,
+            // },
             tooltip: {
-                enabled: true as const,
-                intersect: false as const,
-                borderColor: "red"
+                enabled: true,
+                //mode: 'interpolate',
+                intersect: false
             },
             legend: {
+
                 align: "start" as const,
                 position: "bottom" as const,
+
                 labels: {
+                    color: secondaryColor,
                     pointStyleWidth: 40,
                     usePointStyle: true,
                     pointStyle: "rectRounded" as const,
@@ -184,9 +275,12 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number)
     }
 };
 
+
+// Type Errors are caused with react component because file is .tsx instead of .jsx 
+
 const ChartView = ({ dataset, chartType }) => {
     const chartContainer = useRef(null);
-    const [selectedScale, setSelectedScale] = useState('hour');
+    const [selectedScale, setSelectedScale] = useState('day');
     // Remove chartData state since it will be received as a prop
     // const [chartData, setChartData] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -200,8 +294,8 @@ const ChartView = ({ dataset, chartType }) => {
             }
 
             if (chartContainer.current && dataset) {
-                const yMax: number = Math.max(...dataset.datasets.flatMap(dataset => dataset.data.map(dataPoint => dataPoint.y)));
-                const options = defaultChartOptions(chartType, yMax) as ChartOptions<"line">;
+                const yMaxInDataset: number = Math.max(...dataset.datasets.flatMap(dataset => dataset.data.map(dataPoint => dataPoint.y)));
+                const options = defaultChartOptions(chartType, yMaxInDataset, selectedScale) as ChartOptions<"line">;
 
                 const newChartInstance = new Chart(chartContainer.current, {
                     type: 'line',
@@ -224,10 +318,9 @@ const ChartView = ({ dataset, chartType }) => {
 
     useEffect(() => {
         if (chartInstance) {
-            const yMax: number = Math.max(...dataset.datasets.flatMap(dataset => dataset.data.map(dataPoint => dataPoint.y)));
-
-            const updatedOptions = defaultChartOptions(chartType, yMax);
-            updatedOptions.scales!.x!["time"]["unit"] = selectedScale;
+            const yMaxInDataset: number = Math.max(...dataset.datasets.flatMap(dataset => dataset.data.map(dataPoint => dataPoint.y)));
+            const updatedOptions = defaultChartOptions(chartType, yMaxInDataset, selectedScale);
+            //updatedOptions.scales!.x!["time"]["unit"] = selectedScale;
             chartInstance.options = updatedOptions;
             chartInstance.update();
         }
@@ -237,7 +330,7 @@ const ChartView = ({ dataset, chartType }) => {
         setSelectedScale(e.target.value);
     };
 
-    const scales = ["hour", "day", "month"];
+    const timescales = [{ "Last 1 hour": "hour" }, { "Last 1 day": "day" }, { "Last 1 month": "month" }, { "Last 1 year": "year" }];
 
     return (
         <div className="chart-container">
@@ -247,10 +340,15 @@ const ChartView = ({ dataset, chartType }) => {
                     value={selectedScale}
                     onChange={handleScaleChange}
                 >
-                    {scales.map(scale => (
-                        <option key={scale} value={scale}>{scale}</option>
-                    ))}
+                    {timescales.map((timescale, index) => {
+                        // Extracting the label (key) and value from each object
+                        const [label, value] = Object.entries(timescale)[0]; // Extracting the only entry
+
+                        // Rendering the option with label as text content and value as the value attribute
+                        return <option key={index} value={value}>{label}</option>; // Added 'return' statement
+                    })}
                 </select>
+
             </div>
         </div>
     );

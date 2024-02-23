@@ -5,6 +5,8 @@ import { DataOp } from './src/chart_data/data_op';
 import { ChartDatasetOp } from './src/chart_data/chart_dataset_op';
 import { ServiceChartType } from './src/chart_data/interface';
 
+//Type errors in React componenets caused because file is .tsx not .jsx
+
 const App = () => {
   const [allTimeData, setAllTimeData] = useState(null);
   const [chartType, setChartType] = useState(ServiceChartType.index);
@@ -20,11 +22,11 @@ const App = () => {
           console.error(`Error fetching data.`)
           throw (data);
         }
+       
         setAllTimeData(data);
         const defaultChartData = chartDataOp.getFromData(data, ServiceChartType.index);
-        if(defaultChartData instanceof Error)
-        {
-          
+        if (defaultChartData instanceof Error) {
+
         }
         setChartData(defaultChartData); // Set default chart data
       } catch (error) {

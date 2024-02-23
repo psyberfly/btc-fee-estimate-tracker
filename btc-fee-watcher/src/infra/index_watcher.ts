@@ -72,7 +72,7 @@ export async function runIndexWatcher() {
       console.log("Index alert broadcasted");
 
       // update chart
-    }, movingAverageWatchInterval //change to ten mins for prod
+    }, indexWatchInterval //change to ten mins for prod
       //TEN_MINUTES_MS
     );
   } catch (error) {
