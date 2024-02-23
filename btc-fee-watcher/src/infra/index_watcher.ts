@@ -1,3 +1,4 @@
+import { getFeeEstimateHistoryFromCsv } from "../lib/csv_parser/csv_parser";
 import { handleError } from "../lib/errors/e";
 import { ONE_DAY_MS, ONE_MINUTE_MS, TEN_MINUTES_MS } from "../lib/time/time";
 import { FeeOp } from "../ops/fee_estimate/fee_estimate";
@@ -13,10 +14,29 @@ export async function runIndexWatcher() {
     const feeOp = new FeeOp();
     const movingAverageOp = new MovingAverageOp();
     const indexOp = new IndexOp();
+
     const port: string = process.env.WSS_PORT;
     const baseApiRoute = "/api/v1";
-
     const alertStreamServer = new AlertStreamServer(port, baseApiRoute);
+
+    const csvFilePath = process.env.PATH_TO_CSV;
+
+    const feeHistory = await getFeeEstimateHistoryFromCsv(csvFilePath);
+    if (feeHistory instanceof Error) {
+      console.error(
+        `Error reading Fee Estimate history from .csv!: ${feeHistory}`,
+      );
+    }
+
+    const isHistorySeeded = await feeOp.storeHistoric(feeHistory);
+
+    if (isHistorySeeded instanceof Error) {
+      console.error(
+        `Error seeding Fee Estimate history to DB!: ${isHistorySeeded}`,
+      );
+    } else {
+      console.log("Fee Estimate History seeded from .csv.");
+    }
 
     // every day:
     setInterval(async () => {
@@ -64,6 +84,7 @@ export async function runIndexWatcher() {
         return handleError(latestIndex);
       }
       console.log("Broadcasting Index alert...");
+
       const isAlertBroadcast = alertStreamServer.broadcastAlert(latestIndex);
       if (isAlertBroadcast instanceof Error) {
         console.error("Error broadcasting index alert!");

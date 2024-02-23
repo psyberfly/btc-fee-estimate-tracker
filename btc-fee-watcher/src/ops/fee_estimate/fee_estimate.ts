@@ -9,7 +9,7 @@ export class FeeOp implements IFeeEstimateOp {
   private mempoolApiUrl = "https://mempool.space/api/v1/fees/recommended";
   // private store = new FeeEstPgStore();
   private store = new FeeEstimatePrismaStore();
-  
+
   async readLatest(): Promise<FeeEstimate | Error> {
     const res = await this.store.readLatest();
     return res;
@@ -59,6 +59,14 @@ export class FeeOp implements IFeeEstimateOp {
 
     if (isUpdated instanceof Error) {
       return handleError(isUpdated);
+    }
+    return true;
+  }
+
+  async storeHistoric(history: FeeEstimate[]): Promise<boolean | Error> {
+    const res = await this.store.insertMany(history);
+    if (res instanceof Error) {
+      return handleError(res);
     }
     return true;
   }

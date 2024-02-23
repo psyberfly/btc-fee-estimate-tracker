@@ -14,6 +14,7 @@ USER node
 
 ENV SERVER_PORT=3561
 ENV WSS_PORT=3572
+ENV PATH_TO_CSV="/home/node/app/assets/fee_estimate_history.csv"
 
 # Install app dependencies
 RUN npm install

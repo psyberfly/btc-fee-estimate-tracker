@@ -33,6 +33,20 @@ export class FeeEstimatePrismaStore {
     }
   }
 
+  async insertMany(rows: FeeEstimate[]): Promise<boolean | Error> {
+    try {
+      await prisma.feeEstimate.createMany({
+        data: rows.map((row) => ({
+          time: row.time,
+          satsPerByte: row.satsPerByte,
+        })),
+      });
+      return true;
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
   async readByRange(
     fromDate: string,
     toDate: string,

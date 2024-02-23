@@ -18,24 +18,25 @@ NodeJs (Typescript) + Postgres
 nodejs, npm, postgres server
 
 ## Usage:
-1. sudo chmod +x setup.sh start.sh
-2. sh setup.sh
-3. ensure that the db from the setup is running 
-3. sh start.sh    
+
+1. Use with btc-fee-tracker.  
+or as standalone by:  
+2. npx prisma migrate deploy && npx prisma generate && npx tsc && npm start 
+
 
 ## Test:
 Start service then test from terminal:  
 ### API: 
-   curl http://localhost:3561/service/index
+   curl http://localhost:3561/api/v1/index
 ### WS: 
-   websocat -H="Accept: application/json" -H="Content-Type: application/json" ws://localhost:3572/stream?service=index
+Using websocat:
+   websocat -H="Accept: application/json" -H="Content-Type: application/json" ws://localhost:3572/api/v1?service=index
 
 ## WIP:
 
 ## To Do:
 1. currently last year's fee estimate history is loaded locally from csv file. CSV File is loaded by host via psql. Write an init procedure in server to load it.
-2. Compute moving average once at onset of server if not yet done for today.
-3. Maybe historic data like fee estimates and moving averages should be stored by index of time/createdAt (with some mechanism like 1 for each day, or 1 for each 10 mins?) instead of serial id, so older data can be inserted? 
+2. Maybe historic data like fee estimates and moving averages should be stored by index of time/createdAt (with some mechanism like 1 for each day, or 1 for each 10 mins?) instead of serial id, so older data can be inserted? 
 
 ## Known Issues:
 1. Signing key for lib/http/handler.ts not generated:

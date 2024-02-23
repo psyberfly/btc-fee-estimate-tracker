@@ -28,6 +28,8 @@ services:
       - "${CHARTER_PORT}:3583"
     depends_on:
       - postgres
+    environment:
+      ENV VITE_FEE_WATCHER_API_URL: "http://localhost:3561/api/v1"
   postgres:
     image: postgres:16.1
     container_name: btc-fee-tracker-postgres
