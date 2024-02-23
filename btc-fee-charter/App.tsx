@@ -1,86 +1,57 @@
 import React, { useEffect, useState } from 'react';
 import './src/components/styles.css';
-import { chartOptions, fetchChartDataFeeIndex } from "./src/chart_data/chart_data";
-import { Line } from 'react-chartjs-2';
-import TimerangeSelector from './src/components/dropdown/dropdown';
-import ChartView from "./src/components/chart_view/chart_view";
-import ChartView2 from './src/components/chart_view/chart_view2';
+import ChartView from './src/components/chart_view/chart_view';
+import { DataOp } from './src/chart_data/data_op';
+import { ChartDatasetOp } from './src/chart_data/chart_dataset_op';
+import { ServiceChartType } from './src/chart_data/interface';
+
+//Type errors in React componenets caused because file is .tsx not .jsx
 
 const App = () => {
-
-  const chart1 = "Fee Estimate Index"
-  const chart2 = "Fee Estimate Moving Average"
-
-  const [view, setView] = useState(chart1);
-  const [haveData, setHaveData] = useState(false);
-
-  const [chartDataFeeIndex, setChartData] = useState(null);
+  const [allTimeData, setAllTimeData] = useState(null);
+  const [chartType, setChartType] = useState(ServiceChartType.index);
+  const [chartData, setChartData] = useState(null); // New state for chart data
+  const dataOp = new DataOp();
+  const chartDataOp = new ChartDatasetOp();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDataAndSetDefaultChart = async () => {
       try {
-        const datasetFeeIndex = await fetchChartDataFeeIndex();
-        setChartData(datasetFeeIndex);
-        setHaveData(true);
-      } catch (e) {
-        console.error("Error fetching data:", e);
-        setHaveData(false);
+        const data = await dataOp.fetchAllTime();
+        if (data instanceof Error) {
+          console.error(`Error fetching data.`)
+          throw (data);
+        }
+       
+        setAllTimeData(data);
+        const defaultChartData = chartDataOp.getFromData(data, ServiceChartType.index);
+        if (defaultChartData instanceof Error) {
+
+        }
+        setChartData(defaultChartData); // Set default chart data
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
 
-    fetchData();
+    fetchDataAndSetDefaultChart(); // Fetch data and set default chart on component mount
   }, []);
 
-  const handleClick = (viewName) => {
-    setView(viewName);
-  };
+  // No changes needed in the rest of the component
 
-  const handleTimeRangeChange = (viewName) => {
-    //setView(viewName);
-  };
+  const handleClick = (selectedChartType) => {
+    setChartType(selectedChartType);
 
-
-  const renderChart = () => {
-    switch (view) {
-      case chart1:
-        return <Line options={chartOptions} data={chartDataFeeIndex} />;
-      case chart2:
-        return "Unmapped option";
-      // Add more cases for additional views
-      default:
-        return null; // Return null if the selected view is not defined
+    if (!allTimeData) {
+      console.error("Data not available yet");
+      return;
     }
+
+    const chartData = chartDataOp.getFromData(allTimeData, selectedChartType);
+    setChartData(chartData); // Set chartData state
+
+    // To do: Update state or perform other actions based on chartData
   };
-
-
-
-  //   return (
-  //     <div>
-  //       <div className="title-bar">
-  //         <h1>BTC Fee Estimate Tracker</h1>
-  //       </div>
-  //       <div style={{ display: 'flex' }}>
-  //         <div className="nav">
-  //           <h2>Charts</h2>
-  //           <button onClick={() => handleClick(chart1)}>{chart1}</button>
-  //           <button onClick={() => handleClick(chart2)}>{chart2}</button>
-  //           {/* Add more buttons for additional views */}
-  //         </div>
-  //         {haveData ? (
-  //           <ChartView
-  //             handleClick={handleClick}
-  //             renderChart={renderChart}
-  //             handleTimeRangeChange={handleTimeRangeChange}
-  //             TimerangeSelector={TimerangeSelector}
-
-  //           />
-  //         ) : (
-  //           <div>Loading...</div>
-  //         )}
-  //       </div>
-  //     </div>
-  //   );
-  // };
 
   return (
     <div>
@@ -90,15 +61,14 @@ const App = () => {
       <div style={{ display: 'flex' }}>
         <div className="nav">
           <h2>Charts</h2>
-          <button onClick={() => handleClick(chart1)}>{chart1}</button>
-          <button onClick={() => handleClick(chart2)}>{chart2}</button>
-          {/* Add more buttons for additional views */}
+          <button onClick={() => handleClick(ServiceChartType.index)}>{ServiceChartType.index}</button>
+          <button onClick={() => handleClick(ServiceChartType.movingAverage)}>{ServiceChartType.movingAverage}</button>
+          <button onClick={() => handleClick(ServiceChartType.feeEstimate)}>{ServiceChartType.feeEstimate}</button>
         </div>
-        <ChartView2
-        />
-
+        <ChartView dataset={chartData} chartType={chartType} /> {/* Pass chartData as a prop */}
       </div>
     </div>
   );
 };
+
 export default App;

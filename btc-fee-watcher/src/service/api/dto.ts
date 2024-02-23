@@ -1,8 +1,8 @@
 import { r_500 } from "../../lib/logger/winston";
 import { filterError, parseRequest, respond } from "../../lib/http/handler";
-import { ServiceProvider } from "./service_provider";
+import { ApiService } from "./api";
 
-const serviceProvider = new ServiceProvider();
+const serviceProvider = new ApiService();
 
 export async function handleGetIndex(req, res) {
   const request = parseRequest(req);

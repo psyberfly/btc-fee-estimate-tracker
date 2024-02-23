@@ -13,9 +13,7 @@ RUN chown -R node:node /home/node/app
 USER node
 
 ENV SERVER_PORT=3561
-ENV SERVER_PATH="/service"
 ENV WSS_PORT=3572
-ENV WSS_PATH="/stream"
 
 # Install app dependencies
 RUN npm install

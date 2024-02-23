@@ -7,6 +7,7 @@ const port = process.env.SERVER_PORT;
 export default defineConfig({
   
   server: {
+    
     host:"0.0.0.0",
     port: port,
   },

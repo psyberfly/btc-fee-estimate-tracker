@@ -12,6 +12,11 @@ A docker compose service to run:
 3. use the CLI to setup, start the service.
 
 ## To Do:
+Dev:
+Charter:
+4. Responsive
+
+Watcher:
 1. Auth
 2. SSL for deployment
 3. DB seeding via Watcher (.csv?) Can this be API based instead of file?

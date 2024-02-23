@@ -1,0 +1,165 @@
+import { IChartDatasetOp, IndexResponse, ServiceChartType } from "./interface";
+
+// TODO : Add 365 Day data to index and moving average !!
+
+export class ChartDatasetOp implements IChartDatasetOp {
+  getFromData(
+    data: IndexResponse[],
+    kind: ServiceChartType,
+  ): object | Error {
+    switch (kind) {
+      case ServiceChartType.index:
+        return this.getIndexDataset(data);
+      case ServiceChartType.movingAverage:
+        return this.getMovingAverageDataset(data);
+      case ServiceChartType.feeEstimate:
+        return this.getFeeEstimateDataset(data);
+      default:
+        throw new Error("This functionality is not yet implemented.");
+    }
+  }
+  private getFeeEstimateDataset(data: IndexResponse[]) {
+    const dataSet: { x: Date; y: number }[] = [];
+
+    data.forEach((element) => {
+      dataSet.push({
+        x: element.currentFeeEstimate.time,
+        y: element.currentFeeEstimate.satsPerByte,
+      });
+    });
+
+    const dataset = {
+      datasets: [
+        {
+          fill: true,
+          gradient: {},
+
+          label: "All Time",
+          data: dataSet,
+          borderColor: "rgba(254, 112, 2)",
+        },
+      ],
+    };
+
+    return dataset;
+  }
+
+  private getMovingAverageDataset(data: IndexResponse[]) {
+    const dataSet30Day: { x: Date; y: number }[] = [];
+    const dataSet365Day: { x: Date; y: number }[] = [];
+
+    data.forEach((element) => {
+      dataSet30Day.push({
+        x: element.movingAverage.createdAt,
+        y: element.movingAverage.last30Days,
+      });
+      dataSet365Day.push({
+        x: element.movingAverage.createdAt,
+        y: element.movingAverage.last365Days,
+      });
+    });
+    const dataset = {
+      datasets: [
+        {
+          fill: true,
+          gradient: {},
+
+          label: "Last 30 days",
+          data: dataSet30Day,
+          borderColor: "rgb(254, 112, 2)",
+        },
+        {
+          fill: true,
+          gradient: {},
+
+          label: "Last 365 days",
+          data: dataSet365Day,
+          borderColor: "rgb(254, 112, 2)",
+        },
+      ],
+    };
+
+    return dataset;
+  }
+
+  private getIndexDataset(data: IndexResponse[]) {
+    const dataSet30Day: { x: Date; y: number }[] = [];
+    const dataSet365Day: { x: Date; y: number }[] = [];
+
+    data.forEach((element) => {
+      dataSet30Day.push({
+        x: element.timestamp,
+        y: element.feeEstimateMovingAverageRatio.last30Days,
+      });
+      dataSet365Day.push({
+        x: element.timestamp,
+        y: element.feeEstimateMovingAverageRatio.last365Days,
+      });
+    });
+
+    const dataset = {
+      datasets: [
+        {
+          //fill: true,
+          gradient: {
+            // backgroundColor: {
+            //   axis: "y",
+            //   colors: {
+            //     0: "rgba(0,255,0,0.3)",
+            //     1: "rgba(255,255,0,0.3)",
+            //     2: "rgba(255,0,0,0.3)",
+            //   },
+            // },
+            borderColor: {
+              axis: "y",
+              colors: {
+                0: "rgb(0,255,0)",
+                1: "rgb(255,255,0)",
+                2: "rgb(255,0,0)",
+              },
+            },
+          },
+          fill: {
+            value: 1,
+            above: "rgba(255,0,0,0.2)", // Area will be red above the origin
+            below: "rgba(0, 255, 0,0.2)",
+          },
+          label: "Last 30 days",
+          data: dataSet30Day,
+          // borderColor: "rgb(254, 112, 2)",
+        },
+        {
+          //fill: true,
+          gradient: {
+            // backgroundColor: {
+            //   axis: "y",
+            //   colors: {
+            //     0: "rgba(0,255,0,0.3)",
+            //     1: "rgba(255,255,0,0.3)",
+            //     2: "rgba(255,0,0,0.3)",
+            //   },
+            // },
+            borderColor: {
+              axis: "y",
+              colors: {
+                0: "rgb(0,255,0)",
+                1: "rgb(255,255,0)",
+                2: "rgb(255,0,0)",
+              },
+            },
+          },
+          fill: {
+            value: 1,
+            above: "rgba(255,0,0,0.2)", // Area will be red above the origin
+            below: "rgba(0, 255, 0,0.2)",
+          },
+          label: "Last 365 days",
+          data: dataSet365Day,
+          // borderColor: "rgb(254, 112, 2)",
+        },
+      ],
+    };
+
+    return dataset;
+  }
+}

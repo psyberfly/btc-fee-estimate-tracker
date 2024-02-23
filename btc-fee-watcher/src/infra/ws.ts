@@ -1,12 +1,12 @@
 import express from "express";
 import { Server as WebSocketServer } from "ws";
-import { TEN_MINUTES_MS } from "../lib/time/time";
-import { alertStreamPath } from "../service/service_provider/router";
+import { alertStreamPath } from "../service/api/router";
 import http from "http";
 import * as dotenv from "dotenv";
 import { handleError } from "../lib/errors/e";
-import { FeeIndex } from "@prisma/client";
-import { IndexResponse } from "../op/fee_index/interface";
+import { IndexResponse } from "../ops/fee_index/interface";
+import { indexWatchInterval } from "./index_watcher";
+import { msAsMinutes } from "../lib/time/time";
 dotenv.config();
 
 export class AlertStreamServer {
@@ -48,8 +48,10 @@ export class AlertStreamServer {
           client.close();
         }
 
+        const streamInterval = msAsMinutes(indexWatchInterval);
+
         client.send(
-          "Hello from BTC Fee Watcher! You are now streaming our index...",
+          `Hello from BTC Fee Watcher! You are now streaming our index. Interval: ${streamInterval}m`,
         );
         client.on("message", (message) => {
           console.log("WS message received:", message.toString());

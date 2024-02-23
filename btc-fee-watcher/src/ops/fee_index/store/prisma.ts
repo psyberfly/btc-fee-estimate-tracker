@@ -21,6 +21,7 @@ export class FeeIndexPrismaStore {
           last30Days: latestIndex.ratioLast30Days.toNumber(),
         },
         currentFeeEstimate: {
+          time: latestIndex.feeEstimate.time,
           satsPerByte: latestIndex.feeEstimate.satsPerByte.toNumber(),
         },
         movingAverage: {
@@ -56,6 +57,7 @@ export class FeeIndexPrismaStore {
             last30Days: index.ratioLast30Days.toNumber(),
           },
           currentFeeEstimate: {
+            time: index.feeEstimate.time,
             satsPerByte: index.feeEstimate.satsPerByte.toNumber(),
           },
           movingAverage: {

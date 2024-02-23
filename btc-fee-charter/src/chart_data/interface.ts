@@ -1,3 +1,9 @@
+export enum ServiceChartType {
+  index = "Fee Estimate Index",
+  movingAverage = "Moving Average",
+  feeEstimate = "Fee Estimate History"
+}
+
 export interface IndexResponse {
   timestamp: Date;
   feeEstimateMovingAverageRatio: {
@@ -5,6 +11,7 @@ export interface IndexResponse {
     last30Days: number;
   };
   currentFeeEstimate: {
+    time:Date;
     satsPerByte: number;
   };
   movingAverage: {
@@ -14,11 +21,15 @@ export interface IndexResponse {
   };
 }
 
-// export interface ChartData {
-//   datasets: {
-//     label: string;
-//     data: { x: Date; y: number }[]; // Here you might want to replace `{}` with a specific type for your data
-//     borderColor: string;
-//     backgroundColor: string;
-//   }[];
-// }
+export interface IDataOp {
+  //currently 1 year's data would be 13.4mb.
+  fetchAllTime(): Promise<IndexResponse[] | Error>;
+  // getByTimeRange(
+  //   fromDate: Date,
+  //   toDate: Date,
+  // ): Promise<object | Error>;
+}
+
+export interface IChartDatasetOp {
+  getFromData(data: IndexResponse[], kind:ServiceChartType): object | Error;
+}
