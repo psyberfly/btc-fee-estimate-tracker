@@ -9,14 +9,16 @@ const App = () => {
   const [allTimeData, setAllTimeData] = useState(null);
   const [chartType, setChartType] = useState(ServiceChartType.index);
   const [chartData, setChartData] = useState(null);
-  const [loading, setLoading] = useState(true); // State to track loading status
+  const [loading, setLoading] = useState(true);
+  const [lastRefreshed, setLastRefreshed] = useState(null); // State for last refreshed time
   const dataOp = new DataOp();
   const chartDataOp = new ChartDatasetOp();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        setLoading(true); // Set loading to true while fetching data
+        setLoading(true);
+        //this could be changed to WS instead of API?
         const data = await dataOp.fetchAllTime();
         if (data instanceof Error) {
           console.error(`Error fetching data.`);
@@ -29,19 +31,25 @@ const App = () => {
           throw defaultChartData;
         }
         setChartData(defaultChartData);
-        setLoading(false); // Set loading to false after data is fetched
+        setLoading(false);
+        updateLastRefreshed(); // Update last refreshed time after data is fetched
       } catch (error) {
         console.error("Error fetching data:", error);
-        setLoading(false); // Set loading to false in case of error
+        setLoading(false);
       }
     };
 
-    fetchData(); // Fetch data on component mount
+    fetchData();
 
-    const interval = setInterval(fetchData, 10 * 60 * 1000); // Fetch data every 10 minutes
+    const interval = setInterval(fetchData, 10 * 60 * 1000);
 
-    return () => clearInterval(interval); // Clean up interval on component unmount
+    return () => clearInterval(interval);
   }, []);
+
+  const updateLastRefreshed = () => {
+    const now = new Date();
+    setLastRefreshed(now); // Update last refreshed time with current Date object
+  };
 
   const handleClick = (selectedChartType) => {
     setChartType(selectedChartType);
@@ -59,6 +67,9 @@ const App = () => {
     <div>
       <div className="title-bar">
         <h1>BTC Fee Estimate Tracker</h1>
+        {lastRefreshed && (
+          <span style={{ marginLeft: 'auto' }}>Last updated: {lastRefreshed.toLocaleString()}</span>
+        )}
       </div>
       <div style={{ display: 'flex' }}>
         <div className="nav">
