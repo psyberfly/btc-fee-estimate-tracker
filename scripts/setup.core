@@ -7,15 +7,22 @@ cd $root_dir;
 
 env_file="$root_dir/.env"
 example_env_file="$root_dir/.example.env"
-. "$root_dir/scripts/seed_db.lib"
 
-#Install deps like Docker
+# Install deps like Docker
 
+# Function to prompt user for input and update or create environment variable
 prompt_user() {
     read -r -p "Enter value for $1: " value
-    echo "$1=$value" >>"$env_file"
+    if grep -q "^$1=" "$env_file"; then
+        # If the variable already exists, update its value
+        sed -i "s~^$1=.*~$1=$value~" "$env_file"
+    else
+        # If the variable doesn't exist, add it to the .env file
+        echo "$1=$value" >> "$env_file"
+    fi
 }
 
+# Copy example env file to .env
 cp "$example_env_file" "$env_file"
 
 echo "Please update the environment variables:"
