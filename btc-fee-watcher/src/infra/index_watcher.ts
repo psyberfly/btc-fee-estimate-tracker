@@ -94,7 +94,7 @@ export async function runIndexWatcher() {
 
       // update chart
     }, indexWatchInterval //change to ten mins for prod
-      //TEN_MINUTES_MS
+    
     );
   } catch (error) {
     console.error("Error starting server:", error);
