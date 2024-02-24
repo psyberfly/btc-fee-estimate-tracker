@@ -4,7 +4,7 @@ import { IDataOp, IndexResponse } from "./interface";
 export class DataOp implements IDataOp {
   async fetchAllTime(): Promise<IndexResponse[] | Error> {
     try {
-      const baseUrl = import.meta.env.VITE_FEE_WATCHER_API_URL;
+      const baseUrl = import.meta.env.VITE_FEE_WATCHER_PUBLIC_API_URL;
       const feeHistoryUrl = baseUrl + "/indexHistory";
       const res = await makeApiCall(
         feeHistoryUrl,

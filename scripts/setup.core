@@ -35,6 +35,7 @@ prompt_user "POSTGRES_VOLUME_PATH"
 prompt_user "WATCHER_SERVER_PORT"
 prompt_user "WATCHER_WSS_PORT"
 prompt_user "CHARTER_PORT"
+prompt_user "FEE_WATCHER_PUBLIC_API_URL"
 
 docker compose up --build --no-start -d 
 

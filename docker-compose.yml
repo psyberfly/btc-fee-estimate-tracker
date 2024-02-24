@@ -41,6 +41,9 @@ services:
       timeout: 10s
       start_period: 10s 
       retries: 3
+    environment:
+      VITE_FEE_WATCHER_PUBLIC_API_URL: ${FEE_WATCHER_PUBLIC_API_URL}
+
  
   postgres:
     image: postgres:16.1
