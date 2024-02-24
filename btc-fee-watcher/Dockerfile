@@ -1,33 +1,29 @@
 # Use an official Node.js runtime as the base image
 FROM node:18
 
-# Set the working directory in the container
-WORKDIR /home/node/app
+USER root
+ENV USER_ID=1300
+RUN usermod -u $USER_ID node
+RUN mkdir -p /home/node/app
+RUN mkdir -p /home/node/winston && mkdir /home/node/.keys
 
-# Copy package.json and package-lock.json (if available)
-COPY package*.json ./
+RUN openssl genrsa -out /home/node/.keys/sats_sig.pem 4096
+RUN openssl rsa -in /home/node/.keys/sats_sig.pem -outform PEM -pubout -out /home/node/.keys/sats_sig.pub
 
-# Change ownership of the working directory to the 'node' user
-RUN chown -R node:node /home/node/app
+RUN chown -R node /home/node/app /home/node/.keys /home/node/winston
+RUN npm install -g typescript mocha ts-node
+
 
 USER node
+WORKDIR /home/node/app
+COPY --chown=node:node package*.json ./
+RUN npm install
+COPY --chown=node:node . .
 
 ENV SERVER_PORT=3561
 ENV WSS_PORT=3572
 ENV PATH_TO_CSV="/home/node/app/assets/fee_estimate_history.csv"
 
-# Install app dependencies
-RUN npm install
-RUN npm install typescript
-
-# Define the health check command
-HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-CMD curl -f http://localhost:3561/ || exit 1
-
-# Copy app source
-COPY --chown=node:node . .
-
-# Expose the port the app runs on
 EXPOSE 3561
 EXPOSE 3572
 

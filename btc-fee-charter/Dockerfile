@@ -13,6 +13,7 @@ RUN chown -R node:node /home/node/app
 USER node
 
 ENV SERVER_PORT=3583
+ENV VITE_FEE_WATCHER_API_URL="http://localhost:3561/api/v1"
 
 # Install app dependencies
 RUN npm install

@@ -30,13 +30,7 @@ export class AlertStreamServer {
         path,
       });
 
-      function broadcastAlert(data: string) {
-        AlertStreamServer.alertStreamServer.clients.forEach((client) => {
-          client.send(data);
-        });
-      }
-
-      AlertStreamServer.alertStreamServer.on("connection", (client, req) => {
+        AlertStreamServer.alertStreamServer.on("connection", (client, req) => {
         console.log("WS connection opened");
         const servicePath = req.url.split("?service=")[1];
         //Currently we broadcast to all subscribers if they stream to the offered service, since only 1 service is offered.

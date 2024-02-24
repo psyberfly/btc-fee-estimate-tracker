@@ -59,7 +59,7 @@ export class MovingAverageOp implements IMovingAverageOp {
         0,
       );
 
-      const monthlyAverage = monthlySum / feeHistoryLastYear.length;
+      const monthlyAverage = monthlySum / feeHistoryLastMonth.length;
 
       const update: MovingAverage = {
         id: null, //Added by DB
