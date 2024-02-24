@@ -9,92 +9,104 @@ import { AlertStreamServer } from "./ws";
 export const indexWatchInterval = TEN_MINUTES_MS;
 export const movingAverageWatchInterval = ONE_DAY_MS;
 
+const movingAverageOp = new MovingAverageOp();
+const feeOp = new FeeOp();
+const indexOp = new IndexOp();
+
+async function updateMovingAverage() {
+  console.log("Updating Moving Average...");
+  const today = new Date().toISOString();
+  const isExistMovingAvgToday = await movingAverageOp.checkExists(today);
+
+  if (!isExistMovingAvgToday) {
+    console.log("Creating Moving Average for today...");
+    const isMovingAvgCreated = await movingAverageOp.create();
+
+    if (isMovingAvgCreated instanceof Error) {
+      console.error("Error creating Moving Average!");
+      return handleError(isMovingAvgCreated);
+    }
+  } else {
+    console.log("Moving Average already exists for today.");
+  }
+  return true;
+}
+
+async function udpateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
+  console.log("Updating latest Fee Estimate...");
+  // fetch current fee estimate and update DB
+  const currentFeeEstimate = await feeOp.updateCurrent();
+  if (currentFeeEstimate instanceof Error) {
+    console.error("Error updating Fee Estimate!");
+    return handleError(currentFeeEstimate);
+  }
+  console.log("Fee Estimate updated.");
+  console.log("Updating latest Index...");
+  // calculate index and update DB
+  const isIndexUpdated = await indexOp.udpateIndex();
+
+  if (isIndexUpdated instanceof Error) {
+    console.error("Error updating Index!");
+    return handleError(isIndexUpdated);
+  }
+  console.log("Index updated.");
+  const latestIndex = await indexOp.readLatest();
+
+  if (latestIndex instanceof Error) {
+    return handleError(latestIndex);
+  }
+  console.log("Broadcasting Index alert...");
+
+  const isAlertBroadcast = alertStreamServer.broadcastAlert(latestIndex);
+  if (isAlertBroadcast instanceof Error) {
+    console.error("Error broadcasting index alert!");
+    return handleError(latestIndex);
+  }
+  console.log("Index alert broadcasted");
+
+}
+
+async function seedDb() {
+  const csvFilePath = process.env.PATH_TO_CSV;
+
+  const feeHistory = await getFeeEstimateHistoryFromCsv(csvFilePath);
+  if (feeHistory instanceof Error) {
+    console.error(
+      `Error reading Fee Estimate history from .csv!: ${feeHistory}`,
+    );
+  }
+
+  const isHistorySeeded = await feeOp.seedHistory(feeHistory);
+
+  if (isHistorySeeded instanceof Error) {
+    console.error(
+      `Error seeding Fee Estimate history to DB!: ${isHistorySeeded}`,
+    );
+  } else {
+    console.log("Fee Estimate History seeded from .csv.");
+  }
+}
+
 export async function runIndexWatcher() {
   try {
-    const feeOp = new FeeOp();
-    const movingAverageOp = new MovingAverageOp();
-    const indexOp = new IndexOp();
-
     const port: string = process.env.WSS_PORT;
     const baseApiRoute = "/api/v1";
     const alertStreamServer = new AlertStreamServer(port, baseApiRoute);
 
-    const csvFilePath = process.env.PATH_TO_CSV;
-
-    const feeHistory = await getFeeEstimateHistoryFromCsv(csvFilePath);
-    if (feeHistory instanceof Error) {
-      console.error(
-        `Error reading Fee Estimate history from .csv!: ${feeHistory}`,
-      );
-    }
-
-    const isHistorySeeded = await feeOp.storeHistoric(feeHistory);
-
-    if (isHistorySeeded instanceof Error) {
-      console.error(
-        `Error seeding Fee Estimate history to DB!: ${isHistorySeeded}`,
-      );
-    } else {
-      console.log("Fee Estimate History seeded from .csv.");
-    }
+    //At server start:
+    await seedDb();
+    //Calculate moving average once at onset, else fee index cant be computed until 24hours:
+    await updateMovingAverage();
 
     // every day:
     setInterval(async () => {
-      console.log("Updating Moving Average...");
-      const today = new Date().toISOString();
-      const isExistMovingAvgToday = await movingAverageOp.checkExists(today);
-
-      if (!isExistMovingAvgToday) {
-        console.log("Creating Moving Average for today...");
-        const isMovingAvgCreated = await movingAverageOp.create();
-
-        if (isMovingAvgCreated instanceof Error) {
-          console.error("Error creating Moving Average!");
-          return handleError(isMovingAvgCreated);
-        }
-        // update chart
-      } else {
-        console.log("Moving Average already exists for today.");
-      }
-    }, movingAverageWatchInterval //change to 24 hours for prod
-    );
+      await updateMovingAverage();
+    }, movingAverageWatchInterval);
 
     // every 10 mins (block):
     setInterval(async () => {
-      console.log("Updating latest Fee Estimate...");
-      // fetch current fee estimate and update DB
-      const currentFeeEstimate = await feeOp.updateCurrent();
-      if (currentFeeEstimate instanceof Error) {
-        console.error("Error updating Fee Estimate!");
-        return handleError(currentFeeEstimate);
-      }
-      console.log("Fee Estimate updated.");
-      console.log("Updating latest Index...");
-      // calculate index and update DB
-      const isIndexUpdated = await indexOp.udpateIndex();
-
-      if (isIndexUpdated instanceof Error) {
-        console.error("Error updating Index!");
-        return handleError(isIndexUpdated);
-      }
-      console.log("Index updated.");
-      const latestIndex = await indexOp.readLatest();
-
-      if (latestIndex instanceof Error) {
-        return handleError(latestIndex);
-      }
-      console.log("Broadcasting Index alert...");
-
-      const isAlertBroadcast = alertStreamServer.broadcastAlert(latestIndex);
-      if (isAlertBroadcast instanceof Error) {
-        console.error("Error broadcasting index alert!");
-        return handleError(latestIndex);
-      }
-      console.log("Index alert broadcasted");
-
-      // update chart
+      udpateAndBroadcastIndex(alertStreamServer);
     }, indexWatchInterval //change to ten mins for prod
-    
     );
   } catch (error) {
     console.error("Error starting server:", error);

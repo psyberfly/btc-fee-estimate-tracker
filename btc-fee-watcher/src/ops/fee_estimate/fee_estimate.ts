@@ -63,7 +63,16 @@ export class FeeOp implements IFeeEstimateOp {
     return true;
   }
 
-  async storeHistoric(history: FeeEstimate[]): Promise<boolean | Error> {
+  async seedHistory(history: FeeEstimate[]): Promise<boolean | Error> {
+    const count = await this.store.checkCount();
+    if (count instanceof Error) {
+      return handleError(count);
+    }
+
+    if (count > 0) {
+    return handleError(Error(`Error seeding DB: FeeEstimate table is not empty. Row count: ${count}. Aborting seeding.`));
+    }
+
     const res = await this.store.insertMany(history);
     if (res instanceof Error) {
       return handleError(res);

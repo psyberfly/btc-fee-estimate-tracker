@@ -5,5 +5,5 @@ export interface IFeeEstimateOp {
   readLast30Days(): Promise<FeeEstimate[] | Error>;
   readLatest(): Promise<FeeEstimate | Error>;
   updateCurrent(): Promise<boolean | Error>;
-  storeHistoric(history: FeeEstimate[]): Promise<boolean | Error>;
+  seedHistory(history: FeeEstimate[]): Promise<boolean | Error>;
 }

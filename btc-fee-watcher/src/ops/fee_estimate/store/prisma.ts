@@ -18,6 +18,7 @@ export class FeeEstimatePrismaStore {
       return handleError(e);
     }
   }
+  
 
   async insert(rowData: FeeEstimate): Promise<boolean | Error> {
     try {
@@ -67,6 +68,16 @@ export class FeeEstimatePrismaStore {
       }));
     } catch (error) {
       return handleError(error);
+    }
+  }
+
+  async checkCount(): Promise<number | Error> {
+    try {
+      const res = await prisma.feeEstimate.count(); 
+
+      return res;
+    } catch (e) {
+      return handleError(e);
     }
   }
 }
