@@ -5,12 +5,13 @@ import cors from "cors";
 import * as dotenv from "dotenv";
 dotenv.config();
 
+const app = express();
+
 export async function runServer() {
   try {
-    const app = express();
     const port: string = process.env.SERVER_PORT;
     const baseApiRoute = "/api/v1";
-    //used for btc-fee-watcher 
+    //used for btc-fee-watcher
     app.use(cors());
     app.use(baseApiRoute, serviceRouter);
 
@@ -29,3 +30,5 @@ export async function runServer() {
     process.exit(1);
   }
 }
+
+export default app;
