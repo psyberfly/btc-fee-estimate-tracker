@@ -6,6 +6,7 @@ function core.setup(){
 cd $root_dir;
 
 env_file="$root_dir/.env"
+touch "$env_file"
 example_env_file="$root_dir/.example.env"
 
 # Install deps like Docker
