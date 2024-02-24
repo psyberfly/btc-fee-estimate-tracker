@@ -97,7 +97,8 @@ export async function runIndexWatcher() {
     await seedDb();
     //Calculate moving average once at onset, else fee index cant be computed until 24hours:
     await updateMovingAverage();
-
+    //Calculate index once at onset
+    await udpateAndBroadcastIndex(alertStreamServer);
     // every day:
     setInterval(async () => {
       await updateMovingAverage();
