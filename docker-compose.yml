@@ -36,13 +36,11 @@ services:
     depends_on:
       - postgres
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:3561/api/v1 || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:3583 || exit 1"]
       interval: 30s
       timeout: 10s
       start_period: 10s 
       retries: 3
-    environment:
-      ENV VITE_FEE_WATCHER_API_URL: "http://localhost:3583/api/v1"
  
   postgres:
     image: postgres:16.1
