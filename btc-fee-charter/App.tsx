@@ -10,7 +10,9 @@ const App = () => {
   const [chartType, setChartType] = useState(ServiceChartType.index);
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
-  const [lastRefreshed, setLastRefreshed] = useState(null); // State for last refreshed time
+  const [errorLoading, setErrorLoading] = useState(false);
+
+  const [lastUpdated, setLastUpdated] = useState(null); // State for last refreshed time
   const dataOp = new DataOp();
   const chartDataOp = new ChartDatasetOp();
 
@@ -19,23 +21,25 @@ const App = () => {
       try {
         setLoading(true);
         //this could be changed to WS instead of API?
-        const data = await dataOp.fetchAllTime();
-        if (data instanceof Error) {
+        const dataRes = await dataOp.fetchAllTime();
+        if (dataRes instanceof Error) {
           console.error(`Error fetching data.`);
-          throw data;
+          throw dataRes;
         }
-        setAllTimeData(data);
-        const defaultChartData = chartDataOp.getFromData(data, ServiceChartType.index);
+        setAllTimeData(dataRes.data);
+        const defaultChartData = chartDataOp.getFromData(dataRes.data, ServiceChartType.index);
         if (defaultChartData instanceof Error) {
-          console.error(`Error getting default chart data.`);
+          console.error(`Error getting chart dataset from data.`);
           throw defaultChartData;
         }
         setChartData(defaultChartData);
         setLoading(false);
-        updateLastRefreshed(); // Update last refreshed time after data is fetched
+        setErrorLoading(false);
+        updateLastUpdated(new Date(dataRes.lastUpdated)); 
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error("Error setting data:", error);
         setLoading(false);
+        setErrorLoading(true);
       }
     };
 
@@ -46,9 +50,8 @@ const App = () => {
     return () => clearInterval(interval);
   }, []);
 
-  const updateLastRefreshed = () => {
-    const now = new Date();
-    setLastRefreshed(now); // Update last refreshed time with current Date object
+  const updateLastUpdated = (lastUpdated) => {
+    setLastUpdated(lastUpdated); // Update last refreshed time with current Date object
   };
 
   const handleClick = (selectedChartType) => {
@@ -67,8 +70,8 @@ const App = () => {
     <div>
       <div className="title-bar">
         <h1>BTC Fee Estimate Tracker</h1>
-        {lastRefreshed && (
-          <span style={{ marginLeft: 'auto' }}>Last updated: {lastRefreshed.toLocaleString()}</span>
+        {lastUpdated && (
+          <span style={{ marginLeft: 'auto' }}>Last updated: {lastUpdated.toLocaleString()}</span>
         )}
       </div>
       <div style={{ display: 'flex' }}>
@@ -78,8 +81,10 @@ const App = () => {
           <button onClick={() => handleClick(ServiceChartType.movingAverage)}>{ServiceChartType.movingAverage}</button>
           <button onClick={() => handleClick(ServiceChartType.feeEstimate)}>{ServiceChartType.feeEstimate}</button>
         </div>
-        {loading ? (
-          <div>Loading...</div>
+        {errorLoading ? (
+          <div className="banner-error">Error loading data. Please try again later.</div>
+        ) : loading ? (
+          <div className="banner-loading">Loading...</div>
         ) : (
           <ChartView dataset={chartData} chartType={chartType} />
         )}

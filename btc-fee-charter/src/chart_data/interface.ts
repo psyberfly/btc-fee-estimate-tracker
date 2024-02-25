@@ -21,9 +21,14 @@ export interface IndexResponse {
   };
 }
 
+export interface DataResponse{
+  data: IndexResponse[],
+  lastUpdated: Date;
+}
+
 export interface IDataOp {
   //currently 1 year's data would be 13.4mb.
-  fetchAllTime(): Promise<IndexResponse[] | Error>;
+  fetchAllTime(): Promise<DataResponse | Error>;
   // getByTimeRange(
   //   fromDate: Date,
   //   toDate: Date,

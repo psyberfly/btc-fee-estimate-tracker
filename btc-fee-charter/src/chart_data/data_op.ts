@@ -1,8 +1,8 @@
 import { makeApiCall } from "../lib/network/network";
-import { IDataOp, IndexResponse } from "./interface";
+import { DataResponse, IDataOp, IndexResponse } from "./interface";
 
 export class DataOp implements IDataOp {
-  async fetchAllTime(): Promise<IndexResponse[] | Error> {
+  async fetchAllTime(): Promise<DataResponse | Error> {
     try {
       const baseUrl = import.meta.env.VITE_FEE_WATCHER_PUBLIC_API_URL;
       const feeHistoryUrl = baseUrl + "/indexHistory";
@@ -27,7 +27,7 @@ export class DataOp implements IDataOp {
           },
           currentFeeEstimate: {
             satsPerByte: element["currentFeeEstimate"]["satsPerByte"],
-            time: element["currentFeeEstimate"]["time"]
+            time: element["currentFeeEstimate"]["time"],
           },
           movingAverage: {
             createdAt: element["movingAverage"]["createdAt"],
@@ -35,10 +35,17 @@ export class DataOp implements IDataOp {
             last30Days: element["movingAverage"]["last30Days"],
           },
         };
-
         data.push(feeIndex);
       });
-      return data;
+
+      const dataLastUpdated = data[0].timestamp;
+
+      const dataRes: DataResponse = {
+        data: data,
+        lastUpdated: dataLastUpdated,
+      };
+
+      return dataRes;
     } catch (e) {
       return e;
     }

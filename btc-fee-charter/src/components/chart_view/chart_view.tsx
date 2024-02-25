@@ -12,7 +12,7 @@ Chart.defaults.elements.point.radius = 0;
 Chart.defaults.elements.line.borderWidth = 1.5;
 Chart.defaults.elements.line.tension = 0;
 Chart.defaults.scales.time.adapters.date = { "timezone": "UTC" };
-Chart.defaults.backgroundColor = "rgba(0,255,0,0.2)";
+// Chart.defaults.backgroundColor = "rgba(0,255,0,0.2)";
 Chart.defaults.scale.ticks.color = "rgb(255,255,255)";
 Chart.defaults.scale.grid.color = "rgba(199, 199, 199, 0.2)";
 const titleColor = "rgb(211, 211, 211)";
@@ -61,7 +61,7 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
         yMax = Math.ceil(yMaxInDataset);
     }
     else if (yMaxInDataset >= 10 && yMaxInDataset <= 100) {
-        yMax = (Math.ceil(yMaxInDataset / 10) * 10) + 5;
+        yMax = (Math.ceil(yMaxInDataset / 10) * 10) + 10;
         // Round up to the next whole multiple of 1
     }
     else if (yMaxInDataset >= 100 && yMaxInDataset <= 1000) {
@@ -80,21 +80,21 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
             yMax = yMax;
             yText = "current fee est / moving average";
             title = "Fee Estimate Index"
-            subtitle = "current fee estimate / fee estimate moving average";
+            subtitle = "current fee estimate/fee estimate moving average";
             break;
         case ServiceChartType.movingAverage:
             yMin = 0;
             yMax = yMax;
             yText = "sats/B";
             title = "Fee Estimate Moving Average"
-            subtitle = "30 Day Moving Average";
+            subtitle = "sum(last n days fee estimates)/count(last n days fee estimates)";
             break;
         case ServiceChartType.feeEstimate:
             yMin = 0;
             yMax = yMax;
             yText = "sats/B";
             title = "Fee Estimate History"
-            subtitle = "mempool.space";
+            subtitle = "mempool.space (fastest/1-2 blocks)";
             break;
 
     }
@@ -202,14 +202,7 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
         },
 
         plugins: {
-            crosshair: {
-                sync: {
-                    enabled: false
-                },
-                zoom: {
-                    enabled: false
-                }
-            },
+
             title: {
                 display: true,
                 position: "top" as const,
@@ -234,12 +227,9 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
                     size: 14,
                 },
             },
-            // interaction: {
-            //     mode: "x" as const,
-            // },
             tooltip: {
                 enabled: true,
-                //mode: 'interpolate',
+                mode: 'index',
                 intersect: false
             },
             legend: {
@@ -248,8 +238,11 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
                 position: "bottom" as const,
 
                 labels: {
+                    font: {
+                        family: "Courier New, monospace"
+                    },
                     color: secondaryColor,
-                    pointStyleWidth: 40,
+                    pointStyleWidth: 30,
                     usePointStyle: true,
                     pointStyle: "rectRounded" as const,
                 },
@@ -258,19 +251,21 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
                 lineWidth: 1.5 as const,
                 lineColor: "rgba(255, 0, 0, 0.75)" as const,
             },
-            // annotation: {
-            //     annotations: {
-            //         line1: {
-            //             type: "line" as const,
-            //             yMin: 1,
-            //             yMax: 1,
-            //             borderColor: secondaryColor,
-            //             borderWidth: 1,
-            //         },
-            //     },
-            // },
-            //filler: {},
-            gradient: {},
+            annotation:
+                chartType == ServiceChartType.index ?
+                    {
+                        annotations: {
+                            line1: {
+                                type: "line" as const,
+                                yMin: 1,
+                                yMax: 1,
+                                borderColor: "rgba(255,255,255,0.75)",
+                                borderWidth: 1,
+                            },
+                        },
+                    } : {},
+            filler: {},
+            //gradient: {},
         }
     }
 };
@@ -319,7 +314,6 @@ const ChartView = ({ dataset, chartType }) => {
         if (chartInstance) {
             const yMaxInDataset: number = Math.max(...dataset.datasets.flatMap(dataset => dataset.data.map(dataPoint => dataPoint.y)));
             const updatedOptions = defaultChartOptions(chartType, yMaxInDataset, selectedScale);
-            //updatedOptions.scales!.x!["time"]["unit"] = selectedScale;
             chartInstance.options = updatedOptions;
             chartInstance.update();
         }

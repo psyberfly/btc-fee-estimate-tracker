@@ -3,7 +3,6 @@
   --secondary-color: #6c757d;
   --secondary-color-dark: #3d4246;
   --bg-color: rgb(20, 22, 24);
-  --chart-view-bg-color: rgb(35, 36, 41);
   --text-color: rgb(211, 211, 211);
   --text-color-secondary: rgb(190, 190, 190);
   --hover-color: rgb(13, 150, 255);
@@ -14,7 +13,7 @@ body {
   font-family: 'Courier New', monospace;
   margin: 0;
   padding: 0;
-  background-color: rgb(31, 31, 31);
+  background-color: var(--bg-color);
 }
 
 h1 {
@@ -35,6 +34,24 @@ span {
   color: var(--text-color-secondary);
   font-size: 14px;
 
+}
+
+select {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--text-color);
+  font-family: 'Courier New', monospace;
+  font-size: 14px;
+  background-color: var(--chart-view-bg-color);
+  border-radius: 4px;
+  border-color: var(--secondary-color);
+  padding: 5px;
+  align-items: center;
+}
+
+label {
+  color: aqua
 }
 
 button {
@@ -69,8 +86,8 @@ button:hover {
   display: flex;
   flex-direction: column;
   height: 100vh;
-  border-right: 1px solid var(--secondary-color-dark);
-  box-shadow: 10px 10px 20px -30px rgba(0, 0, 0, 0.3), 4px 0px 6px -2px rgba(200, 200, 200, 0.1);
+  border-right: 1.5px solid var(--secondary-color-dark);
+  /* box-shadow: 10px 10px 20px -30px rgba(0, 0, 0, 0.3), 4px 0px 6px -2px rgba(200, 200, 200, 0.1); */
 }
 
 
@@ -82,16 +99,14 @@ button:hover {
   background: var(--bg-color);
   padding: 1px 10px;
   text-align: left;
-  box-shadow: 10px 10px 20px -30px rgba(0, 0, 0, 0.3), 0px 4px 6px -2px rgba(200, 200, 200, 0.1);
-  border-bottom: 1px solid var(--secondary-color-dark);
+  /* box-shadow: 10px 10px 20px -30px rgba(0, 0, 0, 0.3), 0px 4px 6px -2px rgba(200, 200, 200, 0.1); */
+  border-bottom: 1.5px solid var(--secondary-color-dark);
   display: flex;
   justify-content: space-between;
   /* Aligns items to each end of the container */
 }
 
-label {
-  color:aqua
-}
+
 
 .title-bar span {
   color: var(--text-color-secondary);
@@ -115,16 +130,28 @@ label {
   position: relative;
 }
 
-select {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  color: var(--text-color);
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
-  background-color: var(--chart-view-bg-color);
-  border-radius: 4px;
-  border-color: var(--secondary-color);
-  padding: 5px;
+.banner-error {
+  display: flex;
+  justify-content: center;
+  /* Horizontally center */
   align-items: center;
+  /* Vertically center */
+  text-align: center;
+  /* Horizontally center */
+  color: rgb(255, 0, 0);
+  width: 100%;
+  /* Ensure the container takes up the full width */
+}
+
+.banner-loading {
+  display: flex;
+  justify-content: center;
+  /* Horizontally center */
+  align-items: center;
+  /* Vertically center */
+  text-align: center;
+  /* Horizontally center */
+  color: var(--text-color);
+  width: 100%;
+  /* Ensure the container takes up the full width */
 }

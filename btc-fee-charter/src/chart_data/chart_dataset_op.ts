@@ -31,12 +31,14 @@ export class ChartDatasetOp implements IChartDatasetOp {
     const dataset = {
       datasets: [
         {
-          fill: true,
+          //fill: true,
           gradient: {},
 
           label: "All Time",
           data: dataSet,
-          borderColor: "rgba(254, 112, 2)",
+          borderColor: "rgb(254, 112, 2)",
+          pointBorderColor: "rgba(0, 0, 0, 1)", 
+          pointBackgroundColor: "rgb(254, 112, 2)",
         },
       ],
     };
@@ -61,12 +63,14 @@ export class ChartDatasetOp implements IChartDatasetOp {
     const dataset = {
       datasets: [
         {
-          fill: true,
+          //fill: true,
           gradient: {},
 
           label: "Last 30 days",
           data: dataSet30Day,
           borderColor: "rgb(254, 112, 2)",
+          pointBorderColor: "rgba(0, 0, 0, 1)", 
+          pointBackgroundColor: "rgb(254, 112, 2)",
         },
         {
           fill: true,
@@ -74,7 +78,9 @@ export class ChartDatasetOp implements IChartDatasetOp {
 
           label: "Last 365 days",
           data: dataSet365Day,
-          borderColor: "rgb(254, 112, 2)",
+          borderColor: "rgb(0,228, 255)",
+          pointBorderColor: "rgba(0, 0, 0, 1)", // This will be the border color of the points
+          pointBackgroundColor: "rgba(75, 192, 192, 1)", // This will be the fill color of the points
         },
       ],
     };
@@ -101,32 +107,34 @@ export class ChartDatasetOp implements IChartDatasetOp {
       datasets: [
         {
           //fill: true,
-          gradient: {
-            // backgroundColor: {
-            //   axis: "y",
-            //   colors: {
-            //     0: "rgba(0,255,0,0.3)",
-            //     1: "rgba(255,255,0,0.3)",
-            //     2: "rgba(255,0,0,0.3)",
-            //   },
-            // },
-            borderColor: {
-              axis: "y",
-              colors: {
-                0: "rgb(0,255,0)",
-                1: "rgb(255,255,0)",
-                2: "rgb(255,0,0)",
-              },
-            },
-          },
+          // gradient: {
+          //   // backgroundColor: {
+          //   //   axis: "y",
+          //   //   colors: {
+          //   //     0: "rgba(0,255,0,0.3)",
+          //   //     1: "rgba(255,255,0,0.3)",
+          //   //     2: "rgba(255,0,0,0.3)",
+          //   //   },
+          //   // },
+          //   borderColor: {
+          //     axis: "y",
+          //     colors: {
+          //       0: "rgb(0,255,0)",
+          //       1: "rgb(255,255,0)",
+          //       2: "rgb(255,0,0)",
+          //     },
+          //   },
+          // },
           fill: {
             value: 1,
-            above: "rgba(255,0,0,0.2)", // Area will be red above the origin
-            below: "rgba(0, 255, 0,0.2)",
+            above: "rgba(255,0,0,0.1)", // Area will be red above the origin
+            below: "rgba(0, 255, 0,0.1)",
           },
           label: "Last 30 days",
           data: dataSet30Day,
-          // borderColor: "rgb(254, 112, 2)",
+          borderColor: "rgb(254, 112, 2)",
+          pointBorderColor: "rgba(0, 0, 0, 1)", 
+          pointBackgroundColor: "rgb(254, 112, 2)",
         },
         {
           //fill: true,
@@ -139,23 +147,25 @@ export class ChartDatasetOp implements IChartDatasetOp {
             //     2: "rgba(255,0,0,0.3)",
             //   },
             // },
-            borderColor: {
-              axis: "y",
-              colors: {
-                0: "rgb(0,255,0)",
-                1: "rgb(255,255,0)",
-                2: "rgb(255,0,0)",
-              },
-            },
+            // borderColor: {
+            //   axis: "y",
+            //   colors: {
+            //     0: "rgb(0,255,0)",
+            //     1: "rgb(255,255,0)",
+            //     2: "rgb(255,0,0)",
+            //   },
+            // },
           },
           fill: {
             value: 1,
-            above: "rgba(255,0,0,0.2)", // Area will be red above the origin
-            below: "rgba(0, 255, 0,0.2)",
+            above: "rgba(255,0,0,0.1)", // Area will be red above the origin
+            below: "rgba(0, 255, 0,0.1)",
           },
           label: "Last 365 days",
           data: dataSet365Day,
-          // borderColor: "rgb(254, 112, 2)",
+          borderColor: "rgb(0,228, 255)",
+          pointBorderColor: "rgba(0, 0, 0, 1)", // This will be the border color of the points
+          pointBackgroundColor: "rgba(75, 192, 192, 1)", // This will be the fill color of the points
         },
       ],
     };
