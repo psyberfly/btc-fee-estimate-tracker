@@ -11,7 +11,7 @@ export function minutesAsMs(minutes: number): number {
 }
 
 export function msAsMinutes(ms: number): number {
-    return ms * (1 / 10000) * (1 / 60);
+    return ms * (1 / 1000) * (1 / 60);
 }
 export class S5Times implements TimeInterface {
     convertUnixToGlobal(timestamp: number): GlobalTimes | Error {

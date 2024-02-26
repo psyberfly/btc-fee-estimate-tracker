@@ -1,11 +1,30 @@
 import { Router } from "express";
-import { handleGetIndex, handleGetIndexHistory, handleGetFeeEstimateHistory } from "./dto";
-export const router = Router();
+import {
+  handleGetFeeEstimateHistory,
+  handleGetIndex,
+  handleGetIndexHistory,
+} from "./dto";
+import * as dotenv from "dotenv";
+dotenv.config();
 
+export const router = Router();
 export const alertStreamPath = "index";
 
-router.get("/index", handleGetIndex);
-router.get("/indexHistory", handleGetIndexHistory);
-router.get("/feeEstimateHistory", handleGetFeeEstimateHistory);
+// Middleware for API key authentication
+const authenticateAPIKey = (req, res, next) => {
+  const apiKey = req.headers["x-api-key"];
 
+  if (apiKey == null) return res.sendStatus(401);
 
+  if (apiKey !== process.env.API_KEY) return res.sendStatus(403);
+
+  next();
+};
+
+router.get("/index", authenticateAPIKey, handleGetIndex);
+router.get("/indexHistory", authenticateAPIKey, handleGetIndexHistory);
+router.get(
+  "/feeEstimateHistory",
+  authenticateAPIKey,
+  handleGetFeeEstimateHistory,
+);

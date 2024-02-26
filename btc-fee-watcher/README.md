@@ -27,10 +27,10 @@ or as standalone by:
 ## Test:
 Start service then test from terminal:  
 ### API: 
-   curl http://localhost:3561/api/v1/index
+    curl -H "x-api-key: my-api-key" http://localhost:3561/api/v1/index
 ### WS: 
 Using websocat:
-   websocat -H="Accept: application/json" -H="Content-Type: application/json" ws://localhost:3572/api/v1?service=index
+   websocat -H="Accept: application/json" -H="Content-Type: application/json" "ws://localhost:3572/api/v1?apiKey=my-api-key&service=index"
 
 ## WIP:
 

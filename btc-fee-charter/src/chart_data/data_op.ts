@@ -1,3 +1,4 @@
+import { AxiosHeaders } from "axios";
 import { makeApiCall } from "../lib/network/network";
 import {
   FeeEstimate,
@@ -7,13 +8,16 @@ import {
 } from "./interface";
 
 export class DataOp implements IDataOp {
+  private baseUrl = import.meta.env.VITE_FEE_WATCHER_PUBLIC_API_URL;
+  private apiKey = import.meta.env.VITE_FEE_WATCHER_API_KEY;
+
   async fetchFeeEstimateHistory(): Promise<FeeEstimate[] | Error> {
     try {
-      const baseUrl = import.meta.env.VITE_FEE_WATCHER_PUBLIC_API_URL;
-      const feeHistoryUrl = baseUrl + "/feeEstimateHistory";
+      const feeHistoryUrl = this.baseUrl + "/feeEstimateHistory";
       const res = await makeApiCall(
         feeHistoryUrl,
         "GET",
+        AxiosHeaders.from(`x-api-key: ${this.apiKey}`),
       );
 
       if (res instanceof Error) {
@@ -38,11 +42,11 @@ export class DataOp implements IDataOp {
 
   async fetchIndexHistory(): Promise<IndexDataResponse | Error> {
     try {
-      const baseUrl = import.meta.env.VITE_FEE_WATCHER_PUBLIC_API_URL;
-      const feeHistoryUrl = baseUrl + "/indexHistory";
+      const feeHistoryUrl = this.baseUrl + "/indexHistory";
       const res = await makeApiCall(
         feeHistoryUrl,
         "GET",
+        AxiosHeaders.from(`x-api-key: ${this.apiKey}`),
       );
 
       if (res instanceof Error) {
