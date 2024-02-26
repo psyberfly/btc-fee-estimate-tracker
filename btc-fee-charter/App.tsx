@@ -6,7 +6,8 @@ import { ChartDatasetOp } from './src/chart_data/chart_dataset_op';
 import { ServiceChartType } from './src/chart_data/interface';
 
 const App = () => {
-  const [allTimeData, setAllTimeData] = useState(null);
+  const [indexHistoryData, setIndexHistoryData] = useState(null);
+  const [feeEstimateHistoryData, setFeeEstimateHistoryData] = useState(null);
   const [chartType, setChartType] = useState(ServiceChartType.index);
   const [chartData, setChartData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -21,13 +22,24 @@ const App = () => {
       try {
         setLoading(true);
         //this could be changed to WS instead of API?
-        const dataRes = await dataOp.fetchAllTime();
-        if (dataRes instanceof Error) {
-          console.error(`Error fetching data.`);
-          throw dataRes;
+        const indexData = await dataOp.fetchIndexHistory();
+
+        if (indexData instanceof Error) {
+          console.error(`Error fetching index data.`);
+          throw indexData;
         }
-        setAllTimeData(dataRes.data);
-        const defaultChartData = chartDataOp.getFromData(dataRes.data, ServiceChartType.index);
+
+        const feeEstimateData = await dataOp.fetchFeeEstimateHistory();
+
+        if (feeEstimateData instanceof Error) {
+          console.error(`Error fetching fee estimate data`);
+          throw feeEstimateData;
+        }
+
+        setIndexHistoryData(indexData.data);
+        setFeeEstimateHistoryData(feeEstimateData);
+
+        const defaultChartData = chartDataOp.getFromData(indexData.data, ServiceChartType.index);
         if (defaultChartData instanceof Error) {
           console.error(`Error getting chart dataset from data.`);
           throw defaultChartData;
@@ -35,7 +47,7 @@ const App = () => {
         setChartData(defaultChartData);
         setLoading(false);
         setErrorLoading(false);
-        updateLastUpdated(new Date(dataRes.lastUpdated)); 
+        updateLastUpdated(new Date(indexData.lastUpdated));
       } catch (error) {
         console.error("Error setting data:", error);
         setLoading(false);
@@ -56,14 +68,28 @@ const App = () => {
 
   const handleClick = (selectedChartType) => {
     setChartType(selectedChartType);
+    let chartData;
 
-    if (!allTimeData) {
-      console.error("Data not available yet");
-      return;
+    switch (selectedChartType) {
+      case ServiceChartType.index:
+      case ServiceChartType.movingAverage:
+        if (!indexHistoryData) {
+          console.error("Data not available yet");
+          return;
+        }
+
+        chartData = chartDataOp.getFromData(indexHistoryData, selectedChartType);
+        setChartData(chartData);
+        break;
+      case ServiceChartType.feeEstimate:
+        if (!feeEstimateHistoryData) {
+          console.error("Data not available yet");
+          return;
+        }
+        chartData = chartDataOp.getFromData(feeEstimateHistoryData, selectedChartType);
+        setChartData(chartData);
+        break;
     }
-
-    const chartData = chartDataOp.getFromData(allTimeData, selectedChartType);
-    setChartData(chartData);
   };
 
   return (

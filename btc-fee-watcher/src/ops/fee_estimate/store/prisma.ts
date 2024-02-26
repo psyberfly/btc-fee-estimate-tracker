@@ -18,7 +18,6 @@ export class FeeEstimatePrismaStore {
       return handleError(e);
     }
   }
-  
 
   async insert(rowData: FeeEstimate): Promise<boolean | Error> {
     try {
@@ -71,9 +70,22 @@ export class FeeEstimatePrismaStore {
     }
   }
 
+  async readAll(): Promise<FeeEstimate[] | Error> {
+    try {
+      const feeEstHistory = await prisma.feeEstimate.findMany();
+      return feeEstHistory.map((row) => ({
+        id: row.id,
+        time: row.time,
+        satsPerByte: row.satsPerByte,
+      }));
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
   async checkCount(): Promise<number | Error> {
     try {
-      const res = await prisma.feeEstimate.count(); 
+      const res = await prisma.feeEstimate.count();
 
       return res;
     } catch (e) {

@@ -2,9 +2,14 @@ import { handleError } from "../../lib/errors/e";
 import { IndexOp } from "../../ops/fee_index/fee_index";
 import { IApiService } from "./interface";
 import { IndexResponse } from "../../ops/fee_index/interface";
+import { FeeEstimate } from "@prisma/client";
+import { FeeOp } from "../../ops/fee_estimate/fee_estimate";
 
 export class ApiService implements IApiService {
+
+  
   private indexOp = new IndexOp();
+  private feeOp = new FeeOp();
 
   async getIndex(): Promise<Error | IndexResponse> {
     const index = await this.indexOp.readLatest();
@@ -22,6 +27,19 @@ export class ApiService implements IApiService {
       }
 
       return allIndex;
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+
+  async getFeeEstimateHistory(): Promise<Error | FeeEstimate[]> {
+    try {
+      const allFeeEst = await this.feeOp.readAll();
+      if (allFeeEst instanceof Error) {
+        return handleError(allFeeEst);
+      }
+
+      return allFeeEst;
     } catch (e) {
       return handleError(e);
     }

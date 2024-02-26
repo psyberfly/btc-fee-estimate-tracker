@@ -2,12 +2,12 @@ import { r_500 } from "../../lib/logger/winston";
 import { filterError, parseRequest, respond } from "../../lib/http/handler";
 import { ApiService } from "./api";
 
-const serviceProvider = new ApiService();
+const apiService = new ApiService();
 
 export async function handleGetIndex(req, res) {
   const request = parseRequest(req);
   try {
-    let index = await serviceProvider.getIndex();
+    let index = await apiService.getIndex();
 
     if (index instanceof Error) {
       throw index;
@@ -22,12 +22,28 @@ export async function handleGetIndex(req, res) {
 export async function handleGetIndexHistory(req, res) {
   const request = parseRequest(req);
   try {
-    let indexView = await serviceProvider.getIndexHistory();
+    let indexHistory = await apiService.getIndexHistory();
 
-    if (indexView instanceof Error) {
-      throw indexView;
+    if (indexHistory instanceof Error) {
+      throw indexHistory;
     }
-    res.send(indexView);
+    res.send(indexHistory);
+    //    await respond(200, indexView, res, request);
+  } catch (e) {
+    const result = filterError(e, r_500, request);
+    await respond(result.code, result.message, res, request);
+  }
+}
+
+export async function handleGetFeeEstimateHistory(req, res) {
+  const request = parseRequest(req);
+  try {
+    let feeEstHistory = await apiService.getFeeEstimateHistory();
+
+    if (feeEstHistory instanceof Error) {
+      throw feeEstHistory;
+    }
+    res.send(feeEstHistory);
     //    await respond(200, indexView, res, request);
   } catch (e) {
     const result = filterError(e, r_500, request);

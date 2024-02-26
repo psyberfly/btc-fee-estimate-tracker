@@ -1,8 +1,42 @@
 import { makeApiCall } from "../lib/network/network";
-import { DataResponse, IDataOp, IndexResponse } from "./interface";
+import {
+  FeeEstimate,
+  IDataOp,
+  IndexDataResponse,
+  IndexResponse,
+} from "./interface";
 
 export class DataOp implements IDataOp {
-  async fetchAllTime(): Promise<DataResponse | Error> {
+  async fetchFeeEstimateHistory(): Promise<FeeEstimate[] | Error> {
+    try {
+      const baseUrl = import.meta.env.VITE_FEE_WATCHER_PUBLIC_API_URL;
+      const feeHistoryUrl = baseUrl + "/feeEstimateHistory";
+      const res = await makeApiCall(
+        feeHistoryUrl,
+        "GET",
+      );
+
+      if (res instanceof Error) {
+        console.error(res);
+        throw res;
+      }
+
+      let data: FeeEstimate[] = [];
+
+      res.forEach((element) => {
+        const feeEstimate: FeeEstimate = {
+          time: element["time"],
+          satsPerByte: element["satsPerByte"],
+        };
+        data.push(feeEstimate);
+      });
+      return data;
+    } catch (e) {
+      return e;
+    }
+  }
+
+  async fetchIndexHistory(): Promise<IndexDataResponse | Error> {
     try {
       const baseUrl = import.meta.env.VITE_FEE_WATCHER_PUBLIC_API_URL;
       const feeHistoryUrl = baseUrl + "/indexHistory";
@@ -40,7 +74,7 @@ export class DataOp implements IDataOp {
 
       const dataLastUpdated = data[0].timestamp;
 
-      const dataRes: DataResponse = {
+      const dataRes: IndexDataResponse = {
         data: data,
         lastUpdated: dataLastUpdated,
       };

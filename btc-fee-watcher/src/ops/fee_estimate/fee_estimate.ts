@@ -5,7 +5,9 @@ import { makeApiCall } from "../../lib/network/network";
 import { handleError } from "../../lib/errors/e";
 import { FeeEstimatePrismaStore } from "./store/prisma";
 import { FeeEstimate } from "@prisma/client";
+
 export class FeeOp implements IFeeEstimateOp {
+
   private mempoolApiUrl = "https://mempool.space/api/v1/fees/recommended";
   // private store = new FeeEstPgStore();
   private store = new FeeEstimatePrismaStore();
@@ -29,6 +31,11 @@ export class FeeOp implements IFeeEstimateOp {
     const lastMonth = fetchDate(UTCDate.lastMonth);
 
     const res = await this.store.readByRange(lastMonth, today);
+    return res;
+  }
+
+  async readAll(): Promise<FeeEstimate[] | Error> {
+        const res = await this.store.readAll();
     return res;
   }
 

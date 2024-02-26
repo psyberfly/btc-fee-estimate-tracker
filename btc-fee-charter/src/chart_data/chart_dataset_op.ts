@@ -1,10 +1,10 @@
-import { IChartDatasetOp, IndexResponse, ServiceChartType } from "./interface";
+import { FeeEstimate, IChartDatasetOp, IndexResponse, ServiceChartType } from "./interface";
 
 // TODO : Add 365 Day data to index and moving average !!
 
 export class ChartDatasetOp implements IChartDatasetOp {
   getFromData(
-    data: IndexResponse[],
+    data: any,
     kind: ServiceChartType,
   ): object | Error {
     switch (kind) {
@@ -18,13 +18,14 @@ export class ChartDatasetOp implements IChartDatasetOp {
         throw new Error("This functionality is not yet implemented.");
     }
   }
-  private getFeeEstimateDataset(data: IndexResponse[]) {
+
+  private getFeeEstimateDataset(data: FeeEstimate[]) {
     const dataSet: { x: Date; y: number }[] = [];
 
     data.forEach((element) => {
       dataSet.push({
-        x: element.currentFeeEstimate.time,
-        y: element.currentFeeEstimate.satsPerByte,
+        x: element.time,
+        y: element.satsPerByte,
       });
     });
 
@@ -172,4 +173,6 @@ export class ChartDatasetOp implements IChartDatasetOp {
 
     return dataset;
   }
+
+
 }
