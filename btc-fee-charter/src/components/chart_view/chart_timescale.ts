@@ -44,7 +44,7 @@ export class ChartTimescale {
     "Last 5 months": {
       xMin: () => TimeLib.getMsSinceEpochXMonthsAgo(5),
       xMax: () => TimeLib.getMsSinceEpochXMonthsAgo(0),
-      unit: TimescaleUnit.day,
+      unit: TimescaleUnit.month,
     },
     "Last 1 year": {
       xMin: () => TimeLib.getMsSinceEpochXYearsAgo(1),
