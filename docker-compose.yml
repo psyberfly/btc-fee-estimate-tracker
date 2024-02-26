@@ -24,7 +24,7 @@ services:
       FLUENTD_ADDRESS: ${FLUENTD_ADDRESS}
       FLUENTD_PORT: ${FLUENTD_PORT}
       FLUENTD_PATH: ${FLUENTD_PATH}
-      API_KEY: ${API_KEY}
+      API_KEY: ${FEE_WATCHER_API_KEY}
   
   btc-fee-charter:
     build:
@@ -44,7 +44,7 @@ services:
       retries: 3
     environment:
       VITE_FEE_WATCHER_PUBLIC_API_URL: ${FEE_WATCHER_PUBLIC_API_URL}
-      VITE_FEE_WATCHER_API_KEY: ${API_KEY}
+      VITE_FEE_WATCHER_API_KEY: ${FEE_WATCHER_API_KEY}
  
   postgres:
     image: postgres:16.1
