@@ -5,6 +5,7 @@ import gradient from "chartjs-plugin-gradient";
 Chart.register(gradient);
 import annotationPlugin from "chartjs-plugin-annotation";
 import { ServiceChartType } from '../../chart_data/interface';
+import { ChartTimescale, TimescaleOptions } from './chart_timescale';
 Chart.register(annotationPlugin);
 
 Chart.defaults.elements.point.pointStyle = false;
@@ -65,13 +66,13 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
         // Round up to the next whole multiple of 1
     }
     else if (yMaxInDataset >= 100 && yMaxInDataset <= 1000) {
-        yMax = (Math.ceil(yMaxInDataset / 10) * 10) + 10; // 
+        yMax = (Math.ceil(yMaxInDataset / 10) * 10) + 10;
     }
     else if (yMaxInDataset >= 1000 && yMaxInDataset <= 10000) {
-        yMax = (Math.ceil(yMaxInDataset / 100) * 100) + 100// Round up to the nearest whole number
+        yMax = (Math.ceil(yMaxInDataset / 100) * 100) + 100
     }
     else {
-        yMax = Math.ceil(yMaxInDataset); // Round up to the nearest whole number
+        yMax = Math.ceil(yMaxInDataset);
     };
 
     switch (chartType) {
@@ -99,88 +100,20 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
 
     }
 
-    function getMsSinceEpochXHoursAgo(hours) {
-        // Get the current time in milliseconds since epoch
-        const currentTime = Date.now();
-        // Calculate the time X hours ago (in milliseconds)
-        const timeXHoursAgo = currentTime - (hours * 3600 * 1000);
-        return timeXHoursAgo;
-    };
+    const timescaleOptions: TimescaleOptions = ChartTimescale.getTimescaleOptions(selectedRange);
 
-
-    const getMsSinceEpochXDaysAgo = (days): number => {
-        const currentDate = new Date();
-        const thirtyDaysAgo = new Date(currentDate.getTime() - (days * 24 * 60 * 60 * 1000)); // Subtract 30 days in milliseconds
-        return thirtyDaysAgo.getTime(); // Returns the date 30 days ago in milliseconds since epoch
-    };
-
-    function getMsSinceEpochXMonthsAgo(months) {
-        const currentDate = new Date();
-        const targetDate = new Date(currentDate);
-
-        // Calculate the year and month X months ago
-        targetDate.setMonth(targetDate.getMonth() - months);
-
-        // Get the timestamp of the target date
-        const timestampXMonthsAgo = targetDate.getTime();
-
-        return timestampXMonthsAgo;
-    }
-
-    function getMsSinceEpochXYearsAgo(years) {
-        const currentDate = new Date();
-        const targetDate = new Date(currentDate);
-
-        // Calculate the year X years ago
-        targetDate.setFullYear(targetDate.getFullYear() - years);
-
-        // Get the timestamp of the target date
-        const timestampXYearsAgo = targetDate.getTime();
-
-        return timestampXYearsAgo;
-    }
-
-
-    //set xmin and xmax based on chosen range option
-    if (selectedRange === "hour") {
-        xMin = getMsSinceEpochXHoursAgo(1);
-        xMax = getMsSinceEpochXHoursAgo(0)
-        scale = "minute";
-    }
-
-    else if (selectedRange === "day") {
-        xMin = getMsSinceEpochXDaysAgo(1);
-        xMax = getMsSinceEpochXDaysAgo(0);
-        scale = "hour";
-    }
-
-    else if (selectedRange === "month") {
-        xMin = getMsSinceEpochXMonthsAgo(1);
-        xMax = getMsSinceEpochXMonthsAgo(0);
-        scale = "day";
-    }
-    else if (selectedRange === "year") {
-        xMin = getMsSinceEpochXYearsAgo(1);
-        xMax = getMsSinceEpochXYearsAgo(0);
-        scale = "month";
-    }
-    else {
-        xMin = getMsSinceEpochXDaysAgo(1);
-        xMax = getMsSinceEpochXDaysAgo(0);
-        scale = "hour";
-    }
 
     return {
         responsive: true,
         animation: false,
         scales: {
             x: {
-                min: xMin,
-                max: xMax,
+                min: timescaleOptions.xMin,
+                max: timescaleOptions.xMax,
                 type: "time",
                 time: {
 
-                    unit: scale,
+                    unit: timescaleOptions.unit,
                 },
                 title: {
                     display: true,
@@ -270,14 +203,14 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
     }
 };
 
+const timescales = ChartTimescale.getRangeOptions();
+const defaultTimeScale = timescales[0];
 
 // Type Errors are caused with react component because file is .tsx instead of .jsx 
 
 const ChartView = ({ dataset, chartType }) => {
     const chartContainer = useRef(null);
-    const [selectedScale, setSelectedScale] = useState('day');
-    // Remove chartData state since it will be received as a prop
-    // const [chartData, setChartData] = useState(null);
+    const [selectedScale, setSelectedScale] = useState(defaultTimeScale);
     const [chartInstance, setChartInstance] = useState(null);
 
     // useEffect to handle chart instance creation or update
@@ -323,7 +256,7 @@ const ChartView = ({ dataset, chartType }) => {
         setSelectedScale(e.target.value);
     };
 
-    const timescales = [{ "Last 1 hour": "hour" }, { "Last 1 day": "day" }, { "Last 1 month": "month" }, { "Last 1 year": "year" }];
+
 
     return (
         <div className="chart-container">
@@ -333,13 +266,9 @@ const ChartView = ({ dataset, chartType }) => {
                     value={selectedScale}
                     onChange={handleScaleChange}
                 >
-                    {timescales.map((timescale, index) => {
-                        // Extracting the label (key) and value from each object
-                        const [label, value] = Object.entries(timescale)[0]; // Extracting the only entry
-
-                        // Rendering the option with label as text content and value as the value attribute
-                        return <option key={index} value={value}>{label}</option>; // Added 'return' statement
-                    })}
+                    {timescales.map((timescale, index) => (
+                        <option key={index} value={timescale}>{timescale}</option>
+                    ))}
                 </select>
 
             </div>
