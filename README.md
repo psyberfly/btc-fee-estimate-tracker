@@ -7,14 +7,11 @@ A docker compose service to run:
 3. A Postgres DB for Fee Watcher
 
 ## Usage
-1. download current last 1 year history of api specific fee estimates (1-2 block/fastest) for mempool.space as CSV from [txstats](https://txstats.com/d/000000011/fee-estimation?orgId=1&viewPanel=2&var-source=mempool.space) and rename file as per Watcher ENV var CSV_FILE_PATH (default: fee_estimate_history.csv). Rename csv headers to "time", "satsPerByte" (ensure using CSV UTF-8 format to edit file or else expected and actual headers will give mismatch error even if same), and place in ./assets/ 
+1. download current last 1 year history of api specific fee estimates (1-2 block/fastest) for mempool.space as CSV from [txstats](https://txstats.com/d/000000011/fee-estimation?orgId=1&viewPanel=2&var-source=mempool.space) and rename file as per Watcher ENV var CSV_FILE_PATH (default: fee_estimate_history.csv). Rename csv headers to "time", "satsPerByte" (ensure using CSV UTF-8 format to edit file or else expected and actual headers will give mismatch error even if same), and place in ./btc-fee-watcher/assets/ 
 2. cd ./scripts/
-3. sudo sh bft 
-4. use the CLI to setup, start the service.
+3. sudo bash bft <command>
+4. Use the bft CLI to setup, start or stop the service. Add ./scripts/ to path to invoke bft cli directly
 
 
-Watcher:
-1. Auth
-2. SSL for deployment
-3. DB seeding via Watcher (.csv?) Can this be API based instead of file?
-4. If needed: In compose make user the service admin to access volume/ for backup/restore?
+Dev:
+Refer ./docker-compose.yml, ./.env; use docker compose. 
