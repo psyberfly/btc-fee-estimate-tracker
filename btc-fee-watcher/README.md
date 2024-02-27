@@ -16,10 +16,7 @@ Fee estimate history from [txsats api_specific_fee_estimate](https://txstats.com
 2. An API for: historic index data to [btc-fee-charter](../btc-fee-charter) which charts it for public viewing.   
 
 ## Stack:
-NodeJs (Typescript), Postgres
-
-## Prerequisites:
-nodejs, npm, postgres server
+NodeJs (Typescript), Postgres, Docker(optional)
 
 ## Usage:
 
