@@ -1,8 +1,10 @@
 # BTC Fee Estimate Watcher &emsp;&emsp; )))<!>.<!>(((
 
 ## About:
-A service to provide an index indicating if current btc fee estimate is low or not (compared to last year and last month). This index is useful to alert customers to avail low fee rates for txs, utxo consolidation, etc.  
-The index is available via API & Websocket and provides 2 ratios: 
+A NodeJs app serving:
+
+1. an API & websocket for: a statistical index indicating if current btc fee estimate is relatively low or not compared to last year and last month. This index is useful to alert transactors to avail low fee rates for txs, utxo consolidation, etc.  
+The index provides 2 ratios: 
    1. Current fee estimate / last 365 days moving average of fee estimates    
    2. Current fee estimate / last 30 days moving average of fee estimates
            
@@ -11,32 +13,31 @@ The index is updated every 10 mins (~block) and moving averages every day.
 Fee estimates from [mempool_recommended_fee_api](https://mempool.space/docs/api/rest#get-recommended-fees)  
 Fee estimate history from [txsats api_specific_fee_estimate](https://txstats.com/d/000000011/fee-estimation?orgId=1&viewPanel=2&var-source=mempool.space)  
 
+2. An API for: historic index data to [btc-fee-charter](../btc-fee-charter) which charts it for public viewing.   
+
 ## Stack:
-NodeJs (Typescript) + Postgres
+NodeJs (Typescript), Postgres
 
 ## Prerequisites:
 nodejs, npm, postgres server
 
 ## Usage:
 
-1. Use with btc-fee-tracker.  
-or as standalone by:  
-2. npx prisma migrate deploy && npx prisma generate && npx tsc && npm start 
+### Docker (recommended):
+1. Refer [btc-fee-estimate-tracker](../README.md)
 
+### Standalone/Dev:
+1. cp .example.env .env
+2. Update .env
+3. download current last 1 year history of api specific fee estimates (1-2 block/fastest) for mempool.space as CSV from txstats and rename file as per Watcher ENV var CSV_FILE_PATH (default: fee_estimate_history.csv). Rename csv headers to "time", "satsPerByte" (ensure using CSV UTF-8 format to edit file or else expected and actual headers will give mismatch error even if same), and place in ./assets/
+4. Ensure your Postgres is running.
+5. npm install && npx prisma migrate deploy && npx prisma generate && npx tsc && npm start 
 
-## Test:
-Start service then test from terminal:  
+## Testing:
 ### API: 
     curl -H "x-api-key: my-api-key" http://localhost:3561/api/v1/index
 ### WS: 
-Using websocat:
    websocat -H="Accept: application/json" -H="Content-Type: application/json" "ws://localhost:3572/api/v1?apiKey=my-api-key&service=index"
-
-## WIP:
-
-## To Do:
-1. currently last year's fee estimate history is loaded locally from csv file. CSV File is loaded by host via psql. Write an init procedure in server to load it.
-2. Maybe historic data like fee estimates and moving averages should be stored by index of time/createdAt (with some mechanism like 1 for each day, or 1 for each 10 mins?) instead of serial id, so older data can be inserted? 
 
 ## Known Issues:
 1. Signing key for lib/http/handler.ts not generated:
