@@ -1,11 +1,12 @@
 # BTC Fee Estimate Charter
 A nodejs-React web app to get historic data of btc fee estimate index from [BTC Fee Estimate Watcher](../btc-fee-watcher/README.md) and chart graphs based on it at a webpage.  
 
-## Usage:
+## Stack:
+nodejs, docker (optional)
 
+## Usage:
 ### Docker:
    Use with [BTC Fee Estimate Tracker](./..)  
-
 ### Standalone:
   1. cp ./example.env .env
   2. Update .env
