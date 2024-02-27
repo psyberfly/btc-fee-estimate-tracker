@@ -13,5 +13,5 @@ A docker compose service to run:
 4. Use the bft CLI to setup, start or stop the service. Add ./scripts/ to path to invoke bft cli directly
 
 
-Dev:
+## Dev:
 Refer ./docker-compose.yml, ./.env; use docker compose. 
