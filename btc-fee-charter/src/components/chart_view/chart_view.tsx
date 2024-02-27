@@ -54,9 +54,7 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
     let xText: string = "time";
     let title: string;
     let subtitle: string;
-    let xMin: number;
-    let xMax: number;
-    let scale: string;
+
 
     if (yMaxInDataset >= 1 && yMaxInDataset <= 10) {
         yMax = Math.ceil(yMaxInDataset);
@@ -112,7 +110,6 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
                 max: timescaleOptions.xMax,
                 type: "time",
                 time: {
-
                     unit: timescaleOptions.unit,
                 },
                 title: {
@@ -121,6 +118,9 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
                     color: titleColor,
                     font: { size: 14 },
                 },
+                ticks: {
+                    stepSize: timescaleOptions.stepSize,
+                }
             },
             y: {
                 min: yMin,
@@ -132,6 +132,7 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
                     font: { size: 14 },
                 },
             },
+
         },
 
         plugins: {
