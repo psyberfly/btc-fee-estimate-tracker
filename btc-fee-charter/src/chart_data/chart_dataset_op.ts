@@ -1,7 +1,5 @@
 import { FeeEstimate, IChartDatasetOp, IndexResponse, ServiceChartType } from "./interface";
 
-// TODO : Add 365 Day data to index and moving average !!
-
 export class ChartDatasetOp implements IChartDatasetOp {
   getFromData(
     data: any,

@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useLayoutEffect, useState, useEffect } from 'react';
 import Chart, { ChartOptions } from 'chart.js/auto';
 import "chartjs-adapter-date-fns";
 import gradient from "chartjs-plugin-gradient";
@@ -47,7 +47,7 @@ Chart.register(verticalLinePlugin);
 
 //This is of type ChartOptions<"line"> but TS compiler confuses Types with this lib.
 //INDEX CHART:
-const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number, selectedRange: string) => {
+const getChartOptions = (chartType: ServiceChartType, timescaleOptions: TimescaleOptions,) => {
     let yMin: number;
     let yMax: number;
     let yText: string;
@@ -56,41 +56,25 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
     let subtitle: string;
 
 
-    if (yMaxInDataset >= 1 && yMaxInDataset <= 10) {
-        yMax = Math.ceil(yMaxInDataset);
-    }
-    else if (yMaxInDataset >= 10 && yMaxInDataset <= 100) {
-        yMax = (Math.ceil(yMaxInDataset / 10) * 10) + 10;
-        // Round up to the next whole multiple of 1
-    }
-    else if (yMaxInDataset >= 100 && yMaxInDataset <= 1000) {
-        yMax = (Math.ceil(yMaxInDataset / 10) * 10) + 10;
-    }
-    else if (yMaxInDataset >= 1000 && yMaxInDataset <= 10000) {
-        yMax = (Math.ceil(yMaxInDataset / 100) * 100) + 100
-    }
-    else {
-        yMax = Math.ceil(yMaxInDataset);
-    };
 
     switch (chartType) {
         case ServiceChartType.index:
             yMin = 0;
-            yMax = yMax;
+            yMax = timescaleOptions.yMax;
             yText = "current fee est / moving average";
             title = "Fee Estimate Index"
             subtitle = "current fee estimate/fee estimate moving average";
             break;
         case ServiceChartType.movingAverage:
             yMin = 0;
-            yMax = yMax;
+            yMax = timescaleOptions.yMax;
             yText = "sats/B";
             title = "Fee Estimate Moving Average"
             subtitle = "sum(last n days fee estimates)/count(last n days fee estimates)";
             break;
         case ServiceChartType.feeEstimate:
             yMin = 0;
-            yMax = yMax;
+            yMax = timescaleOptions.yMax;
             yText = "sats/B";
             title = "Fee Estimate History"
             subtitle = "mempool.space (fastest/1-2 blocks)";
@@ -98,7 +82,6 @@ const defaultChartOptions = (chartType: ServiceChartType, yMaxInDataset: number,
 
     }
 
-    const timescaleOptions: TimescaleOptions = ChartTimescale.getTimescaleOptions(selectedRange);
 
 
     return {
@@ -213,8 +196,44 @@ const ChartView = ({ dataset, chartType }) => {
     const chartContainer = useRef(null);
     const [selectedScale, setSelectedScale] = useState(defaultTimeScale);
     const [chartInstance, setChartInstance] = useState(null);
+    const [width, height] = useWindowSize();
+    const [canvasHeight, setCanvasHeight] = useState(1000);
 
-    // useEffect to handle chart instance creation or update
+    function useWindowSize() {
+        const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
+
+        useLayoutEffect(() => {
+            function updateSize() {
+                setSize([window.innerWidth, window.innerHeight]);
+            }
+
+            window.addEventListener('resize', updateSize);
+            updateSize();
+
+            return () => window.removeEventListener('resize', updateSize);
+        }, []);
+
+        return size;
+    }
+
+    useEffect(() => {
+        const updateCanvasHeight = () => {
+            let newCanvasHeight;
+            if (width < 768) {
+                newCanvasHeight = 2000; // Mobile
+            } else if (width < 1024) {
+                newCanvasHeight = 1500; // Tablet
+            } else {
+                newCanvasHeight = 1000; // Desktop
+            }
+            setCanvasHeight(newCanvasHeight);
+        };
+
+        updateCanvasHeight();
+    }, [width]);
+
+
+
     useEffect(() => {
         const createOrUpdateChartInstance = () => {
             if (chartInstance) {
@@ -222,8 +241,8 @@ const ChartView = ({ dataset, chartType }) => {
             }
 
             if (chartContainer.current && dataset) {
-                const yMaxInDataset: number = Math.max(...dataset.datasets.flatMap(dataset => dataset.data.map(dataPoint => dataPoint.y)));
-                const options = defaultChartOptions(chartType, yMaxInDataset, selectedScale) as ChartOptions<"line">;
+                const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedScale, dataset.datasets);
+                const options = getChartOptions(chartType, timescaleOptions) as ChartOptions<"line">;
 
                 const newChartInstance = new Chart(chartContainer.current, {
                     type: 'line',
@@ -246,8 +265,8 @@ const ChartView = ({ dataset, chartType }) => {
 
     useEffect(() => {
         if (chartInstance) {
-            const yMaxInDataset: number = Math.max(...dataset.datasets.flatMap(dataset => dataset.data.map(dataPoint => dataPoint.y)));
-            const updatedOptions = defaultChartOptions(chartType, yMaxInDataset, selectedScale);
+            const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedScale, dataset.datasets);
+            const updatedOptions = getChartOptions(chartType, timescaleOptions) as ChartOptions<"line">;
             chartInstance.options = updatedOptions;
             chartInstance.update();
         }
@@ -258,20 +277,22 @@ const ChartView = ({ dataset, chartType }) => {
     };
 
 
-
     return (
         <div className="chart-container">
             <div className="chart-wrapper">
-                <canvas ref={chartContainer} width="1800" height="1000" style={{ width: '100%', height: '100%' }}></canvas>
-                <select
-                    value={selectedScale}
-                    onChange={handleScaleChange}
-                >
+                <canvas
+                    ref={chartContainer}
+                    width={1800} // Set fixed width
+                    height={canvasHeight} // Set dynamic height
+                    style={{ width: '100%', height: '100%' }}
+                ></canvas>
+                <select value={selectedScale} onChange={handleScaleChange}>
                     {timescales.map((timescale, index) => (
-                        <option key={index} value={timescale}>{timescale}</option>
-                    ))}
+                        <option key={index} value={timescale}>
+                            {timescale}
+                        </option>
+                    ))}u
                 </select>
-
             </div>
         </div>
     );
