@@ -4,7 +4,7 @@
 A docker compose service to run:
 1. [BTC Fee Estimate Watcher](btc-fee-watcher/README.md)
 2. [BTC Fee Estimate Charter](btc-fee-charter/README.md)
-3. A Postgres DB for Fee Watcher
+3. A Postgres DB for Watcher
 
 ## Prerequisite
 Linux, docker
@@ -17,4 +17,5 @@ Linux, docker
 
 
 ## Dev:
-Refer ./docker-compose.yml, ./.env; use docker compose. 
+1. Infra: docker compose
+2. For more details, refer service components.
