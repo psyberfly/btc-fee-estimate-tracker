@@ -36,7 +36,8 @@ NodeJs (Typescript), Postgres, Docker(optional)
 ### WS: 
    websocat -H="Accept: application/json" -H="Content-Type: application/json" "ws://localhost:3572/api/v1?apiKey=my-api-key&service=index"
 
-## Known Issues:
+## Dev:
+### Known Issues:
 1. Signing key for lib/http/handler.ts not generated:
    'No response signing key found!. Run $ ditto crpf sats_sig'
    Sample signature used for dev. Resolve issue for prod...
