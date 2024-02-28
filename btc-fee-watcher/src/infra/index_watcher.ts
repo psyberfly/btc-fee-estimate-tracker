@@ -43,7 +43,7 @@ async function udpateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
   console.log("Fee Estimate updated.");
   console.log("Updating latest Index...");
   // calculate index and update DB
-  const isIndexUpdated = await indexOp.udpateIndex();
+  const isIndexUpdated = await indexOp.updateIndex();
 
   if (isIndexUpdated instanceof Error) {
     console.error("Error updating Index!");
@@ -63,7 +63,6 @@ async function udpateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
     return handleError(latestIndex);
   }
   console.log("Index alert broadcasted");
-
 }
 
 async function seedDb() {
@@ -74,6 +73,7 @@ async function seedDb() {
     console.error(
       `Error reading Fee Estimate history from .csv!: ${feeHistory}`,
     );
+    return;
   }
 
   const isHistorySeeded = await feeOp.seedHistory(feeHistory);
@@ -84,6 +84,7 @@ async function seedDb() {
     );
   } else {
     console.log("Fee Estimate History seeded from .csv.");
+    return;
   }
 }
 

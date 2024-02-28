@@ -1,23 +1,19 @@
 import { FeeEstimate, FeeIndex } from "@prisma/client";
 import { handleError } from "../../lib/errors/e";
 import { FeeOp } from "../fee_estimate/fee_estimate";
-import { IIndexOp, IndexResponse } from "./interface";
+import { IIndexOp, FeeIndexDetailed } from "./interface";
 import { FeeIndexPrismaStore } from "./store/prisma";
 import { MovingAveragePrismaStore } from "../moving_average/store/prisma";
 import { FeeEstimatePrismaStore } from "../fee_estimate/store/prisma";
 import { Decimal } from "@prisma/client/runtime/library";
 
-
 export class IndexOp implements IIndexOp {
-  updateIndex(currentFee: FeeEstimate): Promise<boolean | Error> {
-    throw new Error("Method not implemented.");
-  }
   private feeOp = new FeeOp();
   private store = new FeeIndexPrismaStore();
   private movingAvgStore = new MovingAveragePrismaStore();
   private feeEstStore = new FeeEstimatePrismaStore();
 
-  async readLatest(): Promise<IndexResponse | Error> {
+  async readLatest(): Promise<FeeIndexDetailed | Error> {
     const res = await this.store.fetchLatest();
     if (res instanceof Error) {
       return handleError(res);
@@ -26,7 +22,16 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
-  async readAll(): Promise<IndexResponse[] | Error> {
+  async readAllDetailed(): Promise<FeeIndexDetailed[] | Error> {
+    const res = await this.store.fetchAllDetailed();
+    if (res instanceof Error) {
+      return handleError(res);
+    }
+
+    return res;
+  }
+
+  async readAll(): Promise<FeeIndex[] | Error> {
     const res = await this.store.fetchAll();
     if (res instanceof Error) {
       return handleError(res);
@@ -35,7 +40,7 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
-  async udpateIndex(): Promise<boolean | Error> {
+  async updateIndex(): Promise<boolean | Error> {
     const currentFeeEst = await this.feeEstStore.readLatest();
 
     if (currentFeeEst instanceof Error) {

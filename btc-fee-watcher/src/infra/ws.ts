@@ -4,7 +4,7 @@ import { alertStreamPath } from "../service/api/router";
 import http from "http";
 import * as dotenv from "dotenv";
 import { handleError } from "../lib/errors/e";
-import { IndexResponse } from "../ops/fee_index/interface";
+import { FeeIndexDetailed } from "../ops/fee_index/interface";
 import { indexWatchInterval } from "./index_watcher";
 import { msAsMinutes } from "../lib/time/time";
 dotenv.config();
@@ -83,7 +83,7 @@ export class AlertStreamServer {
     }
   }
 
-  public broadcastAlert(data: IndexResponse): boolean | Error {
+  public broadcastAlert(data: FeeIndexDetailed): boolean | Error {
     try {
       // Broadcast to all connected clients
       AlertStreamServer.alertStreamServer.clients.forEach((client) => {

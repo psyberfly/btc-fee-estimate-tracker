@@ -19,6 +19,8 @@ export async function handleGetIndex(req, res) {
   }
 }
 
+
+
 export async function handleGetIndexHistory(req, res) {
   const request = parseRequest(req);
   try {
@@ -35,6 +37,23 @@ export async function handleGetIndexHistory(req, res) {
   }
 }
 
+
+export async function handleGetMovingAverageHistory(req, res) {
+  const request = parseRequest(req);
+  try {
+    let movingAverageHistory = await apiService.getMovingAverageHistory();
+
+    if (movingAverageHistory instanceof Error) {
+      throw movingAverageHistory;
+    }
+    res.send(movingAverageHistory);
+    //    await respond(200, indexView, res, request);
+  } catch (e) {
+    const result = filterError(e, r_500, request);
+    await respond(result.code, result.message, res, request);
+  }
+}
+
 export async function handleGetFeeEstimateHistory(req, res) {
   const request = parseRequest(req);
   try {
@@ -44,6 +63,22 @@ export async function handleGetFeeEstimateHistory(req, res) {
       throw feeEstHistory;
     }
     res.send(feeEstHistory);
+    //    await respond(200, indexView, res, request);
+  } catch (e) {
+    const result = filterError(e, r_500, request);
+    await respond(result.code, result.message, res, request);
+  }
+}
+
+export async function handleGetIndexDetailedHistory(req, res) {
+  const request = parseRequest(req);
+  try {
+    let indexHistory = await apiService.getIndexDetailedHistory();
+
+    if (indexHistory instanceof Error) {
+      throw indexHistory;
+    }
+    res.send(indexHistory);
     //    await respond(200, indexView, res, request);
   } catch (e) {
     const result = filterError(e, r_500, request);

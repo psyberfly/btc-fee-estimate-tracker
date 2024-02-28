@@ -9,6 +9,15 @@ export class MovingAverageOp implements IMovingAverageOp {
   private feeOp = new FeeOp();
   private store = new MovingAveragePrismaStore();
 
+  async readAll(): Promise<Error | MovingAverage[]> {
+    const all = await this.store.readAll();
+    if (all instanceof Error) {
+      return handleError(all);
+    }
+    return all;
+  }
+
+
   async readLatest(): Promise<Error | MovingAverage> {
     const latestMovingAvg = await this.store.readLatest();
     if (latestMovingAvg instanceof Error) {

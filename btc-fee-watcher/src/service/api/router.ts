@@ -2,7 +2,9 @@ import { Router } from "express";
 import {
   handleGetFeeEstimateHistory,
   handleGetIndex,
+  handleGetIndexDetailedHistory,
   handleGetIndexHistory,
+  handleGetMovingAverageHistory,
 } from "./dto";
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -22,7 +24,24 @@ const authenticateAPIKey = (req, res, next) => {
 };
 
 router.get("/index", authenticateAPIKey, handleGetIndex);
-router.get("/indexHistory", authenticateAPIKey, handleGetIndexHistory);
+
+router.get(
+  "/indexDetailedHistory",
+  authenticateAPIKey,
+  handleGetIndexDetailedHistory,
+);
+
+router.get(
+  "/indexHistory",
+  authenticateAPIKey,
+  handleGetIndexHistory,
+);
+
+router.get(
+  "/movingAverageHistory",
+  authenticateAPIKey,
+  handleGetMovingAverageHistory,
+);
 router.get(
   "/feeEstimateHistory",
   authenticateAPIKey,

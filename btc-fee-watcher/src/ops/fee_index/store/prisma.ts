@@ -1,10 +1,10 @@
 import { FeeIndex } from "@prisma/client";
 import { handleError } from "../../../lib/errors/e";
 import { prisma } from "../../../main";
-import { IndexResponse } from "../interface";
+import { FeeIndexDetailed } from "../interface";
 
 export class FeeIndexPrismaStore {
-  async fetchLatest(): Promise<IndexResponse | Error> {
+  async fetchLatest(): Promise<FeeIndexDetailed | Error> {
     try {
       const latestIndex = await prisma.feeIndex.findFirst({
         orderBy: { createdAt: "desc" },
@@ -14,7 +14,7 @@ export class FeeIndexPrismaStore {
         },
       });
 
-      const latestIndexRes: IndexResponse = {
+      const latestIndexRes: FeeIndexDetailed = {
         timestamp: latestIndex.createdAt,
         feeEstimateMovingAverageRatio: {
           last365Days: latestIndex.ratioLast365Days.toNumber(),
@@ -37,9 +37,21 @@ export class FeeIndexPrismaStore {
     }
   }
 
-  async fetchAll(): Promise<IndexResponse[] | Error> {
+  async fetchAll(): Promise<FeeIndex[] | Error> {
     try {
-      const allIndex = await prisma.feeIndex.findMany({
+      const allFeeIndexRes = await prisma.feeIndex.findMany({
+        orderBy: { createdAt: "desc" },
+      });
+
+      return allFeeIndexRes;
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
+  async fetchAllDetailed(): Promise<FeeIndexDetailed[] | Error> {
+    try {
+      const allIndexDetailed = await prisma.feeIndex.findMany({
         orderBy: { createdAt: "desc" },
         include: {
           feeEstimate: true,
@@ -47,10 +59,10 @@ export class FeeIndexPrismaStore {
         },
       });
 
-      let allIndexRes: IndexResponse[] = [];
+      let allIndexDetailedRes: FeeIndexDetailed[] = [];
 
-      allIndex.forEach((index) => {
-        const indexRes: IndexResponse = {
+      allIndexDetailed.forEach((index) => {
+        const indexRes: FeeIndexDetailed = {
           timestamp: index.createdAt,
           feeEstimateMovingAverageRatio: {
             last365Days: index.ratioLast365Days.toNumber(),
@@ -66,10 +78,10 @@ export class FeeIndexPrismaStore {
             last30Days: index.movingAverage.last30Days.toNumber(),
           },
         };
-        allIndexRes.push(indexRes);
+        allIndexDetailedRes.push(indexRes);
       });
 
-      return allIndexRes;
+      return allIndexDetailedRes;
     } catch (error) {
       return handleError(error);
     }

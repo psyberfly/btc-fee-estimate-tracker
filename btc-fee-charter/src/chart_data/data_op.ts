@@ -40,6 +40,35 @@ export class DataOp implements IDataOp {
     }
   }
 
+  async fetchMovingAverageHistory(): Promise<FeeEstimate[] | Error> {
+    try {
+      const feeHistoryUrl = this.baseUrl + "/movingAverageHistory";
+      const res = await makeApiCall(
+        feeHistoryUrl,
+        "GET",
+        AxiosHeaders.from(`x-api-key: ${this.apiKey}`),
+      );
+
+      if (res instanceof Error) {
+        console.error(res);
+        throw res;
+      }
+
+      let data: FeeEstimate[] = [];
+
+      res.forEach((element) => {
+        const feeEstimate: FeeEstimate = {
+          time: element["time"],
+          satsPerByte: element["satsPerByte"],
+        };
+        data.push(feeEstimate);
+      });
+      return data;
+    } catch (e) {
+      return e;
+    }
+  }
+
   async fetchIndexHistory(): Promise<IndexDataResponse | Error> {
     try {
       const feeHistoryUrl = this.baseUrl + "/indexHistory";

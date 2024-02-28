@@ -3,6 +3,17 @@ import { prisma } from "../../../main";
 import { handleError } from "../../../lib/errors/e";
 
 export class MovingAveragePrismaStore {
+  async readAll(): Promise<MovingAverage[] | Error> {
+    try {
+      const all = await prisma.movingAverage.findMany({
+        orderBy: { createdAt: "desc" },
+      });
+      return all;
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
   async readLatest(): Promise<MovingAverage | Error> {
     try {
       const movingAverage = await prisma.movingAverage.findFirst({

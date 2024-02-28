@@ -16,8 +16,10 @@ Chart.defaults.scales.time.adapters.date = { "timezone": "UTC" };
 // Chart.defaults.backgroundColor = "rgba(0,255,0,0.2)";
 Chart.defaults.scale.ticks.color = "rgb(255,255,255)";
 Chart.defaults.scale.grid.color = "rgba(199, 199, 199, 0.2)";
+
 const titleColor = "rgb(211, 211, 211)";
-const secondaryColor = "rgb(190, 190, 190)";
+const secondaryColor = "rgb(180, 180, 180)";
+const fontFamily = "Courier New, monospace";
 
 const verticalLinePlugin = {
     id: "verticalLine",
@@ -48,8 +50,7 @@ Chart.register(verticalLinePlugin);
 //This is of type ChartOptions<"line"> but TS compiler confuses Types with this lib.
 //INDEX CHART:
 const getChartOptions = (chartType: ServiceChartType, timescaleOptions: TimescaleOptions,) => {
-    let yMin: number;
-    let yMax: number;
+    let yMin: number = 0;
     let yText: string;
     let xText: string = "time";
     let title: string;
@@ -59,22 +60,16 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
 
     switch (chartType) {
         case ServiceChartType.index:
-            yMin = 0;
-            yMax = timescaleOptions.yMax;
             yText = "current fee est / moving average";
             title = "Fee Estimate Index"
             subtitle = "current fee estimate/fee estimate moving average";
             break;
         case ServiceChartType.movingAverage:
-            yMin = 0;
-            yMax = timescaleOptions.yMax;
             yText = "sats/B";
             title = "Fee Estimate Moving Average"
             subtitle = "sum(last n days fee estimates)/count(last n days fee estimates)";
             break;
         case ServiceChartType.feeEstimate:
-            yMin = 0;
-            yMax = timescaleOptions.yMax;
             yText = "sats/B";
             title = "Fee Estimate History"
             subtitle = "mempool.space (fastest/1-2 blocks)";
@@ -82,10 +77,9 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
 
     }
 
-
-
     return {
         responsive: true,
+        maintainAspectRatio: false, //false=stretch to fit
         animation: false,
         scales: {
             x: {
@@ -98,8 +92,12 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 title: {
                     display: true,
                     text: xText,
-                    color: titleColor,
-                    font: { size: 14 },
+                    color: secondaryColor,
+                    font: {
+                        size: 14,
+                        family: fontFamily,
+                    },
+                    padding: { top: 20 }
                 },
                 ticks: {
                     stepSize: timescaleOptions.stepSize,
@@ -107,12 +105,16 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
             },
             y: {
                 min: yMin,
-                max: yMax,
+                max: timescaleOptions.yMax,
                 title: {
                     display: true,
                     text: yText,
-                    color: titleColor,
-                    font: { size: 14 },
+                    color: secondaryColor,
+                    font: {
+                        size: 14,
+                        family: fontFamily,
+                    },
+                    padding: { bottom: 20 }
                 },
             },
 
@@ -128,7 +130,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 text: title,
                 color: titleColor,
                 font: {
-                    family: "'Courier New', monospace" as const,
+                    family: fontFamily,
                     size: 20,
                 },
             },
@@ -140,7 +142,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 text: subtitle,
                 color: secondaryColor,
                 font: {
-                    family: "'Courier New', monospace" as const,
+                    family: fontFamily,
                     size: 14,
                 },
             },
@@ -156,7 +158,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
 
                 labels: {
                     font: {
-                        family: "Courier New, monospace"
+                        family: fontFamily,
                     },
                     color: secondaryColor,
                     pointStyleWidth: 30,
@@ -188,7 +190,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
 };
 
 const timescales = ChartTimescale.getRangeOptions();
-const defaultTimeScale = timescales[0];
+const defaultTimeScale = timescales[2];
 
 // Type Errors are caused with react component because file is .tsx instead of .jsx 
 
@@ -196,41 +198,43 @@ const ChartView = ({ dataset, chartType }) => {
     const chartContainer = useRef(null);
     const [selectedScale, setSelectedScale] = useState(defaultTimeScale);
     const [chartInstance, setChartInstance] = useState(null);
-    const [width, height] = useWindowSize();
-    const [canvasHeight, setCanvasHeight] = useState(1000);
 
-    function useWindowSize() {
-        const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
+    // //FOR RESPONSIVE VIEW:
+    // const [width, height] = useWindowSize();
 
-        useLayoutEffect(() => {
-            function updateSize() {
-                setSize([window.innerWidth, window.innerHeight]);
-            }
+    // function useWindowSize() {
+    //     const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
 
-            window.addEventListener('resize', updateSize);
-            updateSize();
+    //     useLayoutEffect(() => {
+    //         function updateSize() {
+    //             console.log(`size changed: ${window.innerWidth}` )
+    //             setSize([window.innerWidth, window.innerHeight]);
+    //         }
 
-            return () => window.removeEventListener('resize', updateSize);
-        }, []);
+    //         window.addEventListener('resize', updateSize);
+    //         updateSize();
 
-        return size;
-    }
+    //         return () => window.removeEventListener('resize', updateSize);
+    //     }, []);
 
-    useEffect(() => {
-        const updateCanvasHeight = () => {
-            let newCanvasHeight;
-            if (width < 768) {
-                newCanvasHeight = 2000; // Mobile
-            } else if (width < 1024) {
-                newCanvasHeight = 1500; // Tablet
-            } else {
-                newCanvasHeight = 1000; // Desktop
-            }
-            setCanvasHeight(newCanvasHeight);
-        };
+    //     return size;
+    // }
 
-        updateCanvasHeight();
-    }, [width]);
+    // useEffect(() => {
+    //     const updateCanvasHeight = () => {
+    //         let newCanvasHeight;
+    //         if (width < 768) {
+    //             newCanvasHeight = 2000; // Mobile
+    //         } else if (width < 1024) {
+    //             newCanvasHeight = 1500; // Tablet
+    //         } else {
+    //             newCanvasHeight = 1000; // Desktop
+    //         }
+    //         setCanvasHeight(newCanvasHeight);
+    //     };
+
+    //     updateCanvasHeight();
+    // }, [width]);
 
 
 
@@ -270,7 +274,7 @@ const ChartView = ({ dataset, chartType }) => {
             chartInstance.options = updatedOptions;
             chartInstance.update();
         }
-    }, [selectedScale, chartInstance]);
+    }, [selectedScale, chartInstance,]);
 
     const handleScaleChange = (e) => {
         setSelectedScale(e.target.value);
@@ -282,8 +286,8 @@ const ChartView = ({ dataset, chartType }) => {
             <div className="chart-wrapper">
                 <canvas
                     ref={chartContainer}
-                    width={1800} // Set fixed width
-                    height={canvasHeight} // Set dynamic height
+                    // width={1800} // Set fixed width
+                    // height={canvasHeight} // Set dynamic height
                     style={{ width: '100%', height: '100%' }}
                 ></canvas>
                 <select value={selectedScale} onChange={handleScaleChange}>
