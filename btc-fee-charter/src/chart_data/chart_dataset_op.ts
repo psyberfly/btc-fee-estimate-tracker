@@ -1,19 +1,34 @@
-import { FeeEstimate, IChartDatasetOp, IndexResponse, ServiceChartType } from "./interface";
+import {
+  FeeEstimate,
+  FeeIndex,
+  IChartDatasetOp,
+  IndexResponse,
+  MovingAverage,
+  ServiceChartType,
+} from "./interface";
 
 export class ChartDatasetOp implements IChartDatasetOp {
-  getFromData(
-    data: any,
+  getFromData<T extends FeeIndex[] | MovingAverage[] | FeeEstimate[]>(
+    data: T,
     kind: ServiceChartType,
   ): object | Error {
-    switch (kind) {
-      case ServiceChartType.index:
-        return this.getIndexDataset(data);
-      case ServiceChartType.movingAverage:
-        return this.getMovingAverageDataset(data);
-      case ServiceChartType.feeEstimate:
-        return this.getFeeEstimateDataset(data);
-      default:
-        throw new Error("This functionality is not yet implemented.");
+    try {
+      switch (kind) {
+        case ServiceChartType.index:
+          return this.getIndexDataset(
+            data as unknown as FeeIndex[],
+          );
+        case ServiceChartType.movingAverage:
+          return this.getMovingAverageDataset(
+            data as unknown as MovingAverage[],
+          );
+        case ServiceChartType.feeEstimate:
+          return this.getFeeEstimateDataset(data as unknown as FeeEstimate[]);
+        default:
+          throw new Error("This functionality is not yet implemented.");
+      }
+    } catch (e) {
+      return e;
     }
   }
 
@@ -36,7 +51,7 @@ export class ChartDatasetOp implements IChartDatasetOp {
           label: "All Time",
           data: dataSet,
           borderColor: "rgb(254, 112, 2)",
-          pointBorderColor: "rgba(0, 0, 0, 1)", 
+          pointBorderColor: "rgba(0, 0, 0, 1)",
           pointBackgroundColor: "rgb(254, 112, 2)",
         },
       ],
@@ -45,18 +60,18 @@ export class ChartDatasetOp implements IChartDatasetOp {
     return dataset;
   }
 
-  private getMovingAverageDataset(data: IndexResponse[]) {
+  private getMovingAverageDataset(data: MovingAverage[]) {
     const dataSet30Day: { x: Date; y: number }[] = [];
     const dataSet365Day: { x: Date; y: number }[] = [];
 
     data.forEach((element) => {
       dataSet30Day.push({
-        x: element.movingAverage.createdAt,
-        y: element.movingAverage.last30Days,
+        x: element.createdAt,
+        y: element.last30Days,
       });
       dataSet365Day.push({
-        x: element.movingAverage.createdAt,
-        y: element.movingAverage.last365Days,
+        x: element.createdAt,
+        y: element.last365Days,
       });
     });
     const dataset = {
@@ -68,7 +83,7 @@ export class ChartDatasetOp implements IChartDatasetOp {
           label: "Last 30 days",
           data: dataSet30Day,
           borderColor: "rgb(254, 112, 2)",
-          pointBorderColor: "rgba(0, 0, 0, 1)", 
+          pointBorderColor: "rgba(0, 0, 0, 1)",
           pointBackgroundColor: "rgb(254, 112, 2)",
         },
         {
@@ -87,7 +102,54 @@ export class ChartDatasetOp implements IChartDatasetOp {
     return dataset;
   }
 
-  private getIndexDataset(data: IndexResponse[]) {
+  private getIndexDataset(data: FeeIndex[]) {
+    const dataSet30Day: { x: Date; y: number }[] = [];
+    const dataSet365Day: { x: Date; y: number }[] = [];
+
+    data.forEach((element) => {
+      dataSet30Day.push({
+        x: element.createdAt,
+        y: element.ratioLast30Days,
+      });
+      dataSet365Day.push({
+        x: element.createdAt,
+        y: element.ratioLast365Days,
+      });
+    });
+
+    const dataset = {
+      datasets: [
+        {
+          fill: {
+            value: 1,
+            above: "rgba(255,0,0,0.1)", // Area will be red above the origin
+            below: "rgba(0, 255, 0,0.1)",
+          },
+          label: "Last 30 days",
+          data: dataSet30Day,
+          borderColor: "rgb(254, 112, 2)",
+          pointBorderColor: "rgba(0, 0, 0, 1)",
+          pointBackgroundColor: "rgb(254, 112, 2)",
+        },
+        {
+          fill: {
+            value: 1,
+            above: "rgba(255,0,0,0.1)", // Area will be red above the origin
+            below: "rgba(0, 255, 0,0.1)",
+          },
+          label: "Last 365 days",
+          data: dataSet365Day,
+          borderColor: "rgb(0,228, 255)",
+          pointBorderColor: "rgba(0, 0, 0, 1)", // This will be the border color of the points
+          pointBackgroundColor: "rgba(75, 192, 192, 1)", // This will be the fill color of the points
+        },
+      ],
+    };
+
+    return dataset;
+  }
+
+  private getIndexDetailedDataset(data: IndexResponse[]) {
     const dataSet30Day: { x: Date; y: number }[] = [];
     const dataSet365Day: { x: Date; y: number }[] = [];
 
@@ -132,7 +194,7 @@ export class ChartDatasetOp implements IChartDatasetOp {
           label: "Last 30 days",
           data: dataSet30Day,
           borderColor: "rgb(254, 112, 2)",
-          pointBorderColor: "rgba(0, 0, 0, 1)", 
+          pointBorderColor: "rgba(0, 0, 0, 1)",
           pointBackgroundColor: "rgb(254, 112, 2)",
         },
         {
@@ -171,6 +233,4 @@ export class ChartDatasetOp implements IChartDatasetOp {
 
     return dataset;
   }
-
-
 }

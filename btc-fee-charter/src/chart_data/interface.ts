@@ -21,6 +21,18 @@ export interface IndexResponse {
   };
 }
 
+export interface FeeIndex {
+  createdAt: Date;
+  ratioLast365Days: number;
+  ratioLast30Days: number;
+}
+
+export interface MovingAverage {
+  createdAt: Date;
+  last365Days: number;
+  last30Days: number;
+}
+
 export interface FeeEstimate {
   time: Date;
   satsPerByte: number;
@@ -32,11 +44,22 @@ export interface IndexDataResponse {
 }
 
 export interface IDataOp {
-  //currently 1 year's data would be 13.4mb.
-  fetchIndexHistory(): Promise<IndexDataResponse | Error>;
+  fetchFeeIndexHistory(): Promise<FeeIndex[] | Error>;
+  fetchMovingAverageHistory(): Promise<MovingAverage[] | Error>;
   fetchFeeEstimateHistory(): Promise<FeeEstimate[] | Error>;
+  fetchIndexDetailedHistory(): Promise<IndexDataResponse | Error>; //unused
 }
 
 export interface IChartDatasetOp {
-  getFromData(data: IndexResponse[], kind: ServiceChartType): object | Error;
+  //getFromData<T>(data: T[], kind: ServiceChartType): object | Error;
+  
+  getFromData<T extends FeeIndex[] | MovingAverage[] | FeeEstimate[]>(
+    data: T,
+    kind: ServiceChartType
+  ): object | Error;
+  
+  //new
+  // getFeeIndex(data: FeeIndex[]): object | Error;
+  // getMovingAverage(data: MovingAverage[]): object | Error;
+  // getFeeEstimate(data: FeeEstimate[]): object | Error;
 }

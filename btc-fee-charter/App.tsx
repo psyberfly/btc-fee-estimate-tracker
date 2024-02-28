@@ -6,90 +6,66 @@ import { ChartDatasetOp } from './src/chart_data/chart_dataset_op';
 import { ServiceChartType } from './src/chart_data/interface';
 
 const App = () => {
-  const [indexHistoryData, setIndexHistoryData] = useState(null);
-  const [feeEstimateHistoryData, setFeeEstimateHistoryData] = useState(null);
-  const [chartType, setChartType] = useState(ServiceChartType.index);
   const [chartData, setChartData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [errorLoading, setErrorLoading] = useState(false);
+  const [chartType, setChartType] = useState(ServiceChartType.index);
+  const [loading, setLoading] = useState({ [ServiceChartType.index]: true });
+  const [errorLoading, setErrorLoading] = useState({ [ServiceChartType.index]: false });
+  const [lastUpdated, setLastUpdated] = useState(null);
 
-  const [lastUpdated, setLastUpdated] = useState(null); // State for last refreshed time
   const dataOp = new DataOp();
   const chartDataOp = new ChartDatasetOp();
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDataForChartType = async (chartType) => {
       try {
-        setLoading(true);
-        //this could be changed to WS instead of API?
-        const indexData = await dataOp.fetchIndexHistory();
+        setLoading(prev => ({ ...prev, [chartType]: true }));
+        let data;
 
-        if (indexData instanceof Error) {
-          console.error(`Error fetching index data.`);
-          throw indexData;
+        switch (chartType) {
+          case ServiceChartType.index:
+            data = await dataOp.fetchFeeIndexHistory();
+            break;
+          case ServiceChartType.movingAverage:
+            data = await dataOp.fetchMovingAverageHistory();
+            break;
+          case ServiceChartType.feeEstimate:
+            data = await dataOp.fetchFeeEstimateHistory();
+            break;
+          default:
+            throw new Error('Invalid chart type');
         }
 
-        const feeEstimateData = await dataOp.fetchFeeEstimateHistory();
-
-        if (feeEstimateData instanceof Error) {
-          console.error(`Error fetching fee estimate data`);
-          throw feeEstimateData;
+        if (data instanceof Error) {
+          console.error(`Error fetching data for ${chartType}`);
+          throw data;
         }
 
-        setIndexHistoryData(indexData.data);
-        setFeeEstimateHistoryData(feeEstimateData);
-
-        const defaultChartData = chartDataOp.getFromData(indexData.data, ServiceChartType.index);
-        if (defaultChartData instanceof Error) {
+        const chartData = chartDataOp.getFromData(data, chartType);
+        if (chartData instanceof Error) {
           console.error(`Error getting chart dataset from data.`);
-          throw defaultChartData;
+          throw chartData;
         }
-        setChartData(defaultChartData);
-        setLoading(false);
-        setErrorLoading(false);
-        updateLastUpdated(new Date(indexData.lastUpdated));
+
+        setChartData(chartData);
+        updateLastUpdated(new Date());
       } catch (error) {
         console.error("Error setting data:", error);
-        setLoading(false);
-        setErrorLoading(true);
+        setErrorLoading(prev => ({ ...prev, [chartType]: true }));
+      } finally {
+        setLoading(prev => ({ ...prev, [chartType]: false }));
       }
     };
 
-    fetchData();
+    fetchDataForChartType(chartType);
 
-    const interval = setInterval(fetchData, 10 * 60 * 1000);
-
-    return () => clearInterval(interval);
-  }, []);
+  }, [chartType]);
 
   const updateLastUpdated = (lastUpdated) => {
-    setLastUpdated(lastUpdated); // Update last refreshed time with current Date object
+    setLastUpdated(lastUpdated);
   };
 
   const handleClick = (selectedChartType) => {
     setChartType(selectedChartType);
-    let chartData;
-
-    switch (selectedChartType) {
-      case ServiceChartType.index:
-      case ServiceChartType.movingAverage:
-        if (!indexHistoryData) {
-          console.error("Data not available yet");
-          return;
-        }
-
-        chartData = chartDataOp.getFromData(indexHistoryData, selectedChartType);
-        setChartData(chartData);
-        break;
-      case ServiceChartType.feeEstimate:
-        if (!feeEstimateHistoryData) {
-          console.error("Data not available yet");
-          return;
-        }
-        chartData = chartDataOp.getFromData(feeEstimateHistoryData, selectedChartType);
-        setChartData(chartData);
-        break;
-    }
   };
 
   return (
@@ -103,13 +79,13 @@ const App = () => {
       <div style={{ display: 'flex' }}>
         <div className="nav">
           <h2>Charts</h2>
-          <button onClick={() => handleClick(ServiceChartType.index)}>{ServiceChartType.index}</button>
-          <button onClick={() => handleClick(ServiceChartType.movingAverage)}>{ServiceChartType.movingAverage}</button>
-          <button onClick={() => handleClick(ServiceChartType.feeEstimate)}>{ServiceChartType.feeEstimate}</button>
+          <button onClick={() => handleClick(ServiceChartType.index)}>Index</button>
+          <button onClick={() => handleClick(ServiceChartType.movingAverage)}>Moving Average</button>
+          <button onClick={() => handleClick(ServiceChartType.feeEstimate)}>Fee Estimate</button>
         </div>
-        {errorLoading ? (
+        {errorLoading[chartType] ? (
           <div className="banner-error">Error loading data. Please try again later.</div>
-        ) : loading ? (
+        ) : loading[chartType] ? (
           <div className="banner-loading">Loading...</div>
         ) : (
           <ChartView dataset={chartData} chartType={chartType} />

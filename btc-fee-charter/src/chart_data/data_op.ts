@@ -2,9 +2,11 @@ import { AxiosHeaders } from "axios";
 import { makeApiCall } from "../lib/network/network";
 import {
   FeeEstimate,
+  FeeIndex,
   IDataOp,
   IndexDataResponse,
   IndexResponse,
+  MovingAverage,
 } from "./interface";
 
 export class DataOp implements IDataOp {
@@ -13,9 +15,9 @@ export class DataOp implements IDataOp {
 
   async fetchFeeEstimateHistory(): Promise<FeeEstimate[] | Error> {
     try {
-      const feeHistoryUrl = this.baseUrl + "/feeEstimateHistory";
+      const url = this.baseUrl + "/feeEstimateHistory";
       const res = await makeApiCall(
-        feeHistoryUrl,
+        url,
         "GET",
         AxiosHeaders.from(`x-api-key: ${this.apiKey}`),
       );
@@ -40,11 +42,11 @@ export class DataOp implements IDataOp {
     }
   }
 
-  async fetchMovingAverageHistory(): Promise<FeeEstimate[] | Error> {
+  async fetchMovingAverageHistory(): Promise<MovingAverage[] | Error> {
     try {
-      const feeHistoryUrl = this.baseUrl + "/movingAverageHistory";
+      const url = this.baseUrl + "/movingAverageHistory";
       const res = await makeApiCall(
-        feeHistoryUrl,
+        url,
         "GET",
         AxiosHeaders.from(`x-api-key: ${this.apiKey}`),
       );
@@ -54,14 +56,15 @@ export class DataOp implements IDataOp {
         throw res;
       }
 
-      let data: FeeEstimate[] = [];
+      let data: MovingAverage[] = [];
 
       res.forEach((element) => {
-        const feeEstimate: FeeEstimate = {
-          time: element["time"],
-          satsPerByte: element["satsPerByte"],
+        const movingAverage: MovingAverage = {
+          createdAt: element["createdAt"],
+          last30Days: element["last30Days"],
+          last365Days: element["last30Days"],
         };
-        data.push(feeEstimate);
+        data.push(movingAverage);
       });
       return data;
     } catch (e) {
@@ -69,11 +72,41 @@ export class DataOp implements IDataOp {
     }
   }
 
-  async fetchIndexHistory(): Promise<IndexDataResponse | Error> {
+  async fetchFeeIndexHistory(): Promise<Error | FeeIndex[]> {
     try {
-      const feeHistoryUrl = this.baseUrl + "/indexHistory";
+      const url = this.baseUrl + "/indexHistory";
       const res = await makeApiCall(
-        feeHistoryUrl,
+        url,
+        "GET",
+        AxiosHeaders.from(`x-api-key: ${this.apiKey}`),
+      );
+
+      if (res instanceof Error) {
+        console.error(res);
+        throw res;
+      }
+
+      let data: FeeIndex[] = [];
+
+      res.forEach((element) => {
+        const index: FeeIndex = {
+          createdAt: element["createdAt"],
+          ratioLast30Days: element["ratioLast30Days"],
+          ratioLast365Days: element["ratioLast365Days"],
+        };
+        data.push(index);
+      });
+      return data;
+    } catch (e) {
+      return e;
+    }
+  }
+
+  async fetchIndexDetailedHistory(): Promise<IndexDataResponse | Error> {
+    try {
+      const url = this.baseUrl + "/indexHistoryDetailed";
+      const res = await makeApiCall(
+        url,
         "GET",
         AxiosHeaders.from(`x-api-key: ${this.apiKey}`),
       );
