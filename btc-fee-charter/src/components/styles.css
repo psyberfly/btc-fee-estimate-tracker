@@ -100,6 +100,7 @@ button:hover {
 }
 
 .nav {
+  position: absolute;
   width: 200px; /* Adjust based on your preference */
   padding-left: 10px;
   padding-right: 5px; /* Adds padding inside the nav container, affecting all child elements */
@@ -109,7 +110,7 @@ button:hover {
   border-right: 1.5px solid var(--secondary-color-dark);
   transition: transform 0.3s ease;
   transform: translateX(-100%);
-  position: fixed;
+  overflow-y: auto;
   left: 0;
   top: 0;
   z-index: 9;
@@ -127,21 +128,21 @@ button:hover {
   transform: translateX(0);
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .hamburger {
     display: flex;
   }
   /* Adjustments for mobile screens can go here, if needed */
-}
+/*}
 
 @media (max-width: 768px) {
   .nav {
-    position: fixed;
+    position: absolute;
     left: 0;
     top: 0;
     z-index: 9; /* Ensure nav is above other content but below the hamburger */
-  }
-}
+/*  }
+} */
 
 .nav button {
   display: block;
