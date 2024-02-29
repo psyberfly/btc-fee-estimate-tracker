@@ -49,14 +49,14 @@ Chart.register(verticalLinePlugin);
 
 //This is of type ChartOptions<"line"> but TS compiler confuses Types with this lib.
 //INDEX CHART:
-const getChartOptions = (chartType: ServiceChartType, timescaleOptions: TimescaleOptions, width:number) => {
+const getChartOptions = (chartType: ServiceChartType, timescaleOptions: TimescaleOptions, width: number) => {
     let yMin: number = 0;
     let yText: string;
     let xText: string = "time";
     let title: string;
     let subtitle: string;
-    const titleFontSize:number = width < 768 ? 16: 20;
-    const subTitleFontSize:number = width < 768 ? 14: 16;
+    const titleFontSize: number = width < 768 ? 16 : 20;
+    const subTitleFontSize: number = width < 768 ? 14 : 16;
 
 
 
@@ -86,7 +86,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
         layout: {
             padding: {
                 top: 50,
-                bottom:20, // Adjust the value to meet your needs
+                bottom: 20, // Adjust the value to meet your needs
             }
         },
         scales: {
@@ -215,7 +215,6 @@ const ChartView = ({ dataset, chartType }) => {
 
         useLayoutEffect(() => {
             function updateSize() {
-                console.log(`size changed: ${window.innerWidth}` )
                 setSize([window.innerWidth, window.innerHeight]);
             }
 
@@ -226,25 +225,7 @@ const ChartView = ({ dataset, chartType }) => {
         }, []);
 
         return size;
-     }
-
-    // useEffect(() => {
-    //     const updateCanvasHeight = () => {
-    //         let newCanvasHeight;
-    //         if (width < 768) {
-    //             newCanvasHeight = 2000; // Mobile
-    //         } else if (width < 1024) {
-    //             newCanvasHeight = 1500; // Tablet
-    //         } else {
-    //             newCanvasHeight = 1000; // Desktop
-    //         }
-    //         setCanvasHeight(newCanvasHeight);
-    //     };
-
-    //     updateCanvasHeight();
-    // }, [width]);
-
-
+    }
 
     useEffect(() => {
         const createOrUpdateChartInstance = () => {
@@ -282,7 +263,7 @@ const ChartView = ({ dataset, chartType }) => {
             chartInstance.options = updatedOptions;
             chartInstance.update();
         }
-    }, [selectedScale, chartInstance,width]);
+    }, [selectedScale, chartInstance, width]);
 
     const handleScaleChange = (e) => {
         setSelectedScale(e.target.value);
@@ -301,8 +282,6 @@ const ChartView = ({ dataset, chartType }) => {
                 </select>
                 <canvas
                     ref={chartContainer}
-                    // width={1800} // Set fixed width
-                    // height={canvasHeight} // Set dynamic height
                     style={{ width: '100%', height: '100%' }}
                 ></canvas>
 

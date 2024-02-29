@@ -146,22 +146,6 @@ button:hover {
   transform: translateX(0);
 }
 
-/* @media (max-width: 768px) {
-  .hamburger {
-    display: flex;
-  }
-  /* Adjustments for mobile screens can go here, if needed */
-/*}
-
-@media (max-width: 768px) {
-  .nav {
-    position: absolute;
-    left: 0;
-    top: 0;
-    z-index: 9; /* Ensure nav is above other content but below the hamburger */
-/*  }
-} */
-
 .nav button {
   display: block;
   width: calc(100% - 10px); /* Adjust button width to account for left margin/padding */
