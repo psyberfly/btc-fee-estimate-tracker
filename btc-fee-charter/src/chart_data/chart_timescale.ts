@@ -1,4 +1,15 @@
-import { TimeLib } from "../../lib/time";
+import { TimeLib } from "../lib/time";
+
+export enum TimeRange {
+  Last1Hour = "Last 1 hour",
+  Last5Hours = "Last 5 hours",
+  Last1Day = "Last 1 day",
+  Last5Days = "Last 5 days",
+  Last1Month = "Last 1 month",
+  Last5Months = "Last 5 months",
+  Last1Year = "Last 1 year",
+}
+
 
 enum TimescaleUnit {
   minute = "minute",
@@ -56,7 +67,7 @@ function calculateYMax(xMin: number, xMax: number, datasets: any): number {
 
 export class ChartTimescale {
   private static timescaleConfigurations = {
-    "Last 1 hour": {
+    [TimeRange.Last1Hour]: {
       setup: () => {
         const xMin = TimeLib.getMsSinceEpochXHoursAgo(1);
         const xMax = TimeLib.getMsSinceEpochXHoursAgo(0);
@@ -65,7 +76,7 @@ export class ChartTimescale {
       unit: TimescaleUnit.minute,
       stepSize: 10,
     },
-    "Last 5 hours": {
+    [TimeRange.Last5Hours]: {
       setup: () => {
         const xMin = TimeLib.getMsSinceEpochXHoursAgo(5);
         const xMax = TimeLib.getMsSinceEpochXHoursAgo(0);
@@ -83,7 +94,7 @@ export class ChartTimescale {
       unit: TimescaleUnit.hour,
       stepSize: 6,
     },
-    "Last 5 days": {
+    [TimeRange.Last5Days]: {
       setup: () => {
         const xMin = TimeLib.getMsSinceEpochXDaysAgo(5);
         const xMax = TimeLib.getMsSinceEpochXDaysAgo(0);
@@ -92,7 +103,7 @@ export class ChartTimescale {
       unit: TimescaleUnit.day,
       stepSize: 1,
     },
-    "Last 1 month": {
+    [TimeRange.Last1Month]: {
       setup: () => {
         const xMin = TimeLib.getMsSinceEpochXMonthsAgo(1);
         const xMax = TimeLib.getMsSinceEpochXMonthsAgo(0);
@@ -101,7 +112,7 @@ export class ChartTimescale {
       unit: TimescaleUnit.week,
       stepSize: 1,
     },
-    "Last 5 months": {
+    [TimeRange.Last5Months]: {
       setup: () => {
         const xMin = TimeLib.getMsSinceEpochXMonthsAgo(5);
         const xMax = TimeLib.getMsSinceEpochXMonthsAgo(0);
@@ -110,7 +121,7 @@ export class ChartTimescale {
       unit: TimescaleUnit.month,
       stepSize: 1,
     },
-    "Last 1 year": {
+    [TimeRange.Last1Year]: {
       setup: () => {
         const xMin = TimeLib.getMsSinceEpochXYearsAgo(1);
         const xMax = TimeLib.getMsSinceEpochXYearsAgo(0);
@@ -141,7 +152,7 @@ export class ChartTimescale {
     }
   }
 
-  public static getRangeOptions(): string[] {
-    return Object.keys(this.timescaleConfigurations);
+  public static getRangeOptions(): TimeRange[] {
+    return Object.values(TimeRange);
   }
 }
