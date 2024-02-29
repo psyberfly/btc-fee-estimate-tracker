@@ -49,12 +49,14 @@ Chart.register(verticalLinePlugin);
 
 //This is of type ChartOptions<"line"> but TS compiler confuses Types with this lib.
 //INDEX CHART:
-const getChartOptions = (chartType: ServiceChartType, timescaleOptions: TimescaleOptions,) => {
+const getChartOptions = (chartType: ServiceChartType, timescaleOptions: TimescaleOptions, width:number) => {
     let yMin: number = 0;
     let yText: string;
     let xText: string = "time";
     let title: string;
     let subtitle: string;
+    const titleFontSize:number = width < 768 ? 16: 20;
+    const subTitleFontSize:number = width < 768 ? 14: 16;
 
 
 
@@ -81,6 +83,12 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
         responsive: true,
         maintainAspectRatio: false, //false=stretch to fit
         animation: false,
+        layout: {
+            padding: {
+                top: 50,
+                bottom:20, // Adjust the value to meet your needs
+            }
+        },
         scales: {
             x: {
                 min: timescaleOptions.xMin,
@@ -131,7 +139,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 color: titleColor,
                 font: {
                     family: fontFamily,
-                    size: 20,
+                    size: titleFontSize,
                 },
             },
             subtitle: {
@@ -143,7 +151,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 color: secondaryColor,
                 font: {
                     family: fontFamily,
-                    size: 14,
+                    size: subTitleFontSize,
                 },
             },
             tooltip: {
@@ -200,25 +208,25 @@ const ChartView = ({ dataset, chartType }) => {
     const [chartInstance, setChartInstance] = useState(null);
 
     // //FOR RESPONSIVE VIEW:
-    // const [width, height] = useWindowSize();
+    const [width, height] = useWindowSize();
 
-    // function useWindowSize() {
-    //     const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
+    function useWindowSize() {
+        const [size, setSize] = useState([window.innerWidth, window.innerHeight]);
 
-    //     useLayoutEffect(() => {
-    //         function updateSize() {
-    //             console.log(`size changed: ${window.innerWidth}` )
-    //             setSize([window.innerWidth, window.innerHeight]);
-    //         }
+        useLayoutEffect(() => {
+            function updateSize() {
+                console.log(`size changed: ${window.innerWidth}` )
+                setSize([window.innerWidth, window.innerHeight]);
+            }
 
-    //         window.addEventListener('resize', updateSize);
-    //         updateSize();
+            window.addEventListener('resize', updateSize);
+            updateSize();
 
-    //         return () => window.removeEventListener('resize', updateSize);
-    //     }, []);
+            return () => window.removeEventListener('resize', updateSize);
+        }, []);
 
-    //     return size;
-    // }
+        return size;
+     }
 
     // useEffect(() => {
     //     const updateCanvasHeight = () => {
@@ -246,7 +254,7 @@ const ChartView = ({ dataset, chartType }) => {
 
             if (chartContainer.current && dataset) {
                 const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedScale, dataset.datasets);
-                const options = getChartOptions(chartType, timescaleOptions) as ChartOptions<"line">;
+                const options = getChartOptions(chartType, timescaleOptions, width) as ChartOptions<"line">;
 
                 const newChartInstance = new Chart(chartContainer.current, {
                     type: 'line',
@@ -270,11 +278,11 @@ const ChartView = ({ dataset, chartType }) => {
     useEffect(() => {
         if (chartInstance) {
             const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedScale, dataset.datasets);
-            const updatedOptions = getChartOptions(chartType, timescaleOptions) as ChartOptions<"line">;
+            const updatedOptions = getChartOptions(chartType, timescaleOptions, width) as ChartOptions<"line">;
             chartInstance.options = updatedOptions;
             chartInstance.update();
         }
-    }, [selectedScale, chartInstance,]);
+    }, [selectedScale, chartInstance,width]);
 
     const handleScaleChange = (e) => {
         setSelectedScale(e.target.value);
@@ -284,12 +292,6 @@ const ChartView = ({ dataset, chartType }) => {
     return (
         <div className="chart-container">
             <div className="chart-wrapper">
-                <canvas
-                    ref={chartContainer}
-                    // width={1800} // Set fixed width
-                    // height={canvasHeight} // Set dynamic height
-                    style={{ width: '100%', height: '100%' }}
-                ></canvas>
                 <select value={selectedScale} onChange={handleScaleChange}>
                     {timescales.map((timescale, index) => (
                         <option key={index} value={timescale}>
@@ -297,6 +299,13 @@ const ChartView = ({ dataset, chartType }) => {
                         </option>
                     ))}u
                 </select>
+                <canvas
+                    ref={chartContainer}
+                    // width={1800} // Set fixed width
+                    // height={canvasHeight} // Set dynamic height
+                    style={{ width: '100%', height: '100%' }}
+                ></canvas>
+
             </div>
         </div>
     );

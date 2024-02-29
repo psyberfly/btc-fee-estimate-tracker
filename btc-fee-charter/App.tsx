@@ -87,7 +87,7 @@ const App = () => {
     </button>
     <h1>BTC Fee Estimate Tracker</h1>
     {lastUpdated && (
-      <span style={{ marginLeft: 'auto' }}>Last updated: {lastUpdated.toLocaleString()}</span>
+      <h2 style={{ marginLeft: 'auto' }}>Last updated: {lastUpdated.toLocaleString()}</h2>
     )}
   </div>
   <div style={{ display: 'flex' }}>
