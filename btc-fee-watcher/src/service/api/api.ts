@@ -22,9 +22,9 @@ export class ApiService implements IApiService {
   }
 
 
-  async getIndexHistory(): Promise<Error | FeeIndex[]> {
+  async getIndexHistory(since:Date): Promise<Error | FeeIndex[]> {
     try {
-      const allFeeEst = await this.indexOp.readAll();
+      const allFeeEst = await this.indexOp.readAll(since);
       if (allFeeEst instanceof Error) {
         return handleError(allFeeEst);
       }
@@ -35,9 +35,9 @@ export class ApiService implements IApiService {
     }
   }
 
-  async getMovingAverageHistory(): Promise<Error | MovingAverage[]> {
+  async getMovingAverageHistory(since:Date): Promise<Error | MovingAverage[]> {
     try {
-      const allFeeEst = await this.movingAverageOp.readAll();
+      const allFeeEst = await this.movingAverageOp.readAll(since);
       if (allFeeEst instanceof Error) {
         return handleError(allFeeEst);
       }
@@ -48,9 +48,9 @@ export class ApiService implements IApiService {
     }
   }
 
-  async getFeeEstimateHistory(): Promise<Error | FeeEstimate[]> {
+  async getFeeEstimateHistory(since:Date): Promise<Error | FeeEstimate[]> {
     try {
-      const allFeeEst = await this.feeOp.readAll();
+      const allFeeEst = await this.feeOp.readAll(since);
       if (allFeeEst instanceof Error) {
         return handleError(allFeeEst);
       }
@@ -60,6 +60,8 @@ export class ApiService implements IApiService {
       return handleError(e);
     }
   }
+
+  //UNUSED:
 
   async getIndexDetailedHistory(): Promise<Error | FeeIndexDetailed[]> {
     try {

@@ -34,8 +34,8 @@ export class FeeOp implements IFeeEstimateOp {
     return res;
   }
 
-  async readAll(): Promise<FeeEstimate[] | Error> {
-        const res = await this.store.readAll();
+  async readAll(since:Date): Promise<FeeEstimate[] | Error> {
+        const res = await this.store.readAll(since);
     return res;
   }
 

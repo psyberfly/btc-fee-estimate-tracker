@@ -13,9 +13,10 @@ export class DataOp implements IDataOp {
   private baseUrl = import.meta.env.VITE_FEE_WATCHER_PUBLIC_API_URL;
   private apiKey = import.meta.env.VITE_FEE_WATCHER_API_KEY;
 
-  async fetchFeeEstimateHistory(): Promise<FeeEstimate[] | Error> {
+  async fetchFeeEstimateHistory(since: Date): Promise<FeeEstimate[] | Error> {
     try {
-      const url = this.baseUrl + "/feeEstimateHistory";
+      const sinceUnixTime = since.getTime();
+      const url = this.baseUrl + `/feeEstimateHistory?since=${sinceUnixTime}`;
       const res = await makeApiCall(
         url,
         "GET",
@@ -42,9 +43,12 @@ export class DataOp implements IDataOp {
     }
   }
 
-  async fetchMovingAverageHistory(): Promise<MovingAverage[] | Error> {
+  async fetchMovingAverageHistory(
+    since: Date,
+  ): Promise<MovingAverage[] | Error> {
     try {
-      const url = this.baseUrl + "/movingAverageHistory";
+      const sinceUnixTime = since.getTime();
+      const url = this.baseUrl + `/movingAverageHistory?since=${sinceUnixTime}`;
       const res = await makeApiCall(
         url,
         "GET",
@@ -72,9 +76,10 @@ export class DataOp implements IDataOp {
     }
   }
 
-  async fetchFeeIndexHistory(): Promise<Error | FeeIndex[]> {
+  async fetchFeeIndexHistory(since: Date): Promise<Error | FeeIndex[]> {
     try {
-      const url = this.baseUrl + "/indexHistory";
+      const sinceUnixTime = since.getTime();
+      const url = this.baseUrl + `/indexHistory?since=${sinceUnixTime}`;
       const res = await makeApiCall(
         url,
         "GET",

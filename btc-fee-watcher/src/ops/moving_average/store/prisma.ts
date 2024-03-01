@@ -3,12 +3,27 @@ import { prisma } from "../../../main";
 import { handleError } from "../../../lib/errors/e";
 
 export class MovingAveragePrismaStore {
-  async readAll(): Promise<MovingAverage[] | Error> {
+  async readAll(since?: Date): Promise<MovingAverage[] | Error> {
     try {
-      const all = await prisma.movingAverage.findMany({
+      // Initialize the query parameters with orderBy
+      let queryParameters: any = {
         orderBy: { createdAt: "desc" },
-      });
-      return all;
+      };
+
+      console.log({since});
+
+      // If since is provided, add a where clause to the query parameters
+      if (since) {
+        queryParameters.where = {
+          createdAt: {
+            gt: since, // Use the "gt" (greater than) operator to filter records after the "since" date
+          },
+        };
+      }
+
+      const allMovAvgRes = await prisma.movingAverage.findMany(queryParameters);
+
+      return allMovAvgRes;
     } catch (error) {
       return handleError(error);
     }

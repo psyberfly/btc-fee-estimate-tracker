@@ -41,4 +41,5 @@ NodeJs (Typescript), Postgres, Docker(optional)
 1. Signing key for lib/http/handler.ts not generated:
    'No response signing key found!. Run $ ditto crpf sats_sig'
    Sample signature used for dev. Resolve issue for prod...
+2. 500 error response is wrong: {"error":"Internal Error. Contact support@satsbank.io"}
 

@@ -44,20 +44,21 @@ export interface IndexDataResponse {
 }
 
 export interface IDataOp {
-  fetchFeeIndexHistory(): Promise<FeeIndex[] | Error>;
-  fetchMovingAverageHistory(): Promise<MovingAverage[] | Error>;
-  fetchFeeEstimateHistory(): Promise<FeeEstimate[] | Error>;
+  fetchFeeIndexHistory(since: Date): Promise<FeeIndex[] | Error>;
+  fetchMovingAverageHistory(since: Date): Promise<MovingAverage[] | Error>;
+  fetchFeeEstimateHistory(since: Date): Promise<FeeEstimate[] | Error>;
+  //unused:
   fetchIndexDetailedHistory(): Promise<IndexDataResponse | Error>; //unused
 }
 
 export interface IChartDatasetOp {
   //getFromData<T>(data: T[], kind: ServiceChartType): object | Error;
-  
+
   getFromData<T extends FeeIndex[] | MovingAverage[] | FeeEstimate[]>(
     data: T,
-    kind: ServiceChartType
+    kind: ServiceChartType,
   ): object | Error;
-  
+
   //new
   // getFeeIndex(data: FeeIndex[]): object | Error;
   // getMovingAverage(data: MovingAverage[]): object | Error;

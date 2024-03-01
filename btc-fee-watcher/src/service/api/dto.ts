@@ -19,35 +19,60 @@ export async function handleGetIndex(req, res) {
   }
 }
 
-
-
 export async function handleGetIndexHistory(req, res) {
   const request = parseRequest(req);
+
   try {
-    let indexHistory = await apiService.getIndexHistory();
+    const since = parseInt(req.query["since"], 10);
+
+   if (isNaN(since)) {
+      await respond(
+        400,
+        "Missing or invalid query param since (Unix timestamp)",
+        res,
+        request,
+      );
+      return;
+    }
+  
+    let indexHistory = await apiService.getIndexHistory(new Date(since));
 
     if (indexHistory instanceof Error) {
       throw indexHistory;
     }
-    res.send(indexHistory);
-    //    await respond(200, indexView, res, request);
+    await respond(200, indexHistory, res, request);
   } catch (e) {
     const result = filterError(e, r_500, request);
     await respond(result.code, result.message, res, request);
   }
 }
 
-
 export async function handleGetMovingAverageHistory(req, res) {
   const request = parseRequest(req);
+
   try {
-    let movingAverageHistory = await apiService.getMovingAverageHistory();
+    const since = parseInt(req.query["since"], 10);
+
+   if (isNaN(since)) {
+      await respond(
+        400,
+        "Missing or invalid query param since (Unix timestamp)",
+        res,
+        request,
+      );
+      return;
+    }
+  
+
+    let movingAverageHistory = await apiService.getMovingAverageHistory(
+      new Date(since),
+    );
 
     if (movingAverageHistory instanceof Error) {
       throw movingAverageHistory;
     }
-    res.send(movingAverageHistory);
-    //    await respond(200, indexView, res, request);
+    //res.send(movingAverageHistory);
+    await respond(200, movingAverageHistory, res, request);
   } catch (e) {
     const result = filterError(e, r_500, request);
     await respond(result.code, result.message, res, request);
@@ -57,18 +82,32 @@ export async function handleGetMovingAverageHistory(req, res) {
 export async function handleGetFeeEstimateHistory(req, res) {
   const request = parseRequest(req);
   try {
-    let feeEstHistory = await apiService.getFeeEstimateHistory();
+    const since = parseInt(req.query["since"], 10);
+
+   if (isNaN(since)) {
+      await respond(
+        400,
+        "Missing or invalid query param since (Unix timestamp)",
+        res,
+        request,
+      );
+      return;
+    }
+  
+    let feeEstHistory = await apiService.getFeeEstimateHistory(new Date(since));
 
     if (feeEstHistory instanceof Error) {
       throw feeEstHistory;
     }
-    res.send(feeEstHistory);
-    //    await respond(200, indexView, res, request);
+    //res.send(feeEstHistory);
+    await respond(200, feeEstHistory, res, request);
   } catch (e) {
     const result = filterError(e, r_500, request);
     await respond(result.code, result.message, res, request);
   }
 }
+
+//UNUSED:
 
 export async function handleGetIndexDetailedHistory(req, res) {
   const request = parseRequest(req);

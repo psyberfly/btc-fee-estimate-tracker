@@ -4,12 +4,11 @@ import ChartView from './src/components/chart_view/chart_view';
 import { DataOp } from './src/chart_data/data_op';
 import { ChartDatasetOp } from './src/chart_data/chart_dataset_op';
 import { ServiceChartType } from './src/chart_data/interface';
-// import Dexie from 'dexie';
+import { TEN_MINUTES_MS, TimeLib } from './src/lib/time';
+import { Store } from './src/store/store';
 
-// const db = new Dexie('ChartDataDB');
-// db.version(1).stores({
-//   chartData: 'type,lastUpdated,data',
-// });
+
+//Extract functions out of useEffect and only invoke functions and setState from inside it. 
 
 const App = () => {
   const [chartData, setChartData] = useState(null);
@@ -36,6 +35,7 @@ const App = () => {
 
   const dataOp = new DataOp();
   const chartDataOp = new ChartDatasetOp();
+  const store = new Store();
 
   useEffect(() => {
     const fetchDataForChartType = async (chartType) => {
@@ -43,15 +43,25 @@ const App = () => {
         setLoading(prev => ({ ...prev, [chartType]: true }));
         let data;
 
+        //first read latest timestamp from DB
+        let lastUpdated = await store.latestDataTimestamp(chartType);
+
+        console.log({lastUpdated});
+
+        if(!lastUpdated){
+          lastUpdated = new Date(TimeLib.getMsSinceEpochXMonthsAgo(1));
+        }
+
+        //fetch the latest readings from watcher beyond latest timestamp
         switch (chartType) {
           case ServiceChartType.index:
-            data = await dataOp.fetchFeeIndexHistory();
+            data = await dataOp.fetchFeeIndexHistory(lastUpdated);
             break;
           case ServiceChartType.movingAverage:
-            data = await dataOp.fetchMovingAverageHistory();
+            data = await dataOp.fetchMovingAverageHistory(lastUpdated);
             break;
           case ServiceChartType.feeEstimate:
-            data = await dataOp.fetchFeeEstimateHistory();
+            data = await dataOp.fetchFeeEstimateHistory(lastUpdated);
             break;
           default:
             throw new Error('Invalid chart type');
@@ -61,6 +71,16 @@ const App = () => {
           console.error(`Error fetching data for ${chartType}`);
           throw data;
         }
+
+        //Should the first storage use store.create instead of upsert? Will upsert suffice?
+        //upsert this history to DB
+        const isDataStored = await store.upsert(chartType, data);
+
+        if (isDataStored instanceof Error) {
+          throw new Error(`Error storing data to DB: ${isDataStored}`);
+        }
+
+        //if storage successful, update App state.
 
         const chartData = chartDataOp.getFromData(data, chartType);
         if (chartData instanceof Error) {
@@ -79,6 +99,10 @@ const App = () => {
     };
 
     fetchDataForChartType(chartType);
+
+    setInterval(() => {
+      fetchDataForChartType(chartType);
+    }, TEN_MINUTES_MS);
 
   }, [chartType]);
 
@@ -127,7 +151,7 @@ const App = () => {
 
   return (
     <div>
-     <div className="title-bar">
+      <div className="title-bar">
         <button ref={hamburgerRef} className="hamburger" onClick={() => setIsNavOpen(!isNavOpen)}>
           <div /><div /><div />
         </button>

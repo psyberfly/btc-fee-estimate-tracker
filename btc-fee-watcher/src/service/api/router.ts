@@ -17,9 +17,7 @@ const authenticateAPIKey = (req, res, next) => {
   const apiKey = req.headers["x-api-key"];
 
   if (apiKey == null) return res.sendStatus(401);
-
   if (apiKey !== process.env.API_KEY) return res.sendStatus(403);
-
   next();
 };
 

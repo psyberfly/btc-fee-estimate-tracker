@@ -70,14 +70,25 @@ export class FeeEstimatePrismaStore {
     }
   }
 
-  async readAll(): Promise<FeeEstimate[] | Error> {
+  async readAll(since:Date): Promise<FeeEstimate[] | Error> {
     try {
-      const feeEstHistory = await prisma.feeEstimate.findMany();
-      return feeEstHistory.map((row) => ({
-        id: row.id,
-        time: row.time,
-        satsPerByte: row.satsPerByte,
-      }));
+      // Initialize the query parameters with orderBy
+      let queryParameters: any = {
+        orderBy: { time: "desc" },
+      };
+
+      // If since is provided, add a where clause to the query parameters
+      if (since) {
+        queryParameters.where = {
+          time: {
+            gt: since, // Use the "gt" (greater than) operator to filter records after the "since" date
+          },
+        };
+      }
+
+      const allFeeEstRes = await prisma.feeEstimate.findMany(queryParameters);
+
+      return allFeeEstRes;
     } catch (error) {
       return handleError(error);
     }

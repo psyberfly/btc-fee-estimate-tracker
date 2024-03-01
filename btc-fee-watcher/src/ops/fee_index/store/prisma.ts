@@ -37,17 +37,45 @@ export class FeeIndexPrismaStore {
     }
   }
 
-  async fetchAll(): Promise<FeeIndex[] | Error> {
+  // async fetchAll(): Promise<FeeIndex[] | Error> {
+  //   try {
+  //     const allFeeIndexRes = await prisma.feeIndex.findMany({
+  //       orderBy: { createdAt: "desc" },
+  //     });
+
+  //     return allFeeIndexRes;
+  //   } catch (error) {
+  //     return handleError(error);
+  //   }
+  // }
+
+  async fetchAll(since?: Date): Promise<FeeIndex[] | Error> {
     try {
-      const allFeeIndexRes = await prisma.feeIndex.findMany({
+      // Initialize the query parameters with orderBy
+      let queryParameters: any = {
         orderBy: { createdAt: "desc" },
-      });
+      };
+
+      console.log({since});
+
+      // If since is provided, add a where clause to the query parameters
+      if (since) {
+        queryParameters.where = {
+          createdAt: {
+            gt: since, // Use the "gt" (greater than) operator to filter records after the "since" date
+          },
+        };
+      }
+
+      const allFeeIndexRes = await prisma.feeIndex.findMany(queryParameters);
 
       return allFeeIndexRes;
     } catch (error) {
       return handleError(error);
     }
   }
+
+  //UNUSED:
 
   async fetchAllDetailed(): Promise<FeeIndexDetailed[] | Error> {
     try {

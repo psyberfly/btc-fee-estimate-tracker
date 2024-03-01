@@ -5,7 +5,7 @@ import gradient from "chartjs-plugin-gradient";
 Chart.register(gradient);
 import annotationPlugin from "chartjs-plugin-annotation";
 import { ServiceChartType } from '../../chart_data/interface';
-import { ChartTimescale, TimescaleOptions } from './chart_timescale';
+import { ChartTimescale, TimescaleOptions } from "../../chart_data/chart_timescale";
 Chart.register(annotationPlugin);
 
 Chart.defaults.elements.point.pointStyle = false;
