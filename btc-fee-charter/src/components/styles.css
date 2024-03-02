@@ -1,31 +1,47 @@
+@font-face {
+  font-family: 'Bebas Neue';
+  src: local('Bebas Neue'), url('../assets/fonts/bebasneue-regular.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+}
+
+
 :root {
-  --primary-color: rgb(255, 111, 0);
+  --primary-color: #E21F26;
   --secondary-color: #6c757d;
   --secondary-color-dark: #3d4246;
-  --bg-color: rgb(16, 17, 21);
-  --text-color: rgb(211, 211, 211);
+  --bg-color: rgb(0, 0, 0);
+  --text-color: rgb(255, 255, 255);
   --text-color-secondary: rgb(190, 190, 190);
   --hover-color: rgb(13, 150, 255);
+  --title-font: "Bebas Neue", sans-serif;
+  --body-font: Tahoma, sans-serif;
+}
+
+.logo {
+  height: 40px; /* Adjust based on your needs */
+  margin-left: 5px; /* Space between the logo and the title */
 }
 
 
 body {
-  font-family: 'Courier New', monospace;
+  font-family: var(--body-font);
   margin: 0;
   padding: 0;
   background-color: var(--bg-color);
 }
 
 h1 {
-  font-family: 'Courier New', monospace;
-  font-size: 18px;
+  font-family: var(--title-font);
+  font-size: 26px;
   color: var(--text-color);
-   padding: 0px 15px; 
+  padding: 0px 5px;
 }
 
 
 h2 {
-  font-size: 16px;
+  font-size: 18px;
+  font-family: var(--body-font);
   color: var(--text-color);
   padding: 5px;
 }
@@ -34,6 +50,7 @@ h2 {
   h1 {
     font-size: 15px;
   }
+
   h2 {
     font-size: 13px;
   }
@@ -47,11 +64,10 @@ select {
   right: 0px;
   padding: 5px;
   margin-top: 20px;
-  margin-bottom: 100px;
-  
+  margin-bottom: 0px;
   color: var(--text-color);
-  font-family: 'Courier New', monospace;
-  font-size: 14px;
+  font-family: var(--body-font);
+  font-size: 16px;
   background-color: var(--chart-view-bg-color);
   /* border-radius: 4px;
   border-color: var(--secondary-color); */
@@ -63,8 +79,10 @@ select {
 /* Attempt to style the option elements */
 select option {
   padding: 5px;
-  background-color: var(--bg-color) !important; /* Attempt to set the background color */
-  color: white !important; /* Attempt to set the text color to white */
+  background-color: var(--bg-color) !important;
+  /* Attempt to set the background color */
+  color: white !important;
+  /* Attempt to set the text color to white */
 }
 
 
@@ -81,8 +99,8 @@ button {
   text-decoration: none;
   /* Remove underline by default */
   display: inline;
-  font-size: 14px;
-  font-family: 'Courier New', monospace;
+  font-size: 18px;
+  font-family: var(--body-font);
   margin: 4px 2px;
   cursor: pointer;
 
@@ -112,17 +130,21 @@ button:hover {
 .hamburger div {
   width: 30px;
   height: 1.5px;
-  background: rgb(255, 255, 255); /* Adjust color based on your theme */
+  background: rgb(255, 255, 255);
+  /* Adjust color based on your theme */
   border-radius: 10px;
   transition: all 0.3s linear;
 }
 
 .nav {
   position: absolute;
-  width: 200px; /* Adjust based on your preference */
+  width: 200px;
+  /* Adjust based on your preference */
   padding-left: 10px;
-  padding-right: 5px; /* Adds padding inside the nav container, affecting all child elements */
-  box-sizing: border-box; /* Ensures the padding doesn't extend the nav container's width */
+  padding-right: 5px;
+  /* Adds padding inside the nav container, affecting all child elements */
+  box-sizing: border-box;
+  /* Ensures the padding doesn't extend the nav container's width */
   height: 100vh;
   background: var(--bg-color);
   border-right: 1.5px solid var(--secondary-color-dark);
@@ -135,10 +157,13 @@ button:hover {
 }
 
 .nav h2 {
-  margin-top: 60px; /* Adjust as needed */
-  margin-bottom: 10px; /* Provides spacing between the heading and the first button */
+  margin-top: 60px;
+  /* Adjust as needed */
+  margin-bottom: 10px;
+  /* Provides spacing between the heading and the first button */
   margin-left: 0px;
-  text-align: left; /* Centers the heading text, if desired */
+  text-align: left;
+  /* Centers the heading text, if desired */
 }
 
 /* When nav is open, translate it into view */
@@ -148,8 +173,10 @@ button:hover {
 
 .nav button {
   display: block;
-  width: calc(100% - 10px); /* Adjust button width to account for left margin/padding */
-  padding: 12px; /* Adjust padding as needed */
+  width: calc(100% - 10px);
+  /* Adjust button width to account for left margin/padding */
+  padding: 12px;
+  /* Adjust padding as needed */
   border-bottom: 1px solid var(--secondary-color-dark);
   background: transparent;
   cursor: pointer;
@@ -159,7 +186,8 @@ button:hover {
 
 /* Optional: Add styles for hover effect to improve user experience */
 .nav button:hover {
-  background-color: var(--hover-bg-color); /* Replace with your hover background color variable */
+  background-color: var(--hover-bg-color);
+  /* Replace with your hover background color variable */
 }
 
 
@@ -171,7 +199,8 @@ button:hover {
   border-bottom: 1.5px solid var(--secondary-color-dark);
   display: flex;
   justify-content: space-between;
-  align-items: center; /* Aligns children vertically in the center */
+  align-items: center;
+  /* Aligns children vertically in the center */
   /* Aligns items to each end of the container */
 }
 
@@ -188,7 +217,7 @@ button:hover {
   height: 94vh;
   display: flex;
   justify-content: center;
-  align-items:start;
+  align-items: start;
 }
 
 .chart-wrapper {
@@ -204,7 +233,8 @@ button:hover {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 100%; /* This ensures the text is centered in the div */
+  width: 100%;
+  /* This ensures the text is centered in the div */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -217,7 +247,8 @@ button:hover {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 100%; /* This ensures the text is centered in the div */
+  width: 100%;
+  /* This ensures the text is centered in the div */
   display: flex;
   justify-content: center;
   align-items: center;

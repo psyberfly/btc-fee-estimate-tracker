@@ -17,9 +17,9 @@ Chart.defaults.scales.time.adapters.date = { "timezone": "UTC" };
 Chart.defaults.scale.ticks.color = "rgb(255,255,255)";
 Chart.defaults.scale.grid.color = "rgba(199, 199, 199, 0.2)";
 
-const titleColor = "rgb(211, 211, 211)";
-const secondaryColor = "rgb(180, 180, 180)";
-const fontFamily = "Courier New, monospace";
+const titleColor = "#E21F26";
+const secondaryColor = "#FFFFFF";
+const fontFamily = 'Tahoma, sans-serif';
 
 const verticalLinePlugin = {
     id: "verticalLine",
@@ -55,8 +55,8 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
     let xText: string = "time";
     let title: string;
     let subtitle: string;
-    const titleFontSize: number = width < 768 ? 16 : 20;
-    const subTitleFontSize: number = width < 768 ? 14 : 16;
+    const titleFontSize: number = width < 768 ? 16 : 24;
+    const subTitleFontSize: number = width < 768 ? 14 : 20;
 
 
 
@@ -102,7 +102,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                     text: xText,
                     color: secondaryColor,
                     font: {
-                        size: 14,
+                        size: 18,
                         family: fontFamily,
                     },
                     padding: { top: 20 }
@@ -119,7 +119,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                     text: yText,
                     color: secondaryColor,
                     font: {
-                        size: 14,
+                        size: 18,
                         family: fontFamily,
                     },
                     padding: { bottom: 20 }
@@ -167,6 +167,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 labels: {
                     font: {
                         family: fontFamily,
+                        size:14
                     },
                     color: secondaryColor,
                     pointStyleWidth: 30,
