@@ -155,4 +155,14 @@ export class ChartTimescale {
   public static getRangeOptions(): TimeRange[] {
     return Object.values(TimeRange);
   }
+
+  public static getStartEndTimestampsFromTimerange(selectedRange: TimeRange): [number, number] {
+    const configuration = ChartTimescale.timescaleConfigurations[selectedRange];
+    if (configuration) {
+      const { xMin, xMax } = configuration.setup();
+      return [xMin, xMax];
+    } else {
+      throw new Error("Error: Could not find data start timestamp for the selected range!");
+    }
+  }
 }

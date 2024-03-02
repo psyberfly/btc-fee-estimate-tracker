@@ -12,32 +12,54 @@ import { db } from "./dexie";
 //Update it each time after upsert/create.
 
 export class Store implements IStore {
-  latestDataTimestamp = async (
+  historyStartTimestamp = async (
     chartType: ServiceChartType,
   ): Promise<Date> => {
-    let latestTimeStamp: Date;
+    let record;
     switch (chartType) {
       case ServiceChartType.index:
-        latestTimeStamp = await db.feeIndex
-          .orderBy("createdAt")
-          .reverse() // Order by 'createdAt' descending (most recent first)
-          .first()["createdAt"];
+        record = await db.feeIndex.orderBy("createdAt").first();
+        break;
 
       case ServiceChartType.movingAverage:
-        return await db.movingAverages
-          .orderBy("createdAt")
-          .reverse() // Order by 'createdAt' descending (most recent first)
-          .first()["createdAt"];
+        record = await db.movingAverages.orderBy("createdAt").first();
+        break;
+
       case ServiceChartType.feeEstimate:
-        return await db.feeEstimates
-          .orderBy("time")
-          .reverse() // Order by 'createdAt' descending (most recent first)
-          .first()["time"];
+        record = await db.feeEstimates.orderBy("time").first();
+        break;
+
       default:
-        throw (Error(
-          " Store: latestDataTimestamp : Unknown ServiceChartType requested",
-        ));
+        throw new Error("Unknown ServiceChartType requested");
     }
+
+    if (!record) throw new Error("No records found");
+    return record.createdAt || record.time;
+  };
+
+  historyEndTimestamp = async (
+    chartType: ServiceChartType,
+  ): Promise<Date> => {
+    let record;
+    switch (chartType) {
+      case ServiceChartType.index:
+        record = await db.feeIndex.orderBy("createdAt").reverse().first();
+        break;
+
+      case ServiceChartType.movingAverage:
+        record = await db.movingAverages.orderBy("createdAt").reverse().first();
+        break;
+
+      case ServiceChartType.feeEstimate:
+        record = await db.feeEstimates.orderBy("time").reverse().first();
+        break;
+
+      default:
+        throw new Error("Unknown ServiceChartType requested");
+    }
+
+    if (!record) throw new Error("No records found");
+    return record.createdAt || record.time;
   };
 
   async create(
@@ -47,8 +69,7 @@ export class Store implements IStore {
     try {
       switch (chartType) {
         case ServiceChartType.index:
-          const dbCreateRes = await db.feeIndex.bulkAdd(data as FeeIndex[]);
-          console.log({ res: dbCreateRes });
+          await db.feeIndex.bulkAdd(data as FeeIndex[]);
           break;
         case ServiceChartType.movingAverage:
           await db.movingAverages.bulkAdd(data as MovingAverage[]);
@@ -65,27 +86,31 @@ export class Store implements IStore {
 
   async read(
     chartType: ServiceChartType,
-    from: Date,
-    to: Date,
+    // from: Date,
+    // to: Date,
   ): Promise<any | Error> {
     let data;
     try {
       switch (chartType) {
         case ServiceChartType.index:
-          data = await db.feeIndex.where("createdAt")
-            .between(from, to, true, true)
-            .toArray();
+          data = await db.feeIndex.toArray();
+          //  where("createdAt")
+          //   .between(from, to, true, true)
+          //   .toArray();
+          //
           break;
 
         case ServiceChartType.movingAverage:
-          data = await db.movingAverages.where("createdAt")
-            .between(from, to, true, true)
+          data = await db.movingAverages
+            // .where("createdAt")
+            // .between(from, to, true, true)
             .toArray();
           break;
 
         case ServiceChartType.feeEstimate:
-          data = await db.feeEstimates.where("time")
-            .between(from, to, true, true)
+          data = await db.feeEstimates
+            // .where("time")
+            // .between(from, to, true, true)
             .toArray();
           break;
       }
@@ -103,8 +128,7 @@ export class Store implements IStore {
     try {
       switch (chartType) {
         case ServiceChartType.index:
-          const dbCreateRes = await db.feeIndex.bulkPut(data as FeeIndex[]);
-          console.log({ res: dbCreateRes });
+          await db.feeIndex.bulkPut(data as FeeIndex[]);
           break;
         case ServiceChartType.movingAverage:
           await db.movingAverages.bulkPut(data as MovingAverage[]);

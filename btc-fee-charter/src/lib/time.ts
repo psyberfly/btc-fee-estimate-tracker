@@ -1,4 +1,5 @@
 export const TEN_MINUTES_MS = 10 * 60 * 1000;
+export const ONE_MINUTE_MS = 1 * 60 * 1000;
 
 export class TimeLib {
   static getMsSinceEpochXHoursAgo(hours: number) {

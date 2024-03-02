@@ -32,3 +32,5 @@ Then, every 10 mins:
 #### Lazy Loading >> TO DO
 
 Currently selectedTimeRange is within ChartView component and outside of main App where data fetching occurs. The selectedTimeRange should be used in the data fetching mechanism to fetch data from watcher according to selectedTimeRange. That is, at onset of app fetch only upto 1 month history (as this is always quite quick). Beyond that range, only fetch and store history for increasing ranges, i.e., fetch 1Y only when user selects 1Y or 5Y when user selects 5Y, and so on. 
+
+TO DO: Dexie reads all data but does not read data between two dates. Debug that!

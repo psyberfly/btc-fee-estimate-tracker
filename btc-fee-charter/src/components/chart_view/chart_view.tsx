@@ -198,13 +198,9 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
 };
 
 const timescales = ChartTimescale.getRangeOptions();
-const defaultTimeScale = timescales[2];
 
-// Type Errors are caused with react component because file is .tsx instead of .jsx 
-
-const ChartView = ({ dataset, chartType }) => {
+const ChartView = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
     const chartContainer = useRef(null);
-    const [selectedScale, setSelectedScale] = useState(defaultTimeScale);
     const [chartInstance, setChartInstance] = useState(null);
 
     // //FOR RESPONSIVE VIEW:
@@ -230,11 +226,11 @@ const ChartView = ({ dataset, chartType }) => {
     useEffect(() => {
         const createOrUpdateChartInstance = () => {
             if (chartInstance) {
-                chartInstance.destroy();
+                (chartInstance as any).destroy();
             }
 
             if (chartContainer.current && dataset) {
-                const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedScale, dataset.datasets);
+                const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedRange, dataset.datasets);
                 const options = getChartOptions(chartType, timescaleOptions, width) as ChartOptions<"line">;
 
                 const newChartInstance = new Chart(chartContainer.current, {
@@ -243,7 +239,7 @@ const ChartView = ({ dataset, chartType }) => {
                     options: options,
 
                 });
-                setChartInstance(newChartInstance);
+                setChartInstance(newChartInstance as any);
             }
         };
 
@@ -251,35 +247,36 @@ const ChartView = ({ dataset, chartType }) => {
 
         return () => {
             if (chartInstance) {
-                chartInstance.destroy();
+                (chartInstance as any).destroy();
             }
         };
     }, [dataset]); // Run this effect whenever data changes
 
     useEffect(() => {
         if (chartInstance) {
-            const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedScale, dataset.datasets);
+            const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedRange, dataset.datasets);
             const updatedOptions = getChartOptions(chartType, timescaleOptions, width) as ChartOptions<"line">;
-            chartInstance.options = updatedOptions;
-            chartInstance.update();
+            (chartInstance as any).options = updatedOptions;
+            (chartInstance as any).update();
         }
-    }, [selectedScale, chartInstance, width]);
+    }, [selectedRange, chartInstance, width]);
 
     const handleScaleChange = (e) => {
-        setSelectedScale(e.target.value);
+        setSelectedRange(e.target.value);
     };
 
 
     return (
         <div className="chart-container">
             <div className="chart-wrapper">
-                <select value={selectedScale} onChange={handleScaleChange}>
+                <select value={selectedRange} onChange={handleScaleChange}>
                     {timescales.map((timescale, index) => (
                         <option key={index} value={timescale}>
                             {timescale}
                         </option>
-                    ))}u
+                    ))}
                 </select>
+
                 <canvas
                     ref={chartContainer}
                     style={{ width: '100%', height: '100%' }}
