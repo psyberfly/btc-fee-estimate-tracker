@@ -33,7 +33,9 @@ export class Store implements IStore {
         throw new Error("Unknown ServiceChartType requested");
     }
 
-    if (!record) throw new Error("No records found");
+    if (!record) {
+      return new Date();
+    }
     return record.createdAt || record.time;
   };
 
