@@ -37,7 +37,7 @@ export class MovingAverageOp implements IMovingAverageOp {
   }
 
   async seed(since: Date):Promise<boolean | Error>{
-    //read all fee estimates from since
+    //read all fee estimates from since to today
     
     //for each fee estimate in fee estimates: create days: Date[] = all days (24h window) across all fee estimates 
 

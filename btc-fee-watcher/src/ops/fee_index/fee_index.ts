@@ -41,7 +41,7 @@ export class IndexOp implements IIndexOp {
   }
 
   async seed(since: Date):Promise<boolean | Error>{
-    //read all fee estimates from since
+    //read all fee estimates from since to current timestamp
     
     //for each fee estimate in fee estimates: 
         //fetch that day's moving average 
