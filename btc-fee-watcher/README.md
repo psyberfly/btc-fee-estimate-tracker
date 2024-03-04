@@ -61,7 +61,11 @@ Index:
 Create a mechanism to dynamically handle:
 1. Fee Estimate frequency discripancy: using weighted moving averages  
    Upgrade the moving average formula to dynamically check for discripancy in "time" of FeeEstimates, apply weights accordingly to "satsPerByte" and proceed to calculate moving average for the day.
+TODO: test
+
+
 2. Seeding of Fee Index and Moving Average tables at service start from a predefined date instead of from moment of server start. 
    Upgrade Index Watcher to compute Fee Index for
    1. all Fee Estimates starting from seedStartDate upto current time?
    Along with computing index for the fee estimate fetched every 10mins as it currently does.
+Instead of purging old DB, let's just start a new instance of service, with a CSV dump of fee estimates from the previous service insance DB

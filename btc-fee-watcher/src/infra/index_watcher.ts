@@ -13,6 +13,20 @@ const movingAverageOp = new MovingAverageOp();
 const feeOp = new FeeOp();
 const indexOp = new IndexOp();
 
+
+
+async function seedIndexes(){
+  //unix time
+  const seedIndexStartTimestamp: string = process.env.SEED_INDEX_SINCE_TIMESTAMP;
+  const timestampNumber: number = parseInt(seedIndexStartTimestamp, 10);
+  const seedIndexStartDate = new Date(timestampNumber);
+
+  await movingAverageOp.seed(seedIndexStartDate);
+
+  await indexOp.seed(seedIndexStartDate);
+
+}
+
 async function updateMovingAverage() {
   console.log("Updating Moving Average...");
   const today = new Date().toISOString();
@@ -43,7 +57,7 @@ async function udpateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
   console.log("Fee Estimate updated.");
   console.log("Updating latest Index...");
   // calculate index and update DB
-  const isIndexUpdated = await indexOp.updateIndex();
+  const isIndexUpdated = await indexOp.create();
 
   if (isIndexUpdated instanceof Error) {
     console.error("Error updating Index!");
@@ -90,14 +104,6 @@ async function seedDb() {
   }
 
 
-  //Weighted Moving Average:
-
-  //Check if columns in table MovingAverage are empty:
-
-  //If not: Abort
-
-  //If empty:
-    //Calculate WMA for last30Days and last365Days for all rows in table
 
 }
 
@@ -111,10 +117,16 @@ export async function runIndexWatcher() {
     await seedDb();
     //NOTE: This should be updated to run only if there is no reading within last 24 hours
     //Calculate moving average once at onset, else fee index cant be computed until 24hours:
-    await updateMovingAverage();
-    //NOTE: THis should be updated to run only if there is no reading within last 10m.
-    //Calculate index once at onset
-    await udpateAndBroadcastIndex(alertStreamServer);
+    // await updateMovingAverage();
+    // //NOTE: THis should be updated to run only if there is no reading within last 10m.
+    // //Calculate index once at onset
+    // await udpateAndBroadcastIndex(alertStreamServer);
+    
+    //Create moving avg and index for all fee estimates starting from seedIndexStartDate
+
+
+    seedIndexes();
+
     // every day:
     setInterval(async () => {
       await updateMovingAverage();

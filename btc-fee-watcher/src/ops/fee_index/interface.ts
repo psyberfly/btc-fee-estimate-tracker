@@ -21,6 +21,7 @@ export interface IIndexOp {
   //invoked every 10 min (block)
   readAll(since:Date): Promise<FeeIndex[] | Error>;
   readAllDetailed(): Promise<FeeIndexDetailed[] | Error>;
-  updateIndex(): Promise<boolean | Error>;
+  create(): Promise<boolean | Error>;
+  seed(): Promise<boolean | Error>;
   readLatest(): Promise<FeeIndexDetailed | Error>;
 }

@@ -40,8 +40,18 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
-    //Update this function to call 2 functions: updateIndexMA and updatedIndexWMA
-  async updateIndex(): Promise<boolean | Error> {
+  async seed(since: Date):Promise<boolean | Error>{
+    //read all fee estimates from since
+    
+    //for each fee estimate in fee estimates: 
+        //fetch that day's moving average 
+        //compute index for that fee estimate 
+
+
+   };
+
+
+  async create(): Promise<boolean | Error> {
     const currentFeeEst = await this.feeEstStore.readLatest();
 
     if (currentFeeEst instanceof Error) {
