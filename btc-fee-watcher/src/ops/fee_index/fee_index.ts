@@ -40,6 +40,7 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
+    //Update this function to call 2 functions: updateIndexMA and updatedIndexWMA
   async updateIndex(): Promise<boolean | Error> {
     const currentFeeEst = await this.feeEstStore.readLatest();
 

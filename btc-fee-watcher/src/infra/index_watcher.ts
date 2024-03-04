@@ -66,6 +66,8 @@ async function udpateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
 }
 
 async function seedDb() {
+  //Fee Estimate:
+  //csv should be read AFTER checking row count (feeOp.seedHistory) in DB!
   const csvFilePath = process.env.PATH_TO_CSV;
 
   const feeHistory = await getFeeEstimateHistoryFromCsv(csvFilePath);
@@ -86,6 +88,17 @@ async function seedDb() {
     console.log("Fee Estimate History seeded from .csv.");
     return;
   }
+
+
+  //Weighted Moving Average:
+
+  //Check if columns in table MovingAverage are empty:
+
+  //If not: Abort
+
+  //If empty:
+    //Calculate WMA for last30Days and last365Days for all rows in table
+
 }
 
 export async function runIndexWatcher() {
@@ -96,8 +109,10 @@ export async function runIndexWatcher() {
 
     //At server start:
     await seedDb();
+    //NOTE: This should be updated to run only if there is no reading within last 24 hours
     //Calculate moving average once at onset, else fee index cant be computed until 24hours:
     await updateMovingAverage();
+    //NOTE: THis should be updated to run only if there is no reading within last 10m.
     //Calculate index once at onset
     await udpateAndBroadcastIndex(alertStreamServer);
     // every day:

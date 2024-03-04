@@ -36,6 +36,7 @@ export class MovingAverageOp implements IMovingAverageOp {
     return exists;
   }
 
+  //update this function to call 2 functions: calculateMA & calculate WMA.
   async create(): Promise<boolean | Error> {
     try {
       const feeHistoryLastYear = await this.feeOp.readLast365Days();
