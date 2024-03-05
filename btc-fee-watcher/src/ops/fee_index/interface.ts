@@ -22,6 +22,6 @@ export interface IIndexOp {
   readAll(since:Date): Promise<FeeIndex[] | Error>;
   readAllDetailed(): Promise<FeeIndexDetailed[] | Error>;
   create(): Promise<boolean | Error>;
-  seed(): Promise<boolean | Error>;
+ // seed(): Promise<boolean | Error>;
   readLatest(): Promise<FeeIndexDetailed | Error>;
 }

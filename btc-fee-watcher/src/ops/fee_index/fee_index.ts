@@ -40,15 +40,15 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
-  async seed(since: Date):Promise<boolean | Error>{
-    //read all fee estimates from since to current timestamp
+  // async seed(since: Date):Promise<boolean | Error>{
+  //   //read all fee estimates from since to current timestamp
     
-    //for each fee estimate in fee estimates: 
-        //fetch that day's moving average 
-        //compute index for that fee estimate 
+  //   //for each fee estimate in fee estimates: 
+  //       //fetch that day's moving average 
+  //       //compute index for that fee estimate 
 
 
-   };
+  //  };
 
 
   async create(): Promise<boolean | Error> {

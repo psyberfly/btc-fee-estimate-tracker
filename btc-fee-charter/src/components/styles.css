@@ -228,7 +228,7 @@ button:hover {
   position: relative;
 }
 
-.banner-loading {
+.banner-error {
   position: absolute;
   top: 50%;
   left: 50%;

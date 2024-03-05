@@ -15,17 +15,17 @@ const indexOp = new IndexOp();
 
 
 
-async function seedIndexes(){
-  //unix time
-  const seedIndexStartTimestamp: string = process.env.SEED_INDEX_SINCE_TIMESTAMP;
-  const timestampNumber: number = parseInt(seedIndexStartTimestamp, 10);
-  const seedIndexStartDate = new Date(timestampNumber);
+// async function seedIndexes(){
+//   //unix time
+//   const seedIndexStartTimestamp: string = process.env.SEED_INDEX_SINCE_TIMESTAMP;
+//   const timestampNumber: number = parseInt(seedIndexStartTimestamp, 10);
+//   const seedIndexStartDate = new Date(timestampNumber);
 
-  await movingAverageOp.seed(seedIndexStartDate);
+//   await movingAverageOp.seed(seedIndexStartDate);
 
-  await indexOp.seed(seedIndexStartDate);
+//   await indexOp.seed(seedIndexStartDate);
 
-}
+// }
 
 async function updateMovingAverage() {
   console.log("Updating Moving Average...");
@@ -117,15 +117,15 @@ export async function runIndexWatcher() {
     await seedDb();
     //NOTE: This should be updated to run only if there is no reading within last 24 hours
     //Calculate moving average once at onset, else fee index cant be computed until 24hours:
-    // await updateMovingAverage();
+    await updateMovingAverage();
     // //NOTE: THis should be updated to run only if there is no reading within last 10m.
     // //Calculate index once at onset
-    // await udpateAndBroadcastIndex(alertStreamServer);
+    await udpateAndBroadcastIndex(alertStreamServer);
     
     //Create moving avg and index for all fee estimates starting from seedIndexStartDate
 
 
-    seedIndexes();
+    // seedIndexes();
 
     // every day:
     setInterval(async () => {
