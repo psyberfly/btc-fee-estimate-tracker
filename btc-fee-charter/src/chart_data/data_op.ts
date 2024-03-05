@@ -66,7 +66,7 @@ export class DataOp implements IDataOp {
         const movingAverage: MovingAverage = {
           createdAt: element["createdAt"],
           last30Days: element["last30Days"],
-          last365Days: element["last30Days"],
+          last365Days: element["last365Days"],
         };
         data.push(movingAverage);
       });

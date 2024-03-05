@@ -68,8 +68,8 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
             break;
         case ServiceChartType.movingAverage:
             yText = "sats/B";
-            title = "Fee Estimate Moving Average"
-            subtitle = "sum(last n days fee estimates)/count(last n days fee estimates)";
+            title = "Fee Estimate Weighted Moving Average"
+            subtitle = "weighted sum(last n days fee estimates)/total weight";
             break;
         case ServiceChartType.feeEstimate:
             yText = "sats/B";
