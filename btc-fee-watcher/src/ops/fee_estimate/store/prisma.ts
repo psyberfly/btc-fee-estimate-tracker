@@ -59,6 +59,9 @@ export class FeeEstimatePrismaStore {
             { time: { lte: new Date(toDate) } },
           ],
         },
+        orderBy: {
+          time: 'asc', // (old to new)
+        },
       });
       return feeEstHistory.map((row) => ({
         id: row.id,
