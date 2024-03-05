@@ -7,7 +7,7 @@ import { ServiceChartType } from './src/chart_data/interface';
 import { ONE_MINUTE_MS, TEN_MINUTES_MS, TimeLib } from './src/lib/time';
 import { Store } from './src/store/store';
 import { ChartTimescale, TimeRange } from './src/chart_data/chart_timescale';
- import logo from "./src/assets/images/logo.png";
+import logo from "./src/assets/images/logo.png";
 
 //Extract functions out of useEffect and only invoke functions and setState from inside it. 
 
@@ -191,7 +191,7 @@ const App = () => {
         <img src={logo} alt="Logo" className="logo" />
         <h1>BTC Fee Estimate Tracker</h1>
         {lastUpdated && (
-          <h2 style={{ marginLeft: 'auto' }}>Last updated: {(lastUpdated as any).toLocaleString()}</h2>
+          <h3 style={{ marginLeft: 'auto' }}>Last updated: {(lastUpdated as any).toLocaleString()}</h3>
         )}
       </div>
       <div style={{ display: 'flex' }}>

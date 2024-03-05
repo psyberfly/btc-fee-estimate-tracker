@@ -15,7 +15,7 @@
   --text-color-secondary: rgb(190, 190, 190);
   --hover-color: rgb(13, 150, 255);
   --title-font: "Bebas Neue", sans-serif;
-  --body-font: Tahoma, sans-serif;
+  --body-font: Helvetica, sans-serif;
 }
 
 .logo {
@@ -46,13 +46,23 @@ h2 {
   padding: 5px;
 }
 
+h3 {
+  font-size: 15px;
+  font-family: var(--body-font);
+  color: var(--text-color-secondary);
+  padding: 5px;
+}
+
 @media (max-width: 768px) {
   h1 {
-    font-size: 15px;
+    font-size: 20px;
   }
 
   h2 {
-    font-size: 13px;
+    font-size: 15px;
+  }
+  h3{
+    font-size: 12px;
   }
 }
 
@@ -204,13 +214,6 @@ button:hover {
   /* Aligns items to each end of the container */
 }
 
-
-
-.title-bar span {
-  color: var(--text-color-secondary);
-  font-size: 14px;
-  padding: 12px
-}
 
 .chart-container {
   width: 100%;

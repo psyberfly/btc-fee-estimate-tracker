@@ -19,7 +19,8 @@ Chart.defaults.scale.grid.color = "rgba(199, 199, 199, 0.2)";
 
 const titleColor = "#E21F26";
 const secondaryColor = "#FFFFFF";
-const fontFamily = 'Tahoma, sans-serif';
+const textColorSeconday = "rgb(190, 190, 190)";
+const fontFamily = 'Helvetica, sans-serif';
 
 const verticalLinePlugin = {
     id: "verticalLine",
@@ -100,7 +101,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 title: {
                     display: true,
                     text: xText,
-                    color: secondaryColor,
+                    color: textColorSeconday,
                     font: {
                         size: 18,
                         family: fontFamily,
@@ -117,7 +118,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 title: {
                     display: true,
                     text: yText,
-                    color: secondaryColor,
+                    color: textColorSeconday,
                     font: {
                         size: 18,
                         family: fontFamily,
