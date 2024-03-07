@@ -19,7 +19,7 @@ Chart.defaults.scale.grid.color = "rgba(199, 199, 199, 0.2)";
 
 const titleColor = "#E21F26";
 const secondaryColor = "#FFFFFF";
-const textColorSeconday = "rgb(190, 190, 190)";
+const textColorSeconday = "rgb(225, 225, 225)";
 const fontFamily = 'Helvetica, sans-serif';
 
 const verticalLinePlugin = {

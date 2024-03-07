@@ -62,6 +62,10 @@ const App = () => {
     };
   }, [isNavOpen]);
 
+  const handleClick = (selectedChartType) => {
+    setChartType(selectedChartType);
+    setIsNavOpen(false); // Close the nav menu when a chart type is selected
+  };
 
   //-------------------------------CHART DATA -------------------------
 
@@ -75,6 +79,8 @@ const App = () => {
   const chartDataOp = new ChartDatasetOp();
   const store = new Store();
   const [selectedRange, setSelectedRange] = useState(TimeRange.Last1Month); // Default 
+  const [currentFeeIndex, setCurrentFeeIndex] = useState({ last365Days: null, last30Days: null });
+
   useEffect(() => {
     const fetchDataForChartType = async (chartType) => {
       try {
@@ -91,6 +97,11 @@ const App = () => {
           switch (chartType) {
             case ServiceChartType.index:
               data = await dataOp.fetchFeeIndexHistory(requiredHistoryStartTimestamp);
+              const currentFeeIndex = {
+                last30Days: parseFloat(data[0]["ratioLast30Days"]).toFixed(2),
+                last365Days: parseFloat(data[0]["ratioLast365Days"]).toFixed(2)
+              };
+              setCurrentFeeIndex(currentFeeIndex as any);
               break;
             case ServiceChartType.movingAverage:
               data = await dataOp.fetchMovingAverageHistory(requiredHistoryStartTimestamp);
@@ -116,6 +127,7 @@ const App = () => {
         }
         const history = await store.read(chartType); //this could be upgraded to fetch data from db by selectedRange?
         const chartData = chartDataOp.getFromData(history, chartType);
+
         if (chartData instanceof Error) {
           console.error(`Error getting chart dataset from data.`);
           throw chartData;
@@ -123,6 +135,7 @@ const App = () => {
 
         setChartData(chartData as any);
         updateLastUpdated(new Date());
+
       } catch (error) {
         console.error("Error setting data:", error);
         setErrorLoading(prev => ({ ...prev, [chartType]: true }));
@@ -138,6 +151,11 @@ const App = () => {
       switch (chartType) {
         case ServiceChartType.index:
           data = await dataOp.fetchFeeIndexHistory(availableHistoryEndTimestamp);
+          const currentFeeIndex = {
+            last30Days: parseFloat(data[0]["ratioLast30Days"]).toFixed(2),
+            last365Days: parseFloat(data[0]["ratioLast365Days"]).toFixed(2)
+          };
+          setCurrentFeeIndex(currentFeeIndex as any);
           break;
         case ServiceChartType.movingAverage:
           data = await dataOp.fetchMovingAverageHistory(availableHistoryEndTimestamp);
@@ -159,6 +177,7 @@ const App = () => {
       if (isDataStored instanceof Error) {
         throw new Error(`Update data history: Error storing data to DB: ${isDataStored}`);
       }
+
     }
 
     fetchDataForChartType(chartType);
@@ -175,32 +194,53 @@ const App = () => {
   const updateLastUpdated = (lastUpdated) => {
     setLastUpdated(lastUpdated);
   };
-
-
-  const handleClick = (selectedChartType) => {
-    setChartType(selectedChartType);
-    setIsNavOpen(false); // Close the nav menu when a chart type is selected
-  };
-
   return (
-    <div>
+    <div className="app-container">
       <div className="title-bar">
         <button ref={hamburgerRef} className="hamburger" onClick={() => setIsNavOpen(!isNavOpen)}>
           <div /><div /><div />
         </button>
         <img src={logo} alt="Logo" className="logo" />
         <h1>BTC Fee Estimate Tracker</h1>
-        {lastUpdated && (
-          <h3 style={{ marginLeft: 'auto' }}>Last updated: {(lastUpdated as any).toLocaleString()}</h3>
-        )}
+        <h4 style={{ marginLeft: 'auto' }}>Updated every 10m</h4>
       </div>
-      <div style={{ display: 'flex' }}>
+      <div className="scrollable-content">
         <div ref={navRef} className={`nav ${isNavOpen ? 'nav-open' : ''}`}>
           <h2>Charts</h2>
           <button onClick={() => handleClick(ServiceChartType.index)}>Index</button>
           <button onClick={() => handleClick(ServiceChartType.movingAverage)}>Moving Average</button>
           <button onClick={() => handleClick(ServiceChartType.feeEstimate)}>Fee Estimate</button>
         </div>
+        {chartType === ServiceChartType.index && chartData && (
+          <>
+            <h1 style={{ paddingTop: "10vh", textAlign: "center" }}>Fee Estimate Index</h1>
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "baseline", paddingTop: "10px" }}>
+              <div style={{ textAlign: "center", paddingRight: "50px" }}> {/* Adjust spacing as needed */}
+                <h2>Last 365 Days</h2>
+                <h2 style={{ fontSize: "30px" }}>{currentFeeIndex.last365Days}</h2>
+              </div>
+
+              <div style={{ textAlign: "center", paddingLeft: "50px" }}> {/* Adjust spacing as needed */}
+                <h2>Last 30 Days</h2>
+                <h2 style={{ fontSize: "30px" }}>{currentFeeIndex.last30Days}</h2>
+              </div>
+            </div>
+
+            <h3 style={{ paddingTop: "10px", paddingBottom: "10vh", textAlign: "center" }}>
+              Current fee estimate is {Math.abs((currentFeeIndex.last365Days! - 1) * 100).toFixed(2)}%
+              {' '}
+              <span style={{ color: currentFeeIndex.last365Days! >= 1 ? 'red' : 'green' }}>
+                {currentFeeIndex.last365Days! >= 1 ? 'more' : 'less'}
+              </span>
+              {' '} than last year and {Math.abs((currentFeeIndex.last30Days! - 1) * 100).toFixed(2)}%
+              {' '}
+              <span style={{ color: currentFeeIndex.last30Days! >= 1 ? 'red' : 'green' }}>
+                {currentFeeIndex.last30Days! >= 1 ? 'more' : 'less'}
+              </span>
+              {' '} than last month.
+            </h3>
+          </>
+        )}
         {errorLoading[chartType] ? (
           <div className="banner-error">Error loading data. Please try again later.</div>
         ) : loading[chartType] ? (
@@ -211,7 +251,17 @@ const App = () => {
       </div>
     </div>
   );
+
+
+
+
+
 };
+
+
+
+
+
 
 
 export default App;
