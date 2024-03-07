@@ -227,7 +227,7 @@ const App = () => {
             </div>
 
             <h3 style={{ paddingTop: "10px", paddingBottom: "10vh", textAlign: "center" }}>
-              Current fee estimate is {Math.abs((currentFeeIndex.last365Days! - 1) * 100).toFixed(2)}%
+              The current fee estimate is {Math.abs((currentFeeIndex.last365Days! - 1) * 100).toFixed(2)}%
               {' '}
               <span style={{ color: currentFeeIndex.last365Days! >= 1 ? 'red' : 'green' }}>
                 {currentFeeIndex.last365Days! >= 1 ? 'more' : 'less'}
