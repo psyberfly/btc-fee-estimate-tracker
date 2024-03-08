@@ -42,7 +42,7 @@ h4{
 h1 {
   font-family: var(--body-font);
   font-size: 32px;
-  color: var(--primary-color);
+  color: var(--text-color);
   padding: 0px 5px;
 }
 

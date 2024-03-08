@@ -19,15 +19,15 @@ export class FeeEstimatePrismaStore {
     }
   }
 
-  async insert(rowData: FeeEstimate): Promise<boolean | Error> {
+  async insert(rowData: FeeEstimate): Promise<FeeEstimate | Error> {
     try {
-      await prisma.feeEstimate.create({
+     const created = await prisma.feeEstimate.create({
         data: {
           time: rowData.time,
           satsPerByte: rowData.satsPerByte,
         },
       });
-      return true;
+      return created;
     } catch (error) {
       return handleError(error);
     }

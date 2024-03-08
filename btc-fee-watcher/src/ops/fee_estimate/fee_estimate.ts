@@ -17,14 +17,22 @@ export class FeeOp implements IFeeEstimateOp {
     return res;
   }
 
-  async readLast365Days(): Promise<FeeEstimate[] | Error> {
-    const today = fetchDate(UTCDate.today);
-    const lastYear = fetchDate(UTCDate.lastYear);
+  async readLast365Days(since: Date): Promise<FeeEstimate[] | Error> {
+    // Assuming fetchDate is a function to format or validate the date, apply it directly to 'since'
+    const startDate = since;
+    // Calculate the date 365 days after 'since' using setDate and getDate
+    const endDate = new Date(startDate);
+    endDate.setDate(startDate.getDate() + 365);
 
-    const res = await this.store.readByRange(lastYear, today);
-
-    return res;
-  }
+    try {
+        const res = await this.store.readByRange(startDate.toISOString(), endDate.toISOString());
+        return res;
+    } catch (error) {
+        // Log the error or handle it as per your application's error handling strategy
+        console.error("Error fetching data:", error);
+        return new Error("Error fetching data.");
+    }
+}
 
   async readLast30Days(): Promise<FeeEstimate[] | Error> {
     const today = fetchDate(UTCDate.today);
@@ -39,7 +47,7 @@ export class FeeOp implements IFeeEstimateOp {
     return res;
   }
 
-  async updateCurrent(): Promise<boolean | Error> {
+  async create(): Promise<FeeEstimate | Error> {
     const res = await makeApiCall(this.mempoolApiUrl, "GET");
 
     if (res instanceof Error) {
@@ -62,12 +70,13 @@ export class FeeOp implements IFeeEstimateOp {
       id: null, //Added by DB,
     };
 
-    const isUpdated = await this.store.insert(currentfeeEstimate);
+    const insertedFeeEst = await this.store.insert(currentfeeEstimate);
 
-    if (isUpdated instanceof Error) {
-      return handleError(isUpdated);
+    if (res instanceof Error) {
+      return handleError(res);
     }
-    return true;
+    
+    return insertedFeeEst;
   }
 
   async seedHistory(history: FeeEstimate[]): Promise<boolean | Error> {

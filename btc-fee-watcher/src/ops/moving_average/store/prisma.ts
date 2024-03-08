@@ -10,7 +10,7 @@ export class MovingAveragePrismaStore {
         orderBy: { createdAt: "desc" },
       };
 
-      console.log({since});
+      console.log({ since });
 
       // If since is provided, add a where clause to the query parameters
       if (since) {
@@ -53,6 +53,27 @@ export class MovingAveragePrismaStore {
     }
   }
 
+  async readByDay(day: Date): Promise<MovingAverage | Error> {
+    try {
+      const startOfDay = new Date(day);
+      startOfDay.setHours(0, 0, 0, 0);
+
+      const endOfDay = new Date(day);
+      endOfDay.setHours(23, 59, 59, 999);
+
+      const movingAverage = await prisma.movingAverage.findFirst({
+        where: {
+          createdAt: {
+            gte: startOfDay, // Greater than or equal to the start of the day
+            lte: endOfDay, // Less than or equal to the end of the day
+          },
+        },
+      });
+      return movingAverage;
+    } catch (error) {
+      return handleError(error);
+    }
+  }
   async checkRowExistsByDate(dateUTC: string): Promise<boolean | Error> {
     try {
       const count = await prisma.movingAverage.count({

@@ -10,28 +10,35 @@ datasource db {
   url      = env("DB_URL")
 }
 
-model FeeEstimate {
-  id          Int       @id @default(autoincrement())
-  time        DateTime
-  satsPerByte Decimal
-  feeIndex    FeeIndex?
+model FeeEstimates {
+  id                 Int             @id @default(autoincrement())
+  time               DateTime
+  satsPerByte        Decimal
+  movingAverageStart MovingAverages? @relation("StartMovingAverage")
+  movingAverageEnd   MovingAverages? @relation("EndMovingAverage")
+  FeeIndexes         FeeIndexes?
 }
 
-model MovingAverage {
-  id          Int        @id @default(autoincrement())
+model MovingAverages {
+  id                 Int          @id @default(autoincrement())
+  feeEstimateStartId Int          @unique
+  feeEstimateStart   FeeEstimates @relation(name: "StartMovingAverage", fields: [feeEstimateStartId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  feeEstimateEndId   Int          @unique
+  feeEstimateEnd     FeeEstimates @relation(name: "EndMovingAverage", fields: [feeEstimateEndId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+
   last365Days Decimal
   last30Days  Decimal
-  createdAt   DateTime   @default(now())
-  feeIndex    FeeIndex[]
+  createdAt   DateTime     @default(now())
+  feeIndex    FeeIndexes[]
 }
 
-model FeeIndex {
-  id               Int           @id @default(autoincrement())
-  feeEstimateId    Int           @unique
-  feeEstimate      FeeEstimate   @relation(fields: [feeEstimateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model FeeIndexes {
+  id               Int            @id @default(autoincrement())
+  feeEstimateId    Int            @unique
+  feeEstimate      FeeEstimates   @relation(fields: [feeEstimateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   movingAverageId  Int
-  movingAverage    MovingAverage @relation(fields: [movingAverageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  movingAverage    MovingAverages @relation(fields: [movingAverageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   ratioLast365Days Decimal
   ratioLast30Days  Decimal
-  createdAt        DateTime      @default(now())
+  createdAt        DateTime       @default(now())
 }

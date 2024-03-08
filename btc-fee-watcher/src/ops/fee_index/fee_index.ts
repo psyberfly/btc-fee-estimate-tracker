@@ -40,40 +40,46 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
-  // async seed(since: Date):Promise<boolean | Error>{
-  //   //read all fee estimates from since to current timestamp
-    
-  //   //for each fee estimate in fee estimates: 
-  //       //fetch that day's moving average 
-  //       //compute index for that fee estimate 
+  async seed(since: Date):Promise<boolean | Error>{
+    try {
+      //read all fee estimates from since to today
+      const feeEstimates = await this.feeOp.readAll(since);
 
+      if (feeEstimates instanceof Error) {
+        console.error("Error reading fee estimates from DB!");
+        throw feeEstimates;
+      }
 
-  //  };
+      feeEstimates.forEach((feeEstimate) => {
+        //compute moving average
+        this.create(feeEstimate);
+      });
 
-
-  async create(): Promise<boolean | Error> {
-    const currentFeeEst = await this.feeEstStore.readLatest();
-
-    if (currentFeeEst instanceof Error) {
-      return handleError(currentFeeEst);
+      return true;
+    } catch (e) {
+      return handleError(e);
     }
 
-    const movingAvgToday = await this.movingAvgStore.readLatest();
+   };
 
-    if (movingAvgToday instanceof Error) {
-      return handleError(movingAvgToday);
+
+  async create(feeEstimate:FeeEstimate): Promise<boolean | Error> {
+       const movingAverage = await this.movingAvgStore.readByDay(feeEstimate.time);
+
+    if (movingAverage instanceof Error) {
+      return handleError(movingAverage);
     }
 
-    const ratioLast365Days = currentFeeEst.satsPerByte.toNumber() /
-      movingAvgToday.last365Days.toNumber();
+    const ratioLast365Days = feeEstimate.satsPerByte.toNumber() /
+      movingAverage.last365Days.toNumber();
 
-    const ratioLast30Days = currentFeeEst.satsPerByte.toNumber() /
-      movingAvgToday.last30Days.toNumber();
+    const ratioLast30Days = feeEstimate.satsPerByte.toNumber() /
+      movingAverage.last30Days.toNumber();
 
     const index: FeeIndex = {
       id: null, //added by DB
-      feeEstimateId: currentFeeEst.id,
-      movingAverageId: movingAvgToday.id,
+      feeEstimateId: feeEstimate.id,
+      movingAverageId: movingAverage.id,
       ratioLast365Days: new Decimal(ratioLast365Days),
       ratioLast30Days: new Decimal(ratioLast30Days),
       createdAt: null, //added by DB

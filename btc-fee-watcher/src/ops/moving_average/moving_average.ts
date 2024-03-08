@@ -1,7 +1,7 @@
 import { IMovingAverageOp } from "./interface";
 import { FeeOp } from "../fee_estimate/fee_estimate";
 import { handleError } from "../../lib/errors/e";
-import { MovingAverage } from "@prisma/client";
+import { FeeEstimate, MovingAverage } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import { MovingAveragePrismaStore } from "./store/prisma";
 import { fetchDate, UTCDate } from "../../lib/date/date";
@@ -36,20 +36,41 @@ export class MovingAverageOp implements IMovingAverageOp {
     return exists;
   }
 
-  // async seed(since: Date):Promise<boolean | Error>{
-  //   //read all fee estimates from since to today
-  //   const feeEstimates = this.feeOp.readAll(since);
-        
-  //   //for each fee estimate in fee estimates: create days: Date[] = all days (24h window) across all fee estimates 
+  async seed(since: Date): Promise<boolean | Error> {
+    try {
+      //read all fee estimates from since to today
+      const feeEstimates = await this.feeOp.readAll(since);
 
+      if (feeEstimates instanceof Error) {
+        console.error("Error reading fee estimates from DB!");
+        throw feeEstimates;
+      }
+      //for each fee estimate in fee estimates: create days: Date[] = all days (24h window) across all fee estimates
+      const uniqueDayStrings = new Set<string>();
 
+      feeEstimates.forEach((item) => {
+        // Format to YYYY-MM-DD string to normalize time out of equation
+        const dayString = item.time.toISOString().split("T")[0];
+        uniqueDayStrings.add(dayString);
+      });
 
-  //   //for each day:
-  //   //compute moving average 
+      // Convert each unique date string back into a Date object at 00:00:00 hours
+      const uniqueDays = Array.from(uniqueDayStrings).map((dayStr) =>
+        new Date(dayStr)
+      );
 
-  // };
+      uniqueDays.forEach((day) => {
+        //compute moving average
+        this.create(day);
+      });
 
-  async create(): Promise<boolean | Error> {
+      return true;
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+
+  async create(day: Date): Promise<boolean | Error> {
     try {
       const calculateWeightedAverage = (
         feeHistory: Array<{ id: number; time: Date; satsPerByte: Decimal }>,
@@ -78,30 +99,32 @@ export class MovingAverageOp implements IMovingAverageOp {
         return weightedMovingAverage;
       };
 
-      const feeHistoryLastYear = await this.feeOp.readLast365Days();
+      const feeHistoryLast360Days = await this.feeOp.readLast365Days(day);
 
-      if (feeHistoryLastYear instanceof Error) {
-        return feeHistoryLastYear;
+      if (feeHistoryLast360Days instanceof Error) {
+        return feeHistoryLast360Days;
       }
-      if (feeHistoryLastYear.length === 0) {
+      if (feeHistoryLast360Days.length === 0) {
         throw new Error("Array is empty, cannot calculate average.");
       }
-      const yearlyAverage = calculateWeightedAverage(feeHistoryLastYear);
+      const averageLast360Days = calculateWeightedAverage(
+        feeHistoryLast360Days,
+      );
 
-      const feeHistoryLastMonth = await this.feeOp.readLast30Days();
-      if (feeHistoryLastMonth instanceof Error) {
-        return feeHistoryLastMonth;
+      const feeHistoryLast30Days = await this.feeOp.readLast30Days();
+      if (feeHistoryLast30Days instanceof Error) {
+        return feeHistoryLast30Days;
       }
-      if (feeHistoryLastMonth.length === 0) {
+      if (feeHistoryLast30Days.length === 0) {
         throw new Error("Array is empty, cannot calculate average.");
       }
-      const monthlyAverage = calculateWeightedAverage(feeHistoryLastMonth);
+      const averageLast30Days = calculateWeightedAverage(feeHistoryLast30Days);
 
       const update: MovingAverage = {
         id: null, // Added by DB
-        createdAt: null, // Added by DB
-        last365Days: yearlyAverage,
-        last30Days: monthlyAverage,
+        createdAt: day,
+        last365Days: averageLast360Days,
+        last30Days: averageLast30Days,
       };
 
       this.store.insert(update);

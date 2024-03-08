@@ -15,26 +15,26 @@ const indexOp = new IndexOp();
 
 
 
-// async function seedIndexes(){
-//   //unix time
-//   const seedIndexStartTimestamp: string = process.env.SEED_INDEX_SINCE_TIMESTAMP;
-//   const timestampNumber: number = parseInt(seedIndexStartTimestamp, 10);
-//   const seedIndexStartDate = new Date(timestampNumber);
+async function seedIndexes(){
+  //unix time
+  const seedIndexStartTimestamp: string = process.env.SEED_INDEX_SINCE_TIMESTAMP;
+  const timestampNumber: number = parseInt(seedIndexStartTimestamp, 10);
+  const seedIndexStartDate = new Date(timestampNumber);
 
-//   await movingAverageOp.seed(seedIndexStartDate);
+   await movingAverageOp.seed(seedIndexStartDate);
 
-//   await indexOp.seed(seedIndexStartDate);
+  await indexOp.seed(seedIndexStartDate);
 
-// }
+}
 
 async function updateMovingAverage() {
   console.log("Updating Moving Average...");
-  const today = new Date().toISOString();
-  const isExistMovingAvgToday = await movingAverageOp.checkExists(today);
+  const today = new Date();
+  const isExistMovingAvgToday = await movingAverageOp.checkExists(today.toISOString());
 
   if (!isExistMovingAvgToday) {
     console.log("Creating Moving Average for today...");
-    const isMovingAvgCreated = await movingAverageOp.create();
+    const isMovingAvgCreated = await movingAverageOp.create(today);
 
     if (isMovingAvgCreated instanceof Error) {
       console.error("Error creating Moving Average!");
@@ -49,7 +49,7 @@ async function updateMovingAverage() {
 async function udpateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
   console.log("Updating latest Fee Estimate...");
   // fetch current fee estimate and update DB
-  const currentFeeEstimate = await feeOp.updateCurrent();
+  const currentFeeEstimate = await feeOp.create();
   if (currentFeeEstimate instanceof Error) {
     console.error("Error updating Fee Estimate!");
     return handleError(currentFeeEstimate);
@@ -57,7 +57,7 @@ async function udpateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
   console.log("Fee Estimate updated.");
   console.log("Updating latest Index...");
   // calculate index and update DB
-  const isIndexUpdated = await indexOp.create();
+  const isIndexUpdated = await indexOp.create(currentFeeEstimate);
 
   if (isIndexUpdated instanceof Error) {
     console.error("Error updating Index!");

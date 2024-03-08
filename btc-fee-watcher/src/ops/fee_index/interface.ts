@@ -19,9 +19,9 @@ export interface FeeIndexDetailed {
 
 export interface IIndexOp {
   //invoked every 10 min (block)
-  readAll(since:Date): Promise<FeeIndex[] | Error>;
+  readAll(since: Date): Promise<FeeIndex[] | Error>;
   readAllDetailed(): Promise<FeeIndexDetailed[] | Error>;
-  create(): Promise<boolean | Error>;
- // seed(): Promise<boolean | Error>;
+  create(feeEstimate: FeeEstimate): Promise<boolean | Error>;
+  // seed(): Promise<boolean | Error>;
   readLatest(): Promise<FeeIndexDetailed | Error>;
 }
