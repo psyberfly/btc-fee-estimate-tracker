@@ -1,27 +1,27 @@
-import { MovingAverage } from "@prisma/client";
+import { MovingAverages } from "@prisma/client";
 import { prisma } from "../../../main";
 import { handleError } from "../../../lib/errors/e";
 
 export class MovingAveragePrismaStore {
-  async readAll(since?: Date): Promise<MovingAverage[] | Error> {
+  async readAll(since?: Date): Promise<MovingAverages[] | Error> {
     try {
       // Initialize the query parameters with orderBy
       let queryParameters: any = {
-        orderBy: { createdAt: "desc" },
+        orderBy: { day: "desc" },
       };
-
-      console.log({ since });
 
       // If since is provided, add a where clause to the query parameters
       if (since) {
         queryParameters.where = {
-          createdAt: {
+          day: {
             gt: since, // Use the "gt" (greater than) operator to filter records after the "since" date
           },
         };
       }
 
-      const allMovAvgRes = await prisma.movingAverage.findMany(queryParameters);
+      const allMovAvgRes = await prisma.movingAverages.findMany(
+        queryParameters,
+      );
 
       return allMovAvgRes;
     } catch (error) {
@@ -29,9 +29,9 @@ export class MovingAveragePrismaStore {
     }
   }
 
-  async readLatest(): Promise<MovingAverage | Error> {
+  async readLatest(): Promise<MovingAverages | Error> {
     try {
-      const movingAverage = await prisma.movingAverage.findFirst({
+      const movingAverage = await prisma.movingAverages.findFirst({
         orderBy: { createdAt: "desc" },
       });
       return movingAverage;
@@ -39,12 +39,13 @@ export class MovingAveragePrismaStore {
       return handleError(error);
     }
   }
-  async insert(movingAverage: MovingAverage): Promise<boolean | Error> {
+  async insert(movingAverages: MovingAverages): Promise<boolean | Error> {
     try {
-      await prisma.movingAverage.create({
+      await prisma.movingAverages.create({
         data: {
-          last365Days: movingAverage.last365Days,
-          last30Days: movingAverage.last30Days,
+          day: movingAverages.day,
+          last365Days: movingAverages.last365Days,
+          last30Days: movingAverages.last30Days,
         },
       });
       return true;
@@ -53,7 +54,7 @@ export class MovingAveragePrismaStore {
     }
   }
 
-  async readByDay(day: Date): Promise<MovingAverage | Error> {
+  async readByDay(day: Date): Promise<MovingAverages | Error> {
     try {
       const startOfDay = new Date(day);
       startOfDay.setHours(0, 0, 0, 0);
@@ -61,9 +62,9 @@ export class MovingAveragePrismaStore {
       const endOfDay = new Date(day);
       endOfDay.setHours(23, 59, 59, 999);
 
-      const movingAverage = await prisma.movingAverage.findFirst({
+      const movingAverage = await prisma.movingAverages.findFirst({
         where: {
-          createdAt: {
+          day: {
             gte: startOfDay, // Greater than or equal to the start of the day
             lte: endOfDay, // Less than or equal to the end of the day
           },
@@ -76,7 +77,7 @@ export class MovingAveragePrismaStore {
   }
   async checkRowExistsByDate(dateUTC: string): Promise<boolean | Error> {
     try {
-      const count = await prisma.movingAverage.count({
+      const count = await prisma.movingAverages.count({
         where: {
           createdAt: {
             equals: new Date(dateUTC),

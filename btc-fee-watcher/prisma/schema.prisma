@@ -11,29 +11,36 @@ datasource db {
 }
 
 model FeeEstimates {
-  id                 Int             @id @default(autoincrement())
-  time               DateTime
-  satsPerByte        Decimal
-  movingAverageStart MovingAverages? @relation("StartMovingAverage")
-  movingAverageEnd   MovingAverages? @relation("EndMovingAverage")
-  FeeIndexes         FeeIndexes?
+  id                        Int                         @id @default(autoincrement())
+  time                      DateTime                    @unique
+  satsPerByte               Decimal
+  FeeIndexes                FeeIndexes?
+  createdAt                 DateTime                    @default(now())
+  MovingAverageFeeEstimates MovingAverageFeeEstimates[]
 }
 
 model MovingAverages {
-  id                 Int          @id @default(autoincrement())
-  feeEstimateStartId Int          @unique
-  feeEstimateStart   FeeEstimates @relation(name: "StartMovingAverage", fields: [feeEstimateStartId], references: [id], onDelete: NoAction, onUpdate: NoAction)
-  feeEstimateEndId   Int          @unique
-  feeEstimateEnd     FeeEstimates @relation(name: "EndMovingAverage", fields: [feeEstimateEndId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  id           Int                         @id @default(autoincrement())
+  day          DateTime                    @unique
+  last365Days  Decimal
+  last30Days   Decimal
+  feeIndex     FeeIndexes[]
+  feeEstimates MovingAverageFeeEstimates[]
+  createdAt    DateTime                    @default(now())
+}
 
-  last365Days Decimal
-  last30Days  Decimal
-  createdAt   DateTime     @default(now())
-  feeIndex    FeeIndexes[]
+model MovingAverageFeeEstimates {
+  feeEstimateId   Int
+  movingAverageId Int
+  feeEstimate     FeeEstimates   @relation(fields: [feeEstimateId], references: [id])
+  movingAverage   MovingAverages @relation(fields: [movingAverageId], references: [id])
+
+  @@id([feeEstimateId, movingAverageId])
 }
 
 model FeeIndexes {
   id               Int            @id @default(autoincrement())
+  time             DateTime       @unique
   feeEstimateId    Int            @unique
   feeEstimate      FeeEstimates   @relation(fields: [feeEstimateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   movingAverageId  Int

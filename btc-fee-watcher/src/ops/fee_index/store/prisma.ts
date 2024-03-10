@@ -1,4 +1,4 @@
-import { FeeIndex } from "@prisma/client";
+import { FeeIndexes } from "@prisma/client";
 import { handleError } from "../../../lib/errors/e";
 import { prisma } from "../../../main";
 import { FeeIndexDetailed } from "../interface";
@@ -6,7 +6,7 @@ import { FeeIndexDetailed } from "../interface";
 export class FeeIndexPrismaStore {
   async fetchLatest(): Promise<FeeIndexDetailed | Error> {
     try {
-      const latestIndex = await prisma.feeIndex.findFirst({
+      const latestIndex = await prisma.feeIndexes.findFirst({
         orderBy: { createdAt: "desc" },
         include: {
           feeEstimate: true,
@@ -49,14 +49,12 @@ export class FeeIndexPrismaStore {
   //   }
   // }
 
-  async fetchAll(since?: Date): Promise<FeeIndex[] | Error> {
+  async fetchAll(since?: Date): Promise<FeeIndexes[] | Error> {
     try {
       // Initialize the query parameters with orderBy
       let queryParameters: any = {
         orderBy: { createdAt: "desc" },
       };
-
-      console.log({since});
 
       // If since is provided, add a where clause to the query parameters
       if (since) {
@@ -67,7 +65,7 @@ export class FeeIndexPrismaStore {
         };
       }
 
-      const allFeeIndexRes = await prisma.feeIndex.findMany(queryParameters);
+      const allFeeIndexRes = await prisma.feeIndexes.findMany(queryParameters);
 
       return allFeeIndexRes;
     } catch (error) {
@@ -79,7 +77,7 @@ export class FeeIndexPrismaStore {
 
   async fetchAllDetailed(): Promise<FeeIndexDetailed[] | Error> {
     try {
-      const allIndexDetailed = await prisma.feeIndex.findMany({
+      const allIndexDetailed = await prisma.feeIndexes.findMany({
         orderBy: { createdAt: "desc" },
         include: {
           feeEstimate: true,
@@ -114,21 +112,29 @@ export class FeeIndexPrismaStore {
       return handleError(error);
     }
   }
-
-  async insert(index: FeeIndex): Promise<boolean | Error> {
+  async insert(index: FeeIndexes): Promise<boolean | Error> {
     try {
-      await prisma.feeIndex.create({
-        data: {
+      const upserted = await prisma.feeIndexes.upsert({
+        where: {
+          feeEstimateId: index.feeEstimateId, // Unique identifier
+        },
+        update: {
+          movingAverageId: index.movingAverageId,
+          ratioLast365Days: index.ratioLast365Days,
+          ratioLast30Days: index.ratioLast30Days,
+        },
+        create: {
+          time: index.time,
           feeEstimateId: index.feeEstimateId,
           movingAverageId: index.movingAverageId,
           ratioLast365Days: index.ratioLast365Days,
           ratioLast30Days: index.ratioLast30Days,
         },
       });
-
+      console.log({ upserted });
       return true;
     } catch (error) {
-      return handleError(error);
+      return handleError(error); // Ensure handleError is appropriately defined to handle and/or log the error
     }
   }
 }

@@ -33,7 +33,7 @@ export class DataOp implements IDataOp {
       res.forEach((element) => {
         const feeEstimate: FeeEstimate = {
           time: element["time"],
-          satsPerByte: element["satsPerByte"],
+          satsPerByte: parseFloat(element["satsPerByte"]),
         };
         data.push(feeEstimate);
       });
@@ -64,9 +64,9 @@ export class DataOp implements IDataOp {
 
       res.forEach((element) => {
         const movingAverage: MovingAverage = {
-          createdAt: element["createdAt"],
-          last30Days: element["last30Days"],
-          last365Days: element["last365Days"],
+          day: element["day"],
+          last30Days: parseFloat(element["last30Days"]),
+          last365Days: parseFloat(element["last365Days"]),
         };
         data.push(movingAverage);
       });
@@ -95,9 +95,9 @@ export class DataOp implements IDataOp {
 
       res.forEach((element) => {
         const index: FeeIndex = {
-          createdAt: element["createdAt"],
-          ratioLast30Days: element["ratioLast30Days"],
-          ratioLast365Days: element["ratioLast365Days"],
+          time: (element["time"]),
+          ratioLast30Days: parseFloat(element["ratioLast30Days"]),
+          ratioLast365Days: parseFloat(element["ratioLast365Days"]),
         };
         data.push(index);
       });

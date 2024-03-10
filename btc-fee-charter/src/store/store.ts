@@ -8,6 +8,7 @@ import { TimeRange } from "../chart_data/chart_timescale";
 import { IStore } from "./interface";
 import { db } from "./dexie";
 
+
 //Store the most recent timestamp for each chartType history in a global exported object with {ServiceChartType, Date}.
 //Update it each time after upsert/create.
 
@@ -18,11 +19,11 @@ export class Store implements IStore {
     let record;
     switch (chartType) {
       case ServiceChartType.index:
-        record = await db.feeIndex.orderBy("createdAt").first();
+        record = await db.feeIndex.orderBy("time").first();
         break;
 
       case ServiceChartType.movingAverage:
-        record = await db.movingAverages.orderBy("createdAt").first();
+        record = await db.movingAverages.orderBy("day").first();
         break;
 
       case ServiceChartType.feeEstimate:
@@ -45,11 +46,11 @@ export class Store implements IStore {
     let record;
     switch (chartType) {
       case ServiceChartType.index:
-        record = await db.feeIndex.orderBy("createdAt").reverse().first();
+        record = await db.feeIndex.orderBy("time").reverse().first();
         break;
 
       case ServiceChartType.movingAverage:
-        record = await db.movingAverages.orderBy("createdAt").reverse().first();
+        record = await db.movingAverages.orderBy("day").reverse().first();
         break;
 
       case ServiceChartType.feeEstimate:

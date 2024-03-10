@@ -22,13 +22,13 @@ export interface IndexResponse {
 }
 
 export interface FeeIndex {
-  createdAt: Date;
+  time: Date;
   ratioLast365Days: number;
   ratioLast30Days: number;
 }
 
 export interface MovingAverage {
-  createdAt: Date;
+  day: Date;
   last365Days: number;
   last30Days: number;
 }

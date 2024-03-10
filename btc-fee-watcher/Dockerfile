@@ -27,4 +27,4 @@ ENV PATH_TO_CSV="/home/node/app/assets/fee_estimate_history.csv"
 EXPOSE 3561
 EXPOSE 3572
 
-CMD npx prisma migrate deploy && npx prisma generate && npx tsc && npm start
+CMD npx prisma db push && npx tsc && npm start

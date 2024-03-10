@@ -13,73 +13,84 @@ const movingAverageOp = new MovingAverageOp();
 const feeOp = new FeeOp();
 const indexOp = new IndexOp();
 
-
-
-async function seedIndexes(){
+async function seedIndexes() {
+  console.log("Seeding indexes since start date...");
   //unix time
-  const seedIndexStartTimestamp: string = process.env.SEED_INDEX_SINCE_TIMESTAMP;
+  const seedIndexStartTimestamp: string =
+    process.env.SEED_INDEX_SINCE_TIMESTAMP;
   const timestampNumber: number = parseInt(seedIndexStartTimestamp, 10);
   const seedIndexStartDate = new Date(timestampNumber);
-
-   await movingAverageOp.seed(seedIndexStartDate);
-
+  console.log("Seeding moving averages...");
+  await movingAverageOp.seed(seedIndexStartDate);
+  console.log("Seeding indexes...");
   await indexOp.seed(seedIndexStartDate);
-
+  console.log("Indexes seeded.");
 }
 
 async function updateMovingAverage() {
-  console.log("Updating Moving Average...");
-  const today = new Date();
-  const isExistMovingAvgToday = await movingAverageOp.checkExists(today.toISOString());
+  try {
+    console.log("Updating Moving Average...");
+    const today = new Date();
+    const isExistMovingAvgToday = await movingAverageOp.checkExists(
+      today.toISOString(),
+    );
 
-  if (!isExistMovingAvgToday) {
-    console.log("Creating Moving Average for today...");
-    const isMovingAvgCreated = await movingAverageOp.create(today);
+    if (!isExistMovingAvgToday) {
+      console.log("Creating Moving Average for today...");
+      const isMovingAvgCreated = await movingAverageOp.create(today);
 
-    if (isMovingAvgCreated instanceof Error) {
-      console.error("Error creating Moving Average!");
-      return handleError(isMovingAvgCreated);
+      if (isMovingAvgCreated instanceof Error) {
+        console.error(`Error creating Moving Average!${isMovingAvgCreated}`);
+        return handleError(isMovingAvgCreated);
+      }
+    } else {
+      console.log("Moving Average already exists for today.");
     }
-  } else {
-    console.log("Moving Average already exists for today.");
+    return true;
+  } catch (e) {
+    throw e;
   }
-  return true;
 }
 
 async function udpateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
-  console.log("Updating latest Fee Estimate...");
-  // fetch current fee estimate and update DB
-  const currentFeeEstimate = await feeOp.create();
-  if (currentFeeEstimate instanceof Error) {
-    console.error("Error updating Fee Estimate!");
-    return handleError(currentFeeEstimate);
-  }
-  console.log("Fee Estimate updated.");
-  console.log("Updating latest Index...");
-  // calculate index and update DB
-  const isIndexUpdated = await indexOp.create(currentFeeEstimate);
+  try {
+    console.log("Updating latest Fee Estimate...");
+    // fetch current fee estimate and update DB
+    const currentFeeEstimate = await feeOp.create();
+    if (currentFeeEstimate instanceof Error) {
+      console.error("Error updating Fee Estimate!");
+      return handleError(currentFeeEstimate);
+    }
+    console.log("Fee Estimate updated.");
+    console.log("Updating latest Index...");
+    // calculate index and update DB
+    const isIndexUpdated = await indexOp.create(currentFeeEstimate);
 
-  if (isIndexUpdated instanceof Error) {
-    console.error("Error updating Index!");
-    return handleError(isIndexUpdated);
-  }
-  console.log("Index updated.");
-  const latestIndex = await indexOp.readLatest();
+    if (isIndexUpdated instanceof Error) {
+      console.error("Error updating Index!");
+      return handleError(isIndexUpdated);
+    }
+    console.log("Index updated.");
+    const latestIndex = await indexOp.readLatest();
 
-  if (latestIndex instanceof Error) {
-    return handleError(latestIndex);
-  }
-  console.log("Broadcasting Index alert...");
+    if (latestIndex instanceof Error) {
+      return handleError(latestIndex);
+    }
+    console.log("Broadcasting Index alert...");
 
-  const isAlertBroadcast = alertStreamServer.broadcastAlert(latestIndex);
-  if (isAlertBroadcast instanceof Error) {
-    console.error("Error broadcasting index alert!");
-    return handleError(latestIndex);
+    const isAlertBroadcast = alertStreamServer.broadcastAlert(latestIndex);
+    if (isAlertBroadcast instanceof Error) {
+      console.error("Error broadcasting index alert!");
+      return handleError(latestIndex);
+    }
+    console.log("Index alert broadcasted");
+  } catch (e) {
+    throw e;
   }
-  console.log("Index alert broadcasted");
 }
 
-async function seedDb() {
+async function seedHistory() {
+  console.log("Seeding Fee Estimates history from .csv...");
   //Fee Estimate:
   //csv should be read AFTER checking row count (feeOp.seedHistory) in DB!
   const csvFilePath = process.env.PATH_TO_CSV;
@@ -102,9 +113,6 @@ async function seedDb() {
     console.log("Fee Estimate History seeded from .csv.");
     return;
   }
-
-
-
 }
 
 export async function runIndexWatcher() {
@@ -114,18 +122,17 @@ export async function runIndexWatcher() {
     const alertStreamServer = new AlertStreamServer(port, baseApiRoute);
 
     //At server start:
-    await seedDb();
+    await seedHistory();
     //NOTE: This should be updated to run only if there is no reading within last 24 hours
     //Calculate moving average once at onset, else fee index cant be computed until 24hours:
-    await updateMovingAverage();
-    // //NOTE: THis should be updated to run only if there is no reading within last 10m.
-    // //Calculate index once at onset
-    await udpateAndBroadcastIndex(alertStreamServer);
-    
+    // await updateMovingAverage();
+    // // //NOTE: THis should be updated to run only if there is no reading within last 10m.
+    // // //Calculate index once at onset
+    // await udpateAndBroadcastIndex(alertStreamServer);
+
     //Create moving avg and index for all fee estimates starting from seedIndexStartDate
 
-
-    // seedIndexes();
+    await seedIndexes();
 
     // every day:
     setInterval(async () => {

@@ -8,8 +8,8 @@ export enum TimeRange {
   Last1Month = "Last 1 month",
   Last5Months = "Last 5 months",
   Last1Year = "Last 1 year",
+  Last5Years = "Last 5 years",
 }
-
 
 enum TimescaleUnit {
   minute = "minute",
@@ -130,6 +130,15 @@ export class ChartTimescale {
       unit: TimescaleUnit.month,
       stepSize: 1,
     },
+    [TimeRange.Last5Years]: {
+      setup: () => {
+        const xMin = TimeLib.getMsSinceEpochXYearsAgo(5);
+        const xMax = TimeLib.getMsSinceEpochXYearsAgo(0);
+        return { xMin, xMax };
+      },
+      unit: TimescaleUnit.year,
+      stepSize: 1,
+    },
   };
 
   public static getTimescaleOptions(
@@ -156,13 +165,17 @@ export class ChartTimescale {
     return Object.values(TimeRange);
   }
 
-  public static getStartEndTimestampsFromTimerange(selectedRange: TimeRange): [number, number] {
+  public static getStartEndTimestampsFromTimerange(
+    selectedRange: TimeRange,
+  ): [number, number] {
     const configuration = ChartTimescale.timescaleConfigurations[selectedRange];
     if (configuration) {
       const { xMin, xMax } = configuration.setup();
       return [xMin, xMax];
     } else {
-      throw new Error("Error: Could not find data start timestamp for the selected range!");
+      throw new Error(
+        "Error: Could not find data start timestamp for the selected range!",
+      );
     }
   }
 }

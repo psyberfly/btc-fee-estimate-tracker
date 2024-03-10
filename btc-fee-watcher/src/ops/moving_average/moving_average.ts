@@ -1,16 +1,16 @@
 import { IMovingAverageOp } from "./interface";
 import { FeeOp } from "../fee_estimate/fee_estimate";
 import { handleError } from "../../lib/errors/e";
-import { FeeEstimate, MovingAverage } from "@prisma/client";
 import { Decimal } from "@prisma/client/runtime/library";
 import { MovingAveragePrismaStore } from "./store/prisma";
 import { fetchDate, UTCDate } from "../../lib/date/date";
+import { MovingAverages } from "@prisma/client";
 
 export class MovingAverageOp implements IMovingAverageOp {
   private feeOp = new FeeOp();
   private store = new MovingAveragePrismaStore();
 
-  async readAll(since: Date): Promise<Error | MovingAverage[]> {
+  async readAll(since: Date): Promise<Error | MovingAverages[]> {
     const all = await this.store.readAll(since);
     if (all instanceof Error) {
       return handleError(all);
@@ -18,7 +18,7 @@ export class MovingAverageOp implements IMovingAverageOp {
     return all;
   }
 
-  async readLatest(): Promise<Error | MovingAverage> {
+  async readLatest(): Promise<Error | MovingAverages> {
     const latestMovingAvg = await this.store.readLatest();
     if (latestMovingAvg instanceof Error) {
       return handleError(latestMovingAvg);
@@ -99,19 +99,19 @@ export class MovingAverageOp implements IMovingAverageOp {
         return weightedMovingAverage;
       };
 
-      const feeHistoryLast360Days = await this.feeOp.readLast365Days(day);
+      const feeHistoryLast365Days = await this.feeOp.readLast365Days(day);
 
-      if (feeHistoryLast360Days instanceof Error) {
-        return feeHistoryLast360Days;
+      if (feeHistoryLast365Days instanceof Error) {
+        return feeHistoryLast365Days;
       }
-      if (feeHistoryLast360Days.length === 0) {
+      if (feeHistoryLast365Days.length === 0) {
         throw new Error("Array is empty, cannot calculate average.");
       }
-      const averageLast360Days = calculateWeightedAverage(
-        feeHistoryLast360Days,
+      const averageLast365Days = calculateWeightedAverage(
+        feeHistoryLast365Days,
       );
 
-      const feeHistoryLast30Days = await this.feeOp.readLast30Days();
+      const feeHistoryLast30Days = await this.feeOp.readLast30Days(day);
       if (feeHistoryLast30Days instanceof Error) {
         return feeHistoryLast30Days;
       }
@@ -120,10 +120,11 @@ export class MovingAverageOp implements IMovingAverageOp {
       }
       const averageLast30Days = calculateWeightedAverage(feeHistoryLast30Days);
 
-      const update: MovingAverage = {
+      const update: MovingAverages = {
         id: null, // Added by DB
-        createdAt: day,
-        last365Days: averageLast360Days,
+        day: day,
+        createdAt: null, //Added by DB,
+        last365Days: averageLast365Days,
         last30Days: averageLast30Days,
       };
 

@@ -4,50 +4,63 @@ import { IFeeEstimateOp } from "./interface";
 import { makeApiCall } from "../../lib/network/network";
 import { handleError } from "../../lib/errors/e";
 import { FeeEstimatePrismaStore } from "./store/prisma";
-import { FeeEstimate } from "@prisma/client";
+import { FeeEstimates } from "@prisma/client";
 
 export class FeeOp implements IFeeEstimateOp {
-
   private mempoolApiUrl = "https://mempool.space/api/v1/fees/recommended";
   // private store = new FeeEstPgStore();
   private store = new FeeEstimatePrismaStore();
 
-  async readLatest(): Promise<FeeEstimate | Error> {
+  async readLatest(): Promise<FeeEstimates | Error> {
     const res = await this.store.readLatest();
     return res;
   }
 
-  async readLast365Days(since: Date): Promise<FeeEstimate[] | Error> {
-    // Assuming fetchDate is a function to format or validate the date, apply it directly to 'since'
-    const startDate = since;
-    // Calculate the date 365 days after 'since' using setDate and getDate
-    const endDate = new Date(startDate);
-    endDate.setDate(startDate.getDate() + 365);
+  async readLast365Days(since: Date): Promise<FeeEstimates[] | Error> {
+    const endDate = since;
+    const startDate = new Date(since);
+    startDate.setDate(startDate.getDate() - 365);
 
     try {
-        const res = await this.store.readByRange(startDate.toISOString(), endDate.toISOString());
-        return res;
+      const res = await this.store.readByRange(
+        startDate.toISOString(),
+        endDate.toISOString(),
+      );
+      if (res instanceof Error) {
+        throw (`Store error: ${res}`);
+      } else if (res.length < 1) {
+        throw ("No fee estimates found in last 365Days");
+      }
+      return res;
     } catch (error) {
-        // Log the error or handle it as per your application's error handling strategy
-        console.error("Error fetching data:", error);
-        return new Error("Error fetching data.");
+      console.error("Error fetching data:", error);
+      return new Error("Error fetching data.");
     }
-}
+  }
 
-  async readLast30Days(): Promise<FeeEstimate[] | Error> {
-    const today = fetchDate(UTCDate.today);
-    const lastMonth = fetchDate(UTCDate.lastMonth);
+  async readLast30Days(since: Date): Promise<FeeEstimates[] | Error> {
+    const endDate = since;
+    const startDate = new Date(since);
+    startDate.setDate(startDate.getDate() - 30);
 
-    const res = await this.store.readByRange(lastMonth, today);
+    const res = await this.store.readByRange(
+      startDate.toISOString(),
+      endDate.toISOString(),
+    );
+    if (res instanceof Error) {
+      throw (`Store error: ${res}`);
+    } else if (res.length < 1) {
+      throw ("No fee estimates found in last 30Days");
+    }
     return res;
   }
 
-  async readAll(since:Date): Promise<FeeEstimate[] | Error> {
-        const res = await this.store.readAll(since);
+  async readAll(since: Date): Promise<FeeEstimates[] | Error> {
+    const res = await this.store.readAll(since);
     return res;
   }
 
-  async create(): Promise<FeeEstimate | Error> {
+  async create(): Promise<FeeEstimates | Error> {
     const res = await makeApiCall(this.mempoolApiUrl, "GET");
 
     if (res instanceof Error) {
@@ -64,9 +77,10 @@ export class FeeOp implements IFeeEstimateOp {
       });
     }
 
-    const currentfeeEstimate: FeeEstimate = {
+    const currentfeeEstimate: FeeEstimates = {
       time: new Date(),
       satsPerByte: satsPerByte,
+      createdAt: null, //Added by DB
       id: null, //Added by DB,
     };
 
@@ -75,18 +89,22 @@ export class FeeOp implements IFeeEstimateOp {
     if (res instanceof Error) {
       return handleError(res);
     }
-    
+
     return insertedFeeEst;
   }
 
-  async seedHistory(history: FeeEstimate[]): Promise<boolean | Error> {
+  async seedHistory(history: FeeEstimates[]): Promise<boolean | Error> {
     const count = await this.store.checkCount();
     if (count instanceof Error) {
       return handleError(count);
     }
 
     if (count > 0) {
-    return handleError(Error(`Error seeding DB: FeeEstimate table is not empty. Row count: ${count}. Aborting seeding.`));
+      return handleError(
+        Error(
+          `Error seeding DB: FeeEstimates table is not empty. Row count: ${count}. Aborting seeding.`,
+        ),
+      );
     }
 
     const res = await this.store.insertMany(history);

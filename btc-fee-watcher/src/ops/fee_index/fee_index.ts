@@ -1,7 +1,7 @@
-import { FeeEstimate, FeeIndex } from "@prisma/client";
+import { FeeEstimates, FeeIndexes } from "@prisma/client";
 import { handleError } from "../../lib/errors/e";
 import { FeeOp } from "../fee_estimate/fee_estimate";
-import { IIndexOp, FeeIndexDetailed } from "./interface";
+import { FeeIndexDetailed, IIndexOp } from "./interface";
 import { FeeIndexPrismaStore } from "./store/prisma";
 import { MovingAveragePrismaStore } from "../moving_average/store/prisma";
 import { FeeEstimatePrismaStore } from "../fee_estimate/store/prisma";
@@ -31,7 +31,7 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
-  async readAll(since: Date): Promise<FeeIndex[] | Error> {
+  async readAll(since: Date): Promise<FeeIndexes[] | Error> {
     const res = await this.store.fetchAll(since);
     if (res instanceof Error) {
       return handleError(res);
@@ -40,7 +40,7 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
-  async seed(since: Date):Promise<boolean | Error>{
+  async seed(since: Date): Promise<boolean | Error> {
     try {
       //read all fee estimates from since to today
       const feeEstimates = await this.feeOp.readAll(since);
@@ -49,43 +49,62 @@ export class IndexOp implements IIndexOp {
         console.error("Error reading fee estimates from DB!");
         throw feeEstimates;
       }
+      const feeEstToSeed = feeEstimates.length;
+      console.log({ feeEstToSeed });
 
-      feeEstimates.forEach((feeEstimate) => {
+      feeEstimates.forEach(async (feeEstimate) => {
         //compute moving average
-        this.create(feeEstimate);
+        const res = await this.create(feeEstimate);
       });
 
       return true;
     } catch (e) {
       return handleError(e);
     }
+  }
 
-   };
+  async create(feeEstimate: FeeEstimates): Promise<boolean | Error> {
+    try {
+      const movingAverage = await this.movingAvgStore.readByDay(
+        feeEstimate.time,
+      );
 
+      if (!movingAverage) {
+        console.error(`No moving averge for fee est: ${feeEstimate.time}`);
+        return true;
+      }
 
-  async create(feeEstimate:FeeEstimate): Promise<boolean | Error> {
-       const movingAverage = await this.movingAvgStore.readByDay(feeEstimate.time);
+      if (
+        !(movingAverage instanceof Error) &&
+        movingAverage
+      ) {
+        const ratioLast365Days = feeEstimate.satsPerByte.toNumber() /
+          movingAverage.last365Days.toNumber();
 
-    if (movingAverage instanceof Error) {
-      return handleError(movingAverage);
+        const ratioLast30Days = feeEstimate.satsPerByte.toNumber() /
+          movingAverage.last30Days.toNumber();
+
+        const index: FeeIndexes = {
+          id: null, //added by DB
+          time: feeEstimate.time,
+          feeEstimateId: feeEstimate.id,
+          movingAverageId: movingAverage.id,
+          ratioLast365Days: new Decimal(ratioLast365Days),
+          ratioLast30Days: new Decimal(ratioLast30Days),
+          createdAt: null, //added by DB
+        };
+
+        const res = await this.store.insert(index);
+        if (res instanceof Error) {
+          console.error(`Error inserting fee index: ${res}`);
+          const feeEstId = feeEstimate.id;
+          console.log({ feeEstId });
+          throw res;
+        }
+      }
+      return true;
+    } catch (e) {
+      return handleError(e);
     }
-
-    const ratioLast365Days = feeEstimate.satsPerByte.toNumber() /
-      movingAverage.last365Days.toNumber();
-
-    const ratioLast30Days = feeEstimate.satsPerByte.toNumber() /
-      movingAverage.last30Days.toNumber();
-
-    const index: FeeIndex = {
-      id: null, //added by DB
-      feeEstimateId: feeEstimate.id,
-      movingAverageId: movingAverage.id,
-      ratioLast365Days: new Decimal(ratioLast365Days),
-      ratioLast30Days: new Decimal(ratioLast30Days),
-      createdAt: null, //added by DB
-    };
-
-    this.store.insert(index);
-    return true;
   }
 }

@@ -101,6 +101,7 @@ const App = () => {
                 last30Days: parseFloat(data[0]["ratioLast30Days"]).toFixed(2),
                 last365Days: parseFloat(data[0]["ratioLast365Days"]).toFixed(2)
               };
+              console.log({ data });
               setCurrentFeeIndex(currentFeeIndex as any);
               break;
             case ServiceChartType.movingAverage:
@@ -112,11 +113,14 @@ const App = () => {
             default:
               throw new Error('Invalid chart type');
           }
-
+          console.log("Here's the data!");
+          console.log({ data });
           if (data instanceof Error) {
             console.error(`Error fetching data for ${chartType}`);
             throw data;
           }
+
+
 
           const isDataStored = await store.upsert(chartType, data);
 
@@ -166,6 +170,8 @@ const App = () => {
         default:
           throw new Error('Invalid chart type');
       }
+      console.log("Here's the data!");
+      console.log({ data });
 
       if (data instanceof Error) {
         console.error(`Update data history: Error fetching data for ${chartType}`);
