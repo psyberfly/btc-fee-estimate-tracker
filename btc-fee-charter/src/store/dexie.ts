@@ -8,7 +8,7 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super("btcFee");
-    this.version(1).stores({
+    this.version(3).stores({
       feeIndex: "time, ratioLast365Days, ratioLast30Days", // Primary key and indexed props
       movingAverages: "day, last365Days, last30Days",
       feeEstimates: "time, satsPerByte",

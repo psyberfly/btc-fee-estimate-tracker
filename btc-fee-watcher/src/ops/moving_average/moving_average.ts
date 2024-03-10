@@ -42,7 +42,7 @@ export class MovingAverageOp implements IMovingAverageOp {
       const feeEstimates = await this.feeOp.readAll(since);
 
       if (feeEstimates instanceof Error) {
-        console.error("Error reading fee estimates from DB!");
+        console.error(`Error reading fee estimates from DB! ${feeEstimates}`);
         throw feeEstimates;
       }
       //for each fee estimate in fee estimates: create days: Date[] = all days (24h window) across all fee estimates

@@ -24,7 +24,6 @@ async function seedIndexes() {
   await movingAverageOp.seed(seedIndexStartDate);
   console.log("Seeding indexes...");
   await indexOp.seed(seedIndexStartDate);
-  console.log("Indexes seeded.");
 }
 
 async function updateMovingAverage() {

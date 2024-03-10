@@ -44,29 +44,4 @@ NodeJs (Typescript), Postgres, Docker(optional)
 2. 500 error response is wrong: {"error":"Internal Error. Contact support@satsbank.io"}
 
 ### To Do:
-
-<!-- Weighted Moving Average:
-1. In table MovingAverage: add columns weightedLast30Days, weightedLast365Days.
-Note: WMA is calculated with weights 36 and 1 for 6h and 10m intervals respectively. Refer ChatGPT thread...
-2. Seed WMAs: Write a script to calculate WMA starting from the date of first row in MovingAverage table.
-3. After seeding WMA, add WMA to interval routine of Index Watcher.
-4. Chart WMA, WMA-based Index in Charter.
-
-Index:
-1. In table Index: add columns ratioLast30DaysWMA, ratioLast365DaysWMA. Maybe rename previous ratios to *MA ?
-2. Seed IndexWMA for all rows in table.
-3. After seeding, add IndexWMA to Index Watcher routine
-4. Chart IndexWMA. -->
-
-Create a mechanism to dynamically handle:
-1. Fee Estimate frequency discripancy: using weighted moving averages  
-   Upgrade the moving average formula to dynamically check for discripancy in "time" of FeeEstimates, apply weights accordingly to "satsPerByte" and proceed to calculate moving average for the day.
-TODO: test
-
-
-2. Seeding of Fee Index and Moving Average tables at service start from a predefined date instead of from moment of server start. 
-   Upgrade Index Watcher to compute Fee Index for
-   1. all Fee Estimates starting from seedStartDate upto current time?
-   Along with computing index for the fee estimate fetched every 10mins as it currently does.
-Instead of purging old DB, let's just start a new instance of service, with a CSV dump of fee estimates from the previous service insance DB
-TODO: Test
+1. Patch: fee indexes are not generated form seed date at server onset. seedIndexes returns movingAverage not available for n fee estimate date and stops. Upon restarting server, fee indexes are calculated. Maybe, seedIndex is not happening synchronously after seedMovingAverage. 
