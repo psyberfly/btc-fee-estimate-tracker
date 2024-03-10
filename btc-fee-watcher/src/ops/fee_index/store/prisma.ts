@@ -7,7 +7,7 @@ export class FeeIndexPrismaStore {
   async fetchLatest(): Promise<FeeIndexDetailed | Error> {
     try {
       const latestIndex = await prisma.feeIndexes.findFirst({
-        orderBy: { createdAt: "desc" },
+        orderBy: { time: "desc" },
         include: {
           feeEstimate: true,
           movingAverage: true,
@@ -15,7 +15,7 @@ export class FeeIndexPrismaStore {
       });
 
       const latestIndexRes: FeeIndexDetailed = {
-        timestamp: latestIndex.createdAt,
+        timestamp: latestIndex.time,
         feeEstimateMovingAverageRatio: {
           last365Days: latestIndex.ratioLast365Days.toNumber(),
           last30Days: latestIndex.ratioLast30Days.toNumber(),
@@ -53,13 +53,13 @@ export class FeeIndexPrismaStore {
     try {
       // Initialize the query parameters with orderBy
       let queryParameters: any = {
-        orderBy: { createdAt: "desc" },
+        orderBy: { time: "desc" },
       };
 
       // If since is provided, add a where clause to the query parameters
       if (since) {
         queryParameters.where = {
-          createdAt: {
+          time: {
             gt: since, // Use the "gt" (greater than) operator to filter records after the "since" date
           },
         };

@@ -1,11 +1,5 @@
-import {
-  FeeEstimate,
-  FeeIndex,
-  IChartDatasetOp,
-  IndexResponse,
-  MovingAverage,
-  ServiceChartType,
-} from "./interface";
+import { FeeEstimate, FeeIndex, MovingAverage } from "../store/interface";
+import { IChartDatasetOp, ServiceChartType } from "./interface";
 
 export class ChartDatasetOp implements IChartDatasetOp {
   getFromData<T extends FeeIndex[] | MovingAverage[] | FeeEstimate[]>(
@@ -98,7 +92,6 @@ export class ChartDatasetOp implements IChartDatasetOp {
         },
       ],
     };
-
     return dataset;
   }
 
@@ -145,7 +138,6 @@ export class ChartDatasetOp implements IChartDatasetOp {
         },
       ],
     };
-
     return dataset;
   }
 

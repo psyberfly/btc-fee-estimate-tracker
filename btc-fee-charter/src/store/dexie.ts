@@ -1,5 +1,5 @@
 import Dexie, { Table } from "dexie";
-import { FeeEstimate, FeeIndex, MovingAverage } from "../chart_data/interface";
+import { FeeIndex, MovingAverage, FeeEstimate } from "./interface";
 
 export class MySubClassedDexie extends Dexie {
   feeIndex!: Table<FeeIndex>;

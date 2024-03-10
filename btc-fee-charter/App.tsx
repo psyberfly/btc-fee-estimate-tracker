@@ -91,8 +91,8 @@ const App = () => {
         const availableHistoryStartTimestamp = new Date(await store.historyStartTimestamp(chartType));
         const [requiredHistoryStart, requiredHistoryEnd] = ChartTimescale.getStartEndTimestampsFromTimerange(selectedRange);
         const requiredHistoryStartTimestamp = new Date(requiredHistoryStart);
-
-        if (!availableHistoryStartTimestamp || availableHistoryStartTimestamp > requiredHistoryStartTimestamp) {
+        if (!availableHistoryStartTimestamp || isNaN(availableHistoryStartTimestamp.getTime()) || availableHistoryStartTimestamp > requiredHistoryStartTimestamp) {
+          console.log("Fetching data from watcher...")
           //fetch the latest readings from watcher beyond latest timestamp
           switch (chartType) {
             case ServiceChartType.index:
@@ -101,7 +101,6 @@ const App = () => {
                 last30Days: parseFloat(data[0]["ratioLast30Days"]).toFixed(2),
                 last365Days: parseFloat(data[0]["ratioLast365Days"]).toFixed(2)
               };
-              console.log({ data });
               setCurrentFeeIndex(currentFeeIndex as any);
               break;
             case ServiceChartType.movingAverage:
@@ -113,8 +112,7 @@ const App = () => {
             default:
               throw new Error('Invalid chart type');
           }
-          console.log("Here's the data!");
-          console.log({ data });
+
           if (data instanceof Error) {
             console.error(`Error fetching data for ${chartType}`);
             throw data;
@@ -128,7 +126,9 @@ const App = () => {
             throw new Error(`Error storing data to DB: ${isDataStored}`);
           }
 
+
         }
+
         const history = await store.read(chartType); //this could be upgraded to fetch data from db by selectedRange?
         const chartData = chartDataOp.getFromData(history, chartType);
 
@@ -151,6 +151,7 @@ const App = () => {
 
     const updateDataHistory = async (chartType) => {
       const availableHistoryEndTimestamp = new Date(await store.historyEndTimestamp(chartType));
+
       let data;
       switch (chartType) {
         case ServiceChartType.index:
@@ -170,8 +171,6 @@ const App = () => {
         default:
           throw new Error('Invalid chart type');
       }
-      console.log("Here's the data!");
-      console.log({ data });
 
       if (data instanceof Error) {
         console.error(`Update data history: Error fetching data for ${chartType}`);

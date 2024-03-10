@@ -1,13 +1,7 @@
 import { AxiosHeaders } from "axios";
 import { makeApiCall } from "../lib/network/network";
-import {
-  FeeEstimate,
-  FeeIndex,
-  IDataOp,
-  IndexDataResponse,
-  IndexResponse,
-  MovingAverage,
-} from "./interface";
+import { IDataOp, IndexDataResponse, IndexResponse } from "./interface";
+import { FeeEstimate, MovingAverage, FeeIndex } from "../store/interface";
 
 export class DataOp implements IDataOp {
   private baseUrl = import.meta.env.VITE_FEE_WATCHER_PUBLIC_API_URL;
@@ -96,8 +90,8 @@ export class DataOp implements IDataOp {
       res.forEach((element) => {
         const index: FeeIndex = {
           time: (element["time"]),
-          ratioLast30Days: parseFloat(element["ratioLast30Days"]),
-          ratioLast365Days: parseFloat(element["ratioLast365Days"]),
+          ratioLast30Days: (element["ratioLast30Days"]),
+          ratioLast365Days: (element["ratioLast365Days"]),
         };
         data.push(index);
       });
