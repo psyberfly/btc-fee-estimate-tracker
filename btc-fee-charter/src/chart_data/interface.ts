@@ -1,9 +1,9 @@
-import { FeeIndex, MovingAverage, FeeEstimate } from "../store/interface";
+import { FeeEstimate, FeeIndex, MovingAverage } from "../store/interface";
 
 export enum ServiceChartType {
-  index = "Fee Estimate Index",
-  movingAverage = "Moving Average",
-  feeEstimate = "Fee Estimate History",
+  index,
+  movingAverage,
+  feeEstimate,
 }
 
 export interface IndexResponse {
