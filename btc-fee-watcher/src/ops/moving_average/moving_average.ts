@@ -59,10 +59,12 @@ export class MovingAverageOp implements IMovingAverageOp {
         new Date(dayStr)
       );
 
-      uniqueDays.forEach((day) => {
-        //compute moving average
-        this.create(day);
-      });
+      for (const day of uniqueDays) {
+        const res = await this.create(day);
+        if (res instanceof Error) {
+          console.error(`Error creating moving average: ${res} `);
+        }
+      }
 
       return true;
     } catch (e) {

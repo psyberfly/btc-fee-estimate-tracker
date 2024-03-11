@@ -52,11 +52,12 @@ export class IndexOp implements IIndexOp {
       const feeEstToSeed = feeEstimates.length;
       console.log({ feeEstToSeed });
 
-      feeEstimates.forEach(async (feeEstimate) => {
-        //compute moving average
+      for (const feeEstimate of feeEstimates) {
         const res = await this.create(feeEstimate);
-      });
-
+        if (res instanceof Error) {
+          console.error(`Error creating feeIndex: ${res}`);
+        }
+      }
       return true;
     } catch (e) {
       return handleError(e);
