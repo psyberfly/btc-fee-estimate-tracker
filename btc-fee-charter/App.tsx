@@ -79,7 +79,17 @@ const App = () => {
   const chartDataOp = new ChartDatasetOp();
   const store = new Store();
   const [selectedRange, setSelectedRange] = useState(TimeRange.Last1Month); // Default 
-  const [currentFeeIndex, setCurrentFeeIndex] = useState({ last365Days: null, last30Days: null });
+  const [currentFeeIndex, setCurrentFeeIndex] = useState({ ratioLast365Days: 0, ratioLast30Days: 0, time: new Date() });
+
+  const latestFeeIndex = async () => {
+    const latestIndex = await store.readLatest(ServiceChartType.index);
+    if (latestFeeIndex instanceof Error || !latestFeeIndex) {
+      console.log(`Error fetching latest fee index: ${latestFeeIndex}`);
+    }
+    else {
+      return latestIndex;
+    }
+  };
 
   useEffect(() => {
     const fetchDataForChartType = async (chartType) => {
@@ -97,11 +107,6 @@ const App = () => {
           switch (chartType) {
             case ServiceChartType.index:
               data = await dataOp.fetchFeeIndexHistory(requiredHistoryStartTimestamp);
-              const currentFeeIndex = {
-                last30Days: parseFloat(data[0]["ratioLast30Days"]).toFixed(2),
-                last365Days: parseFloat(data[0]["ratioLast365Days"]).toFixed(2)
-              };
-              setCurrentFeeIndex(currentFeeIndex as any);
               break;
             case ServiceChartType.movingAverage:
               data = await dataOp.fetchMovingAverageHistory(requiredHistoryStartTimestamp);
@@ -126,7 +131,14 @@ const App = () => {
             throw new Error(`Error storing data to DB: ${isDataStored}`);
           }
 
-
+          const currentFeeIndex = await latestFeeIndex()
+          if (currentFeeIndex instanceof Error || !currentFeeIndex) {
+            console.log(`Error fetching latest fee index: ${currentFeeIndex}`);
+            setCurrentFeeIndex({ ratioLast30Days: 0, ratioLast365Days: 0, time: new Date() });
+          }
+          else {
+            setCurrentFeeIndex(currentFeeIndex);
+          }
         }
 
         const history = await store.read(chartType); //this could be upgraded to fetch data from db by selectedRange?
@@ -156,11 +168,7 @@ const App = () => {
       switch (chartType) {
         case ServiceChartType.index:
           data = await dataOp.fetchFeeIndexHistory(availableHistoryEndTimestamp);
-          const currentFeeIndex = {
-            last30Days: parseFloat(data[0]["ratioLast30Days"]).toFixed(2),
-            last365Days: parseFloat(data[0]["ratioLast365Days"]).toFixed(2)
-          };
-          setCurrentFeeIndex(currentFeeIndex as any);
+
           break;
         case ServiceChartType.movingAverage:
           data = await dataOp.fetchMovingAverageHistory(availableHistoryEndTimestamp);
@@ -182,7 +190,14 @@ const App = () => {
       if (isDataStored instanceof Error) {
         throw new Error(`Update data history: Error storing data to DB: ${isDataStored}`);
       }
-
+      const currentFeeIndex = await latestFeeIndex()
+      if (currentFeeIndex instanceof Error || !currentFeeIndex) {
+        console.log(`Error fetching latest fee index: ${currentFeeIndex}`);
+        setCurrentFeeIndex({ ratioLast30Days: 0, ratioLast365Days: 0, time: new Date() });
+      }
+      else {
+        setCurrentFeeIndex(currentFeeIndex);
+      }
     }
 
     fetchDataForChartType(chartType);
@@ -219,28 +234,41 @@ const App = () => {
         {chartType === ServiceChartType.index && chartData && (
           <>
             <h1 style={{ paddingTop: "10vh", textAlign: "center" }}>Fee Estimate Index</h1>
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "baseline", paddingTop: "10px" }}>
-              <div style={{ textAlign: "center", paddingRight: "50px" }}> {/* Adjust spacing as needed */}
-                <h2>Last 365 Days</h2>
-                <h2 style={{ fontSize: "30px" }}>{currentFeeIndex.last365Days}</h2>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "10px" }}>
+              <div style={{ display: "flex", justifyContent: "center", alignItems: "baseline" }}>
+                {/* Container for ratios */}
+                <div style={{ textAlign: "center", paddingRight: "50px" }}>
+                  <h2>Last 365 Days</h2>
+                  <h2 style={{ fontSize: "30px" }}>{Number(currentFeeIndex.ratioLast365Days).toFixed(2)}</h2>
+                </div>
+                <div style={{ textAlign: "center", paddingLeft: "50px" }}>
+                  <h2>Last 30 Days</h2>
+                  <h2 style={{ fontSize: "30px" }}>{Number(currentFeeIndex.ratioLast30Days).toFixed(2)}</h2>
+                </div>
               </div>
-
-              <div style={{ textAlign: "center", paddingLeft: "50px" }}> {/* Adjust spacing as needed */}
-                <h2>Last 30 Days</h2>
-                <h2 style={{ fontSize: "30px" }}>{currentFeeIndex.last30Days}</h2>
+              {/* Separate container for the date */}
+              <div style={{ textAlign: "center", paddingTop: "0px" }}> {/* Adjust spacing as needed */}
+                <h3 style={{ fontSize: "20px" }}> at {new Date(currentFeeIndex.time).toLocaleString('en-US', {
+                  year: 'numeric',
+                  month: 'numeric',
+                  day: 'numeric',
+                  hour: 'numeric',
+                  minute: 'numeric',
+                  second: 'numeric',
+                  hour12: true
+                })}</h3>
               </div>
             </div>
-
             <h3 style={{ paddingTop: "10px", paddingBottom: "10vh", textAlign: "center" }}>
-              The current fee estimate is {Math.abs((currentFeeIndex.last365Days! - 1) * 100).toFixed(2)}%
+              The current fee estimate is {Math.abs((Number(currentFeeIndex.ratioLast365Days) - 1) * 100).toFixed(2)}%
               {' '}
-              <span style={{ color: currentFeeIndex.last365Days! >= 1 ? 'red' : 'green' }}>
-                {currentFeeIndex.last365Days! >= 1 ? 'more' : 'less'}
+              <span style={{ color: Number(currentFeeIndex.ratioLast365Days) >= 1 ? 'red' : 'green' }}>
+                {Number(currentFeeIndex.ratioLast365Days) >= 1 ? 'more' : 'less'}
               </span>
-              {' '} than last year and {Math.abs((currentFeeIndex.last30Days! - 1) * 100).toFixed(2)}%
+              {' '} than last year and {Math.abs((Number(currentFeeIndex.ratioLast30Days) - 1) * 100).toFixed(2)}%
               {' '}
-              <span style={{ color: currentFeeIndex.last30Days! >= 1 ? 'red' : 'green' }}>
-                {currentFeeIndex.last30Days! >= 1 ? 'more' : 'less'}
+              <span style={{ color: Number(currentFeeIndex.ratioLast30Days) >= 1 ? 'red' : 'green' }}>
+                {Number(currentFeeIndex.ratioLast30Days) >= 1 ? 'more' : 'less'}
               </span>
               {' '} than last month.
             </h3>
@@ -254,7 +282,7 @@ const App = () => {
           <ChartView dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
         )}
       </div>
-    </div>
+    </div >
   );
 
 

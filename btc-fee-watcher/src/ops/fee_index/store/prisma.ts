@@ -7,7 +7,7 @@ export class FeeIndexPrismaStore {
   async fetchLatest(): Promise<FeeIndexDetailed | Error> {
     try {
       const latestIndex = await prisma.feeIndexes.findFirst({
-        orderBy: { time: "desc" },
+        orderBy: { time: "asc" },
         include: {
           feeEstimate: true,
           movingAverage: true,
@@ -53,7 +53,7 @@ export class FeeIndexPrismaStore {
     try {
       // Initialize the query parameters with orderBy
       let queryParameters: any = {
-        orderBy: { time: "desc" },
+        orderBy: { time: "asc" },
       };
 
       // If since is provided, add a where clause to the query parameters
@@ -78,7 +78,7 @@ export class FeeIndexPrismaStore {
   async fetchAllDetailed(): Promise<FeeIndexDetailed[] | Error> {
     try {
       const allIndexDetailed = await prisma.feeIndexes.findMany({
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: "asc" },
         include: {
           feeEstimate: true,
           movingAverage: true,

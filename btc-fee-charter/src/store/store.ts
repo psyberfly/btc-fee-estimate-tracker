@@ -71,6 +71,26 @@ export class Store implements IStore {
     }
   }
 
+  async readLatest(chartType: ServiceChartType): Promise<any | Error> {
+    let data;
+    switch (chartType) {
+      case ServiceChartType.index:
+        data = await db.feeIndex.orderBy("time").reverse().first().then(
+          (latestEntry) => {
+            if (latestEntry) {
+              return latestEntry;
+            } else {
+              console.log("No entries found in the database for readLatest.");
+            }
+          },
+        ).catch((error) => {
+          console.error("Failed to find the most recent entry: ", error);
+        });
+        break;
+    }
+    return data;
+  }
+
   async read(
     chartType: ServiceChartType,
     // from: Date,
@@ -81,7 +101,7 @@ export class Store implements IStore {
       switch (chartType) {
         case ServiceChartType.index:
           data = await db.feeIndex.orderBy("time").toArray();
-    
+
           //  where("createdAt")
           //   .between(from, to, true, true)
           //   .toArray();
@@ -93,7 +113,7 @@ export class Store implements IStore {
             // .where("createdAt")
             // .between(from, to, true, true)
             .toArray();
-        
+
           break;
 
         case ServiceChartType.feeEstimate:

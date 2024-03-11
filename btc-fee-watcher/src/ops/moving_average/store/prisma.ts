@@ -7,7 +7,7 @@ export class MovingAveragePrismaStore {
     try {
       // Initialize the query parameters with orderBy
       let queryParameters: any = {
-        orderBy: { day: "desc" },
+        orderBy: { day: "asc" },
       };
 
       // If since is provided, add a where clause to the query parameters
@@ -32,7 +32,7 @@ export class MovingAveragePrismaStore {
   async readLatest(): Promise<MovingAverages | Error> {
     try {
       const movingAverage = await prisma.movingAverages.findFirst({
-        orderBy: { createdAt: "desc" },
+        orderBy: { createdAt: "asc" },
       });
       return movingAverage;
     } catch (error) {

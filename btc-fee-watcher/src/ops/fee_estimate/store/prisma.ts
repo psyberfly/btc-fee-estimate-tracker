@@ -6,7 +6,7 @@ export class FeeEstimatePrismaStore {
   async readLatest(): Promise<FeeEstimates | Error> {
     try {
       const res = await prisma.feeEstimates.findFirst({
-        orderBy: { time: "desc" },
+        orderBy: { time: "asc" },
       });
       const feeEstimateLatest: FeeEstimates = {
         id: res.id,
@@ -79,7 +79,7 @@ export class FeeEstimatePrismaStore {
     try {
       // Initialize the query parameters with orderBy
       let queryParameters: any = {
-        orderBy: { time: "desc" },
+        orderBy: { time: "asc" },
       };
 
       // If since is provided, add a where clause to the query parameters
