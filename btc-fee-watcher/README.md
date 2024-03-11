@@ -44,4 +44,4 @@ NodeJs (Typescript), Postgres, Docker(optional)
 2. 500 error response is wrong: {"error":"Internal Error. Contact support@satsbank.io"}
 
 ### To Do:
-1. Patch: fee indexes are not generated form seed date at server onset. seedIndexes returns movingAverage not available for n fee estimate date and stops. Upon restarting server, fee indexes are calculated. Maybe, seedIndex is not happening synchronously after seedMovingAverage. 
+1. Upgrade: Seeding of moving averages & fee index: use bulkUpsert instead of upsert/create.
