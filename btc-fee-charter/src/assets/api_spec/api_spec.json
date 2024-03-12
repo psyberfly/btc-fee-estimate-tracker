@@ -1,0 +1,55 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "BTC Fee Tracker API",
+    "description": "Public API serving current index and other historic data",
+    "version": "1.0.0"
+  },
+ 
+  "paths": {
+    "/index": {
+      "get": {
+        "summary": "Get latest fee estimate index",
+        "operationId": "getIndex",
+        "tags": [
+          "index"
+        ],
+        "responses": {
+          "200": {
+            "description": "Latest fee index object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "items": {
+                    "$ref": "#/components/schemas/FeeIndex"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "FeeIndex": {
+        "type": "object",
+        "required": [
+          "id",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}
