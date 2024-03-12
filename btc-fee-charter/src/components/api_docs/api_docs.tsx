@@ -7,7 +7,7 @@ import "./swagger_custom_styles.css"
 
 const ApiDocs = () => {
   return (
-    <div style={{ height: '100vh' }}>
+    <div style={{height: '100vh' }}>
       <SwaggerUI spec={apiDocs} />
     </div>
   );

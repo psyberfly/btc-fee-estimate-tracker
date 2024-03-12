@@ -5,15 +5,21 @@
     "description": "Public API serving current index and other historic data",
     "version": "1.0.0"
   },
- 
+  "servers": [
+    {
+      "url": "http://localhost:3561/api/v1",
+      "description": "Production server"
+    }
+  ],
   "paths": {
     "/index": {
       "get": {
         "summary": "Get latest fee estimate index",
         "operationId": "getIndex",
+        "description": "Get the current fee estimate index, along with the current fee estimate and daily moving average used to compute it.\n\nExample request:\n`GET http://localhost:3561/api/v1`",
         "tags": [
           "index"
-        ],
+        ],  
         "responses": {
           "200": {
             "description": "Latest fee index object",
@@ -21,32 +27,73 @@
               "application/json": {
                 "schema": {
                   "type": "object",
-                  "items": {
-                    "$ref": "#/components/schemas/FeeIndex"
+                  "properties": {
+                    "timestamp": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "feeEstimateMovingAverageRatio": {
+                      "type": "object",
+                      "properties": {
+                        "last365Days": {
+                          "type": "number"
+                        },
+                        "last30Days": {
+                          "type": "number"
+                        }
+                      }
+                    },
+                    "currentFeeEstimate": {
+                      "type": "object",
+                      "properties": {
+                        "time": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "satsPerByte": {
+                          "type": "integer"
+                        }
+                      }
+                    },
+                    "movingAverage": {
+                      "type": "object",
+                      "properties": {
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "last365Days": {
+                          "type": "number"
+                        },
+                        "last30Days": {
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "feeExample": {
+                    "value": {
+                      "timestamp": "2024-03-12T12:06:29.424Z",
+                      "feeEstimateMovingAverageRatio": {
+                        "last365Days": 0.645062381735235,
+                        "last30Days": 1.0792556857339766
+                      },
+                      "currentFeeEstimate": {
+                        "time": "2024-03-12T12:06:29.424Z",
+                        "satsPerByte": 29
+                      },
+                      "movingAverage": {
+                        "createdAt": "2024-03-12T12:06:28.629Z",
+                        "last365Days": 44.956892265193375,
+                        "last30Days": 26.87037037037037
+                      }
+                    }
                   }
                 }
               }
             }
-          }
-        }
-      }
-    }
-  },
-  "components": {
-    "schemas": {
-      "FeeIndex": {
-        "type": "object",
-        "required": [
-          "id",
-          "name"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid"
-          },
-          "name": {
-            "type": "string"
           }
         }
       }

@@ -122,16 +122,12 @@ export async function runIndexWatcher() {
 
     //At server start:
     await seedHistory();
-    //NOTE: This should be updated to run only if there is no reading within last 24 hours
-    //Calculate moving average once at onset, else fee index cant be computed until 24hours:
-    // await updateMovingAverage();
-    // // //NOTE: THis should be updated to run only if there is no reading within last 10m.
-    // // //Calculate index once at onset
-    // await udpateAndBroadcastIndex(alertStreamServer);
-
-    //Create moving avg and index for all fee estimates starting from seedIndexStartDate
 
     await seedIndexes();
+
+    await updateMovingAverage();
+
+    await udpateAndBroadcastIndex(alertStreamServer);
 
     // every day:
     setInterval(async () => {

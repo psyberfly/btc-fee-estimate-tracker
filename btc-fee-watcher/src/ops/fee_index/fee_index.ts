@@ -50,7 +50,6 @@ export class IndexOp implements IIndexOp {
         throw feeEstimates;
       }
       const feeEstToSeed = feeEstimates.length;
-      console.log({ feeEstToSeed });
 
       for (const feeEstimate of feeEstimates) {
         const res = await this.create(feeEstimate);
@@ -99,7 +98,6 @@ export class IndexOp implements IIndexOp {
         if (res instanceof Error) {
           console.error(`Error inserting fee index: ${res}`);
           const feeEstId = feeEstimate.id;
-          console.log({ feeEstId });
           throw res;
         }
       }

@@ -3,13 +3,13 @@
     --secondary-color: #6c757d;
     --secondary-color-dark: #3d4246;
     --text-color-dark: rgb(0, 0, 0);
+    --bg-color: rgb(0, 0, 0);
     --text-color: rgb(255, 255, 255);
     --text-color-secondary: rgb(190, 190, 190);
     --hover-color: rgb(13, 150, 255);
     --title-font: "Bebas Neue", sans-serif;
     --body-font: Helvetica, sans-serif;
 }
-
 
 .swagger-ui h1,
 .swagger-ui h2 {
@@ -29,9 +29,32 @@
     /* Override text color */
 }
 
+.swagger-ui .servers label select {
+    position: relative;
+    padding: 10px 10px;
+    color: var(--primary-color) !important;
+    background-color: var(--bg-color) !important;
+}
+
+.swagger-ui .scheme-container {
+    position: relative;
+    padding: 10px;
+    color: var(--primary-color) !important;
+    background-color: var(--bg-color) !important;
+}
+
+.swagger-ui .examples-select .examples-select-element {
+    display: none;
+    top: 20px;
+    width: 10%;
+}
+
+.swagger-ui .response-control-media-type--accept-controller select {
+    display: none;
+  }
+
 .swagger-ui body {
     margin: 0;
-    background: red !important
 }
 
 .swagger-ui .title {

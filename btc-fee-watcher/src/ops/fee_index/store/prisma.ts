@@ -7,7 +7,7 @@ export class FeeIndexPrismaStore {
   async fetchLatest(): Promise<FeeIndexDetailed | Error> {
     try {
       const latestIndex = await prisma.feeIndexes.findFirst({
-        orderBy: { time: "asc" },
+        orderBy: { time: "desc" },
         include: {
           feeEstimate: true,
           movingAverage: true,
@@ -131,10 +131,9 @@ export class FeeIndexPrismaStore {
           ratioLast30Days: index.ratioLast30Days,
         },
       });
-      console.log({ upserted });
       return true;
     } catch (error) {
-      return handleError(error); // Ensure handleError is appropriately defined to handle and/or log the error
+      return handleError(error); 
     }
   }
 }
