@@ -21,29 +21,31 @@ const authenticateAPIKey = (req, res, next) => {
   next();
 };
 
-router.get("/index", 
-//authenticateAPIKey,
- handleGetIndex);
+router.get(
+  "/index",
+  //authenticateAPIKey,
+  handleGetIndex,
+);
 
 router.get(
-  "/indexDetailedHistory",
+  "/history",
   //authenticateAPIKey,
   handleGetIndexDetailedHistory,
 );
 
 router.get(
   "/indexHistory",
-  //authenticateAPIKey,
+  authenticateAPIKey,
   handleGetIndexHistory,
 );
 
 router.get(
   "/movingAverageHistory",
- // authenticateAPIKey,
+  authenticateAPIKey,
   handleGetMovingAverageHistory,
 );
 router.get(
   "/feeEstimateHistory",
- // authenticateAPIKey,
+  authenticateAPIKey,
   handleGetFeeEstimateHistory,
 );

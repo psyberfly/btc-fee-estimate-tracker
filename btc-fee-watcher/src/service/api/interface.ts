@@ -8,6 +8,5 @@ export interface IApiService {
   getMovingAverageHistory(since: Date): Promise<MovingAverages[] | Error>; //Used for chart
 
   //UNUSED:
-  getIndexDetailedHistory(): Promise<FeeIndexDetailed[] | Error>; //Used for chart
-
+  getIndexDetailedHistory(since: Date): Promise<FeeIndexDetailed[] | Error>; //Used for chart
 }

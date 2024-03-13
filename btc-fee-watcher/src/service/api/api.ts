@@ -7,8 +7,6 @@ import { FeeOp } from "../../ops/fee_estimate/fee_estimate";
 import { MovingAverageOp } from "../../ops/moving_average/moving_average";
 
 export class ApiService implements IApiService {
-
-  
   private indexOp = new IndexOp();
   private feeOp = new FeeOp();
   private movingAverageOp = new MovingAverageOp();
@@ -21,8 +19,7 @@ export class ApiService implements IApiService {
     return index;
   }
 
-
-  async getIndexHistory(since:Date): Promise<Error | FeeIndexes[]> {
+  async getIndexHistory(since: Date): Promise<Error | FeeIndexes[]> {
     try {
       const allFeeEst = await this.indexOp.readAll(since);
       if (allFeeEst instanceof Error) {
@@ -35,7 +32,9 @@ export class ApiService implements IApiService {
     }
   }
 
-  async getMovingAverageHistory(since:Date): Promise<Error | MovingAverages[]> {
+  async getMovingAverageHistory(
+    since: Date,
+  ): Promise<Error | MovingAverages[]> {
     try {
       const allFeeEst = await this.movingAverageOp.readAll(since);
       if (allFeeEst instanceof Error) {
@@ -48,7 +47,7 @@ export class ApiService implements IApiService {
     }
   }
 
-  async getFeeEstimateHistory(since:Date): Promise<Error | FeeEstimates[]> {
+  async getFeeEstimateHistory(since: Date): Promise<Error | FeeEstimates[]> {
     try {
       const allFeeEst = await this.feeOp.readAll(since);
       if (allFeeEst instanceof Error) {
@@ -63,17 +62,18 @@ export class ApiService implements IApiService {
 
   //UNUSED:
 
-  async getIndexDetailedHistory(): Promise<Error | FeeIndexDetailed[]> {
+  async getIndexDetailedHistory(
+    since: Date,
+  ): Promise<Error | FeeIndexDetailed[]> {
     try {
-   const allIndex = await this.indexOp.readAllDetailed();
-   if (allIndex instanceof Error) {
-     return handleError(allIndex);
-   }
+      const allIndex = await this.indexOp.readAllDetailed(since);
+      if (allIndex instanceof Error) {
+        return handleError(allIndex);
+      }
 
-   return allIndex;
- } catch (e) {
-   return handleError(e);
- }
-}
-
+      return allIndex;
+    } catch (e) {
+      return handleError(e);
+    }
+  }
 }

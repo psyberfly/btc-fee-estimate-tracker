@@ -22,8 +22,8 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
-  async readAllDetailed(): Promise<FeeIndexDetailed[] | Error> {
-    const res = await this.store.fetchAllDetailed();
+  async readAllDetailed(from:Date): Promise<FeeIndexDetailed[] | Error> {
+    const res = await this.store.fetchDetailed90Days(from);
     if (res instanceof Error) {
       return handleError(res);
     }

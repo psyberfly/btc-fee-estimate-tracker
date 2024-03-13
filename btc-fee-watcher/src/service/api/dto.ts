@@ -25,7 +25,7 @@ export async function handleGetIndexHistory(req, res) {
   try {
     const since = parseInt(req.query["since"], 10);
 
-   if (isNaN(since)) {
+    if (isNaN(since)) {
       await respond(
         400,
         "Missing or invalid query param since (Unix timestamp)",
@@ -34,7 +34,7 @@ export async function handleGetIndexHistory(req, res) {
       );
       return;
     }
-  
+
     let indexHistory = await apiService.getIndexHistory(new Date(since));
 
     if (indexHistory instanceof Error) {
@@ -53,7 +53,7 @@ export async function handleGetMovingAverageHistory(req, res) {
   try {
     const since = parseInt(req.query["since"], 10);
 
-   if (isNaN(since)) {
+    if (isNaN(since)) {
       await respond(
         400,
         "Missing or invalid query param since (Unix timestamp)",
@@ -62,7 +62,6 @@ export async function handleGetMovingAverageHistory(req, res) {
       );
       return;
     }
-  
 
     let movingAverageHistory = await apiService.getMovingAverageHistory(
       new Date(since),
@@ -84,7 +83,7 @@ export async function handleGetFeeEstimateHistory(req, res) {
   try {
     const since = parseInt(req.query["since"], 10);
 
-   if (isNaN(since)) {
+    if (isNaN(since)) {
       await respond(
         400,
         "Missing or invalid query param since (Unix timestamp)",
@@ -93,7 +92,7 @@ export async function handleGetFeeEstimateHistory(req, res) {
       );
       return;
     }
-  
+
     let feeEstHistory = await apiService.getFeeEstimateHistory(new Date(since));
 
     if (feeEstHistory instanceof Error) {
@@ -107,12 +106,22 @@ export async function handleGetFeeEstimateHistory(req, res) {
   }
 }
 
-//UNUSED:
-
 export async function handleGetIndexDetailedHistory(req, res) {
   const request = parseRequest(req);
   try {
-    let indexHistory = await apiService.getIndexDetailedHistory();
+    let startDate: Date;
+    const from = parseInt(req.query["fromDate"], 10);
+
+    if (isNaN(from)) {
+      startDate = new Date();
+      startDate.setDate(startDate.getDate() - 90);
+    } else {
+      startDate = new Date(from);
+    }
+
+    let indexHistory = await apiService.getIndexDetailedHistory(
+      startDate,
+    );
 
     if (indexHistory instanceof Error) {
       throw indexHistory;
