@@ -12,6 +12,7 @@ export class Store implements IStore {
     chartType: ServiceChartType,
   ): Promise<Date> => {
     try {
+      console.log(chartType);
       switch (chartType) {
         case ServiceChartType.index:
           const date = await db.feeIndex.orderBy("time").first()["time"];

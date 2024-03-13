@@ -12,7 +12,11 @@ import { useParams } from 'react-router-dom';
 const ChartPage = () => {
 
     const getChartTypeFromParams = (): ServiceChartType => {
-        const chartTypeKey = useParams()["chartType"] as string;
+        let chartTypeKey = useParams()["chartType"] as string;
+
+        if (!chartTypeKey) {
+            chartTypeKey = "index";
+        }
 
         switch (chartTypeKey) {
             case 'index':
@@ -22,13 +26,13 @@ const ChartPage = () => {
             case 'feeEstimate':
                 return ServiceChartType.feeEstimate;
             default:
+                console.error(`Invalid chart type: ${chartTypeKey}. Setting to default:index`);
                 return ServiceChartType.index;
         }
 
     };
 
     const chartType = getChartTypeFromParams();
-    getChartTypeFromParams();
     const [chartData, setChartData] = useState(null);
     const [loading, setLoading] = useState({ [ServiceChartType.index]: true });
     const [errorLoading, setErrorLoading] = useState({ [ServiceChartType.index]: false });
@@ -52,23 +56,14 @@ const ChartPage = () => {
         const fetchDataForChartType = async (chartType) => {
             try {
 
-                console.log(chartType);
-                if (!Object.keys(ServiceChartType).includes(chartType)) {
-                    console.error(`Invalid chart type: ${chartType}`);
-                    setErrorLoading(true as any);
-                }
-                else {
-                    chartType = ServiceChartType[chartType];
-                }
                 setLoading(prev => ({ ...prev, [chartType]: true }));
                 let data;
 
-               //first read latest timestamp from DB
+                //first read latest timestamp from DB
                 const availableHistoryStartTimestamp = new Date(await store.historyStartTimestamp(chartType));
                 const [requiredHistoryStart, requiredHistoryEnd] = ChartTimescale.getStartEndTimestampsFromTimerange(selectedRange);
                 const requiredHistoryStartTimestamp = new Date(requiredHistoryStart);
                 if (!availableHistoryStartTimestamp || isNaN(availableHistoryStartTimestamp.getTime()) || availableHistoryStartTimestamp > requiredHistoryStartTimestamp) {
-                    console.log("Fetching data from watcher...")
                     //fetch the latest readings from watcher beyond latest timestamp
                     switch (chartType) {
                         case ServiceChartType.index:
