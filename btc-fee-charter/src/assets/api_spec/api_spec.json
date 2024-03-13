@@ -1,0 +1,146 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "BTC Fee Tracker API",
+    "description": "Public API serving current index and other historic data",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:3561/api/v1",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/index": {
+      "get": {
+        "summary": "Get the latest fee estimate index",
+        "operationId": "getIndex",
+        "description": "Get the current fee estimate index, along with the current fee estimate and daily moving average used to compute it.\n\nExample request:\n`GET http://localhost:3561/api/v1/index`",
+        "tags": [
+          "index"
+        ],
+        "responses": {
+          "200": {
+            "description": "Latest fee index object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IndexObject"
+                },
+                "examples": {
+                  "feeExample": {
+                    "value": {
+                      "timestamp": "2024-03-12T12:06:29.424Z",
+                      "feeEstimateMovingAverageRatio": {
+                        "last365Days": 0.645062381735235,
+                        "last30Days": 1.0792556857339766
+                      },
+                      "currentFeeEstimate": {
+                        "time": "2024-03-12T12:06:29.424Z",
+                        "satsPerByte": 29
+                      },
+                      "movingAverage": {
+                        "createdAt": "2024-03-12T12:06:28.629Z",
+                        "last365Days": 44.956892265193375,
+                        "last30Days": 26.87037037037037
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/history": {
+      "get": {
+        "summary": "Get historic fee estimate indexes",
+        "operationId": "getIndexHistory",
+        "description": "Get a list of historic fee indexes, along with the fee estimates and moving averages used to compute them.\n\n History starts from {fromDate} and goes up to next 90 days. If {fromDate} not provided, defaults to last 90 days.  \n\nExample request:\n`GET http://localhost:3561/api/v1/index`",
+        "tags": [
+          "indexHistory"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "fromDate",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "format": "int64"
+            },
+            "description": "Unix timestamp in milliseconds since epoch. Sets the start date for history retrieval."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Array of fee index objects showing history",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/IndexObject"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "IndexObject": {
+        "type": "object",
+        "properties": {
+          "timestamp": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "feeEstimateMovingAverageRatio": {
+            "type": "object",
+            "properties": {
+              "last365Days": {
+                "type": "number"
+              },
+              "last30Days": {
+                "type": "number"
+              }
+            }
+          },
+          "currentFeeEstimate": {
+            "type": "object",
+            "properties": {
+              "time": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "satsPerByte": {
+                "type": "integer"
+              }
+            }
+          },
+          "movingAverage": {
+            "type": "object",
+            "properties": {
+              "createdAt": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "last365Days": {
+                "type": "number"
+              },
+              "last30Days": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

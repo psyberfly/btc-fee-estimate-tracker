@@ -1,7 +1,9 @@
+import { FeeEstimate, FeeIndex, MovingAverage } from "../store/interface";
+
 export enum ServiceChartType {
-  index = "Fee Estimate Index",
-  movingAverage = "Moving Average",
-  feeEstimate = "Fee Estimate History",
+  index,
+  movingAverage,
+  feeEstimate,
 }
 
 export interface IndexResponse {
@@ -19,23 +21,6 @@ export interface IndexResponse {
     last365Days: number;
     last30Days: number;
   };
-}
-
-export interface FeeIndex {
-  createdAt: Date;
-  ratioLast365Days: number;
-  ratioLast30Days: number;
-}
-
-export interface MovingAverage {
-  createdAt: Date;
-  last365Days: number;
-  last30Days: number;
-}
-
-export interface FeeEstimate {
-  time: Date;
-  satsPerByte: number;
 }
 
 export interface IndexDataResponse {

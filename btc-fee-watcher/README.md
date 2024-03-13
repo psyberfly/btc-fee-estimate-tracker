@@ -43,3 +43,5 @@ NodeJs (Typescript), Postgres, Docker(optional)
    Sample signature used for dev. Resolve issue for prod...
 2. 500 error response is wrong: {"error":"Internal Error. Contact support@satsbank.io"}
 
+### To Do:
+1. Upgrade: Seeding of moving averages & fee index: use bulkUpsert instead of upsert/create.

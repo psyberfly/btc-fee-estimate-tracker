@@ -1,5 +1,5 @@
 import Dexie, { Table } from "dexie";
-import { FeeEstimate, FeeIndex, MovingAverage } from "../chart_data/interface";
+import { FeeIndex, MovingAverage, FeeEstimate } from "./interface";
 
 export class MySubClassedDexie extends Dexie {
   feeIndex!: Table<FeeIndex>;
@@ -8,10 +8,10 @@ export class MySubClassedDexie extends Dexie {
 
   constructor() {
     super("btcFee");
-    this.version(1).stores({
-      feeIndex: "createdAt, ratioLast365Days, ratioLast30Days", // Primary key and indexed props
-      movingAverages: "createdAt, last365Days, last30Days",
-      feeEstimates: "time, satsPerByte"
+    this.version(3).stores({
+      feeIndex: "time, ratioLast365Days, ratioLast30Days", // Primary key and indexed props
+      movingAverages: "day, last365Days, last30Days",
+      feeEstimates: "time, satsPerByte",
     });
   }
 }

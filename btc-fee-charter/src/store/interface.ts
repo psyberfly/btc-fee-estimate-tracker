@@ -1,5 +1,22 @@
 import { ServiceChartType } from "../chart_data/interface";
-import { TimeRange } from "../chart_data/chart_timescale";
+
+export interface FeeIndex {
+  time: Date;
+  ratioLast365Days: number;
+  ratioLast30Days: number;
+}
+
+export interface MovingAverage {
+  day: Date;
+  last365Days: number;
+  last30Days: number;
+}
+
+export interface FeeEstimate {
+  time: Date;
+  satsPerByte: number;
+}
+
 
 export interface IStore {
   create(chartType: ServiceChartType, data: any): Promise<boolean | Error>;

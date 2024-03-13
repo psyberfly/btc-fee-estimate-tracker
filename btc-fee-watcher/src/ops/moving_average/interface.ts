@@ -1,15 +1,9 @@
-import { MovingAverage } from "@prisma/client";
+import { FeeEstimates, MovingAverages } from "@prisma/client";
 
 export interface IMovingAverageOp {
-  readLatest(): Promise<MovingAverage | Error>;
-  readAll(since:Date): Promise<Error | MovingAverage[]>;
-  create(): Promise<boolean | Error>;
+  readLatest(): Promise<MovingAverages | Error>;
+  readAll(since: Date): Promise<Error | MovingAverages[]>;
+  create(day: Date): Promise<boolean | Error>;
+  seed(since: Date): Promise<boolean | Error>;
   checkExists(DateUTC: string): Promise<boolean | Error>;
 }
-
-// export interface IWeightedMovingAverageOp {
-//   readLatest(): Promise<MovingAverage | Error>;
-//   readAll(since:Date): Promise<Error | MovingAverage[]>;
-//   create(): Promise<boolean | Error>;
-//   checkExists(DateUTC: string): Promise<boolean | Error>;
-// }

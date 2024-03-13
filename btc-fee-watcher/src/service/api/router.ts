@@ -21,11 +21,15 @@ const authenticateAPIKey = (req, res, next) => {
   next();
 };
 
-router.get("/index", authenticateAPIKey, handleGetIndex);
+router.get(
+  "/index",
+  //authenticateAPIKey,
+  handleGetIndex,
+);
 
 router.get(
-  "/indexDetailedHistory",
-  authenticateAPIKey,
+  "/history",
+  //authenticateAPIKey,
   handleGetIndexDetailedHistory,
 );
 

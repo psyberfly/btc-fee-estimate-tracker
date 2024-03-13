@@ -1,11 +1,10 @@
-import { FeeEstimate } from "@prisma/client";
+import { FeeEstimates } from "@prisma/client";
 
 export interface IFeeEstimateOp {
-  readAll(since:Date): Promise<FeeEstimate[] | Error>;
-  //does readAll makes readLast365 and readLast30 unnecessary with since?
-  readLast365Days(): Promise<FeeEstimate[] | Error>;
-  readLast30Days(): Promise<FeeEstimate[] | Error>;
-  readLatest(): Promise<FeeEstimate | Error>;
-  updateCurrent(): Promise<boolean | Error>;
-  seedHistory(history: FeeEstimate[]): Promise<boolean | Error>;
+  readAll(since: Date): Promise<FeeEstimates[] | Error>;
+  readLast365Days(since: Date): Promise<FeeEstimates[] | Error>;
+  readLast30Days(since: Date): Promise<FeeEstimates[] | Error>;
+  readLatest(): Promise<FeeEstimates | Error>;
+  create(): Promise<FeeEstimates | Error>;
+  seedHistory(history: FeeEstimates[]): Promise<boolean | Error>;
 }

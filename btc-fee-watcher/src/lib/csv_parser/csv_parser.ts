@@ -1,11 +1,12 @@
 import fs from "fs";
 import { parse } from "csv-parse";
-import { FeeEstimate } from "@prisma/client";
+import { FeeEstimates } from "@prisma/client";
 import { handleError } from "../errors/e";
+import { Decimal } from "@prisma/client/runtime/library";
 
 export function getFeeEstimateHistoryFromCsv(
   filePath: string,
-): Promise<FeeEstimate[] | Error> {
+): Promise<FeeEstimates[] | Error> {
   try {
     return new Promise((resolve, reject) => {
       const headers: string[] = ["time", "satsPerByte"];
@@ -13,7 +14,6 @@ export function getFeeEstimateHistoryFromCsv(
       const parser = parse({
         delimiter: ",",
         columns: (header) => {
-        
           if (headers.every((h) => header.includes(h))) {
             return header;
           } else {
@@ -26,14 +26,27 @@ export function getFeeEstimateHistoryFromCsv(
         castDate: true,
       });
 
-      const records: FeeEstimate[] = [];
+      const records: FeeEstimates[] = [];
 
       fs.createReadStream(filePath)
         .pipe(parser)
         .on("readable", function () {
           let record;
           while ((record = this.read())) {
-            records.push(record as FeeEstimate);
+            // Check if satsPerByte is an empty string or not a number, set it to a default value or convert it
+            record.satsPerByte = record.satsPerByte === ""
+              ? "0"
+              : record.satsPerByte; // Convert empty string to "0" or keep the number as string
+
+            // Ensure satsPerByte is a valid number before converting to Decimal
+            const satsPerByteValue = isNaN(Number(record.satsPerByte))
+              ? 0
+              : Number(record.satsPerByte);
+
+            // Convert number to Decimal
+            record.satsPerByte = new Decimal(satsPerByteValue);
+
+            records.push(record as FeeEstimates);
           }
         })
         .on("end", () => {
