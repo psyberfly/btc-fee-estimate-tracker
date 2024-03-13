@@ -2,7 +2,6 @@ import { FeeIndexes } from "@prisma/client";
 import { handleError } from "../../../lib/errors/e";
 import { prisma } from "../../../main";
 import { FeeIndexDetailed } from "../interface";
-
 export class FeeIndexPrismaStore {
   async fetchLatest(): Promise<FeeIndexDetailed | Error> {
     try {
@@ -15,7 +14,7 @@ export class FeeIndexPrismaStore {
       });
 
       const latestIndexRes: FeeIndexDetailed = {
-        timestamp: latestIndex.time,
+        time: latestIndex.time,
         feeEstimateMovingAverageRatio: {
           last365Days: latestIndex.ratioLast365Days.toNumber(),
           last30Days: latestIndex.ratioLast30Days.toNumber(),
@@ -25,7 +24,7 @@ export class FeeIndexPrismaStore {
           satsPerByte: latestIndex.feeEstimate.satsPerByte.toNumber(),
         },
         movingAverage: {
-          createdAt: latestIndex.movingAverage.createdAt,
+          day: latestIndex.movingAverage.day,
           last365Days: latestIndex.movingAverage.last365Days.toNumber(),
           last30Days: latestIndex.movingAverage.last30Days.toNumber(),
         },
@@ -73,11 +72,19 @@ export class FeeIndexPrismaStore {
     }
   }
 
-  //UNUSED:
-
-  async fetchAllDetailed(): Promise<FeeIndexDetailed[] | Error> {
+  async fetchDetailed90Days(from: Date): Promise<FeeIndexDetailed[] | Error> {
     try {
+      const startDate = from;
+      const endDate = new Date(from);
+      endDate.setDate(endDate.getDate() + 90);
+
       const allIndexDetailed = await prisma.feeIndexes.findMany({
+        where: {
+          createdAt: {
+            gte: startDate,
+            lt: endDate,
+          },
+        },
         orderBy: { createdAt: "asc" },
         include: {
           feeEstimate: true,
@@ -89,7 +96,7 @@ export class FeeIndexPrismaStore {
 
       allIndexDetailed.forEach((index) => {
         const indexRes: FeeIndexDetailed = {
-          timestamp: index.createdAt,
+          time: index.time,
           feeEstimateMovingAverageRatio: {
             last365Days: index.ratioLast365Days.toNumber(),
             last30Days: index.ratioLast30Days.toNumber(),
@@ -99,7 +106,7 @@ export class FeeIndexPrismaStore {
             satsPerByte: index.feeEstimate.satsPerByte.toNumber(),
           },
           movingAverage: {
-            createdAt: index.movingAverage.createdAt,
+            day: index.movingAverage.day,
             last365Days: index.movingAverage.last365Days.toNumber(),
             last30Days: index.movingAverage.last30Days.toNumber(),
           },
@@ -112,6 +119,7 @@ export class FeeIndexPrismaStore {
       return handleError(error);
     }
   }
+
   async insert(index: FeeIndexes): Promise<boolean | Error> {
     try {
       const upserted = await prisma.feeIndexes.upsert({
@@ -133,7 +141,7 @@ export class FeeIndexPrismaStore {
       });
       return true;
     } catch (error) {
-      return handleError(error); 
+      return handleError(error);
     }
   }
 }

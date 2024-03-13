@@ -22,6 +22,7 @@
 .swagger-ui h6,
 .swagger-ui p {
     font-family: var(--body-font), sans-serif !important;
+    color: yellow;
 }
 
 .swagger-ui .opblock .description {
@@ -51,7 +52,7 @@
 
 .swagger-ui .response-control-media-type--accept-controller select {
     display: none;
-  }
+}
 
 .swagger-ui body {
     margin: 0;
@@ -75,7 +76,13 @@
 }
 
 .swagger-ui .opblock-section-header {
-    background-color: var(--text-color) !important
+    background-color: var(--text-color-secondary) !important;
+    color: var(--primary-color) !important
+}
+
+.swagger-ui .markdown code,
+.swagger-ui .renderedMarkdown code {
+    color: var(--primary-color)
 }
 
 .swagger-ui .opblock-section-header h4 {
@@ -90,7 +97,15 @@
 }
 
 .swagger-ui button {
+    fill: #E21F26;
+    background: #E21F26;
     color: green !important
+}
+
+.swagger-ui .btn.execute {
+    background-color: var(--secondary-color) !important;
+    border-color: var(--primary-color) !important;
+    color: var(--text-color-dark) !important;
 }
 
 .swagger-ui .responses-header td {
@@ -104,6 +119,23 @@
 }
 
 .swagger-ui .opblock-control-arrow {
-    background-color: var(--secondary-color) !important;
+    background-color: var(--text-color) !important;
     /* Change arrow color */
+}
+
+.swagger-ui .model-toggle:after {
+    background-color: var(--text-color-secondary) !important
+}
+.swagger-ui .parameter__name {
+    color: var(--text-color) !important
+}
+.swagger-ui .parameter__type  {
+    color: var(--text-color) !important
+}
+.swagger-ui .parameter__in  {
+    color: var(--text-color) !important
+}
+
+.swagger-ui table thead tr td, .swagger-ui table thead tr th{
+    color: var(--text-color) !important
 }

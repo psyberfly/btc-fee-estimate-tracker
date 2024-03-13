@@ -1,7 +1,7 @@
 import { FeeEstimates, FeeIndexes, MovingAverages } from "@prisma/client";
 
 export interface FeeIndexDetailed {
-  timestamp: Date;
+  time: Date;
   feeEstimateMovingAverageRatio: {
     last365Days: number;
     last30Days: number;
@@ -11,16 +11,15 @@ export interface FeeIndexDetailed {
     satsPerByte: number;
   };
   movingAverage: {
-    createdAt: Date;
+    day: Date;
     last365Days: number;
     last30Days: number;
   };
 }
 
 export interface IIndexOp {
-  //invoked every 10 min (block)
   readAll(since: Date): Promise<FeeIndexes[] | Error>;
-  readAllDetailed(): Promise<FeeIndexDetailed[] | Error>;
+  readAllDetailed(since: Date): Promise<FeeIndexDetailed[] | Error>;
   create(
     feeEstimate: FeeEstimates,
     movingAverage: MovingAverages,

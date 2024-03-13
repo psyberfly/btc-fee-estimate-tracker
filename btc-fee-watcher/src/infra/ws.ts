@@ -33,20 +33,18 @@ export class AlertStreamServer {
       AlertStreamServer.alertStreamServer.on("connection", (client, req) => {
         console.log("WS connection opened");
 
-        const apiKey = new URLSearchParams(req.url.split("?")[1]).get("apiKey");
+        //  const apiKey = new URLSearchParams(req.url.split("?")[1]).get("apiKey");
+        // if (apiKey !== process.env.API_KEY) {
+        //   client.send("Error: 403; Message: Forbidden. Invalid API Key.");
+        //   client.close();
+        //   return;
+        // }
+
+        //Currently we broadcast to all subscribers if they stream to the offered service, since only 1 service is offered.
+        //When upgrading to multiple services, attach tag to the client: client["service"]="index" and filter by tag in broadcastAlert
         const servicePath = new URLSearchParams(req.url.split("?")[1]).get(
           "service",
         );
-
-        if (apiKey !== process.env.API_KEY) {
-          client.send("Error: 403; Message: Forbidden. Invalid API Key.");
-          client.close();
-          return;
-        }
-
-        //const servicePath = req.url.split("?service=")[1];
-        //Currently we broadcast to all subscribers if they stream to the offered service, since only 1 service is offered.
-        //When upgrading to multiple services, attach tag to the client: client["service"]="index" and filter by tag in broadcastAlert
         if (servicePath !== alertStreamPath) {
           client.send(
             "Error: 404; Message: Service not found. Please check the service you want to stream.",
