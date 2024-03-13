@@ -1,7 +1,7 @@
 import { AxiosHeaders } from "axios";
 import { makeApiCall } from "../lib/network/network";
 import { IDataOp, IndexDataResponse, IndexResponse } from "./interface";
-import { FeeEstimate, MovingAverage, FeeIndex } from "../store/interface";
+import { FeeEstimate, FeeIndex, MovingAverage } from "../store/interface";
 
 export class DataOp implements IDataOp {
   private baseUrl = import.meta.env.VITE_FEE_WATCHER_PUBLIC_API_URL;
@@ -17,9 +17,10 @@ export class DataOp implements IDataOp {
         AxiosHeaders.from(`x-api-key: ${this.apiKey}`),
       );
 
+      console.log(res);
       if (res instanceof Error) {
         console.error(res);
-        throw res;
+        return res;
       }
 
       let data: FeeEstimate[] = [];
