@@ -117,6 +117,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 }
             },
             y: {
+                type: "logarithmic",
                 min: yMin,
                 max: timescaleOptions.yMax,
                 title: {
@@ -172,7 +173,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 labels: {
                     font: {
                         family: fontFamily,
-                        size:14
+                        size: 14
                     },
                     color: secondaryColor,
                     pointStyleWidth: 30,
