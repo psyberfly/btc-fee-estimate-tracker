@@ -19,11 +19,9 @@ RUN npm install
 
 # Copy app source
 COPY --chown=node:node . .
-RUN npx vite build
 
 # Expose the port the app runs on
 EXPOSE 3583
 
-
 # Command to run the app
-CMD ["npm", "start"]
+CMD npx vite build && npm start

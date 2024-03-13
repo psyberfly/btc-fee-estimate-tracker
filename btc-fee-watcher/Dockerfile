@@ -13,7 +13,6 @@ RUN openssl rsa -in /home/node/.keys/sats_sig.pem -outform PEM -pubout -out /hom
 RUN chown -R node /home/node/app /home/node/.keys /home/node/winston
 RUN npm install -g typescript mocha ts-node
 
-
 USER node
 WORKDIR /home/node/app
 COPY --chown=node:node package*.json ./
