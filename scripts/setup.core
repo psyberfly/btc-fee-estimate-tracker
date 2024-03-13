@@ -37,6 +37,7 @@ prompt_user "WATCHER_WSS_PORT"
 prompt_user "CHARTER_PORT"
 prompt_user "FEE_WATCHER_PUBLIC_API_URL"
 prompt_user "FEE_WATCHER_API_KEY"
+prompt_user "SEED_INDEX_SINCE_TIMESTAMP"
 
 docker compose up --build --no-start -d 
 
