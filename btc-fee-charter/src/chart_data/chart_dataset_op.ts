@@ -1,11 +1,5 @@
-import {
-  FeeEstimate,
-  FeeIndex,
-  IChartDatasetOp,
-  IndexResponse,
-  MovingAverage,
-  ServiceChartType,
-} from "./interface";
+import { FeeEstimate, FeeIndex, MovingAverage } from "../store/interface";
+import { IChartDatasetOp, ServiceChartType } from "./interface";
 
 export class ChartDatasetOp implements IChartDatasetOp {
   getFromData<T extends FeeIndex[] | MovingAverage[] | FeeEstimate[]>(
@@ -66,11 +60,11 @@ export class ChartDatasetOp implements IChartDatasetOp {
 
     data.forEach((element) => {
       dataSet30Day.push({
-        x: element.createdAt,
+        x: element.day,
         y: element.last30Days,
       });
       dataSet365Day.push({
-        x: element.createdAt,
+        x: element.day,
         y: element.last365Days,
       });
     });
@@ -98,7 +92,6 @@ export class ChartDatasetOp implements IChartDatasetOp {
         },
       ],
     };
-
     return dataset;
   }
 
@@ -108,11 +101,11 @@ export class ChartDatasetOp implements IChartDatasetOp {
 
     data.forEach((element) => {
       dataSet30Day.push({
-        x: element.createdAt,
+        x: element.time,
         y: element.ratioLast30Days,
       });
       dataSet365Day.push({
-        x: element.createdAt,
+        x: element.time,
         y: element.ratioLast365Days,
       });
     });
@@ -145,92 +138,91 @@ export class ChartDatasetOp implements IChartDatasetOp {
         },
       ],
     };
-
     return dataset;
   }
 
-  private getIndexDetailedDataset(data: IndexResponse[]) {
-    const dataSet30Day: { x: Date; y: number }[] = [];
-    const dataSet365Day: { x: Date; y: number }[] = [];
+  // private getIndexDetailedDataset(data: IndexResponse[]) {
+  //   const dataSet30Day: { x: Date; y: number }[] = [];
+  //   const dataSet365Day: { x: Date; y: number }[] = [];
 
-    data.forEach((element) => {
-      dataSet30Day.push({
-        x: element.timestamp,
-        y: element.feeEstimateMovingAverageRatio.last30Days,
-      });
-      dataSet365Day.push({
-        x: element.timestamp,
-        y: element.feeEstimateMovingAverageRatio.last365Days,
-      });
-    });
+  //   data.forEach((element) => {
+  //     dataSet30Day.push({
+  //       x: element.timestamp,
+  //       y: element.feeEstimateMovingAverageRatio.last30Days,
+  //     });
+  //     dataSet365Day.push({
+  //       x: element.timestamp,
+  //       y: element.feeEstimateMovingAverageRatio.last365Days,
+  //     });
+  //   });
 
-    const dataset = {
-      datasets: [
-        {
-          //fill: true,
-          // gradient: {
-          //   // backgroundColor: {
-          //   //   axis: "y",
-          //   //   colors: {
-          //   //     0: "rgba(0,255,0,0.3)",
-          //   //     1: "rgba(255,255,0,0.3)",
-          //   //     2: "rgba(255,0,0,0.3)",
-          //   //   },
-          //   // },
-          //   borderColor: {
-          //     axis: "y",
-          //     colors: {
-          //       0: "rgb(0,255,0)",
-          //       1: "rgb(255,255,0)",
-          //       2: "rgb(255,0,0)",
-          //     },
-          //   },
-          // },
-          fill: {
-            value: 1,
-            above: "rgba(255,0,0,0.1)", // Area will be red above the origin
-            below: "rgba(0, 255, 0,0.1)",
-          },
-          label: "Last 30 days",
-          data: dataSet30Day,
-          borderColor: "rgb(254, 112, 2)",
-          pointBorderColor: "rgba(0, 0, 0, 1)",
-          pointBackgroundColor: "rgb(254, 112, 2)",
-        },
-        {
-          //fill: true,
-          gradient: {
-            // backgroundColor: {
-            //   axis: "y",
-            //   colors: {
-            //     0: "rgba(0,255,0,0.3)",
-            //     1: "rgba(255,255,0,0.3)",
-            //     2: "rgba(255,0,0,0.3)",
-            //   },
-            // },
-            // borderColor: {
-            //   axis: "y",
-            //   colors: {
-            //     0: "rgb(0,255,0)",
-            //     1: "rgb(255,255,0)",
-            //     2: "rgb(255,0,0)",
-            //   },
-            // },
-          },
-          fill: {
-            value: 1,
-            above: "rgba(255,0,0,0.1)", // Area will be red above the origin
-            below: "rgba(0, 255, 0,0.1)",
-          },
-          label: "Last 365 days",
-          data: dataSet365Day,
-          borderColor: "rgb(0,228, 255)",
-          pointBorderColor: "rgba(0, 0, 0, 1)", // This will be the border color of the points
-          pointBackgroundColor: "rgba(75, 192, 192, 1)", // This will be the fill color of the points
-        },
-      ],
-    };
+  //   const dataset = {
+  //     datasets: [
+  //       {
+  //         //fill: true,
+  //         // gradient: {
+  //         //   // backgroundColor: {
+  //         //   //   axis: "y",
+  //         //   //   colors: {
+  //         //   //     0: "rgba(0,255,0,0.3)",
+  //         //   //     1: "rgba(255,255,0,0.3)",
+  //         //   //     2: "rgba(255,0,0,0.3)",
+  //         //   //   },
+  //         //   // },
+  //         //   borderColor: {
+  //         //     axis: "y",
+  //         //     colors: {
+  //         //       0: "rgb(0,255,0)",
+  //         //       1: "rgb(255,255,0)",
+  //         //       2: "rgb(255,0,0)",
+  //         //     },
+  //         //   },
+  //         // },
+  //         fill: {
+  //           value: 1,
+  //           above: "rgba(255,0,0,0.1)", // Area will be red above the origin
+  //           below: "rgba(0, 255, 0,0.1)",
+  //         },
+  //         label: "Last 30 days",
+  //         data: dataSet30Day,
+  //         borderColor: "rgb(254, 112, 2)",
+  //         pointBorderColor: "rgba(0, 0, 0, 1)",
+  //         pointBackgroundColor: "rgb(254, 112, 2)",
+  //       },
+  //       {
+  //         //fill: true,
+  //         gradient: {
+  //           // backgroundColor: {
+  //           //   axis: "y",
+  //           //   colors: {
+  //           //     0: "rgba(0,255,0,0.3)",
+  //           //     1: "rgba(255,255,0,0.3)",
+  //           //     2: "rgba(255,0,0,0.3)",
+  //           //   },
+  //           // },
+  //           // borderColor: {
+  //           //   axis: "y",
+  //           //   colors: {
+  //           //     0: "rgb(0,255,0)",
+  //           //     1: "rgb(255,255,0)",
+  //           //     2: "rgb(255,0,0)",
+  //           //   },
+  //           // },
+  //         },
+  //         fill: {
+  //           value: 1,
+  //           above: "rgba(255,0,0,0.1)", // Area will be red above the origin
+  //           below: "rgba(0, 255, 0,0.1)",
+  //         },
+  //         label: "Last 365 days",
+  //         data: dataSet365Day,
+  //         borderColor: "rgb(0,228, 255)",
+  //         pointBorderColor: "rgba(0, 0, 0, 1)", // This will be the border color of the points
+  //         pointBackgroundColor: "rgba(75, 192, 192, 1)", // This will be the fill color of the points
+  //       },
+  //     ],
+  //   };
 
-    return dataset;
-  }
+  //   return dataset;
+  // }
 }

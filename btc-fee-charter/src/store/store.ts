@@ -1,12 +1,8 @@
-import {
-  FeeEstimate,
-  FeeIndex,
-  MovingAverage,
-  ServiceChartType,
-} from "../chart_data/interface";
+import { FeeEstimate, FeeIndex, MovingAverage } from "../store/interface";
 import { TimeRange } from "../chart_data/chart_timescale";
 import { IStore } from "./interface";
 import { db } from "./dexie";
+import { ServiceChartType } from "../chart_data/interface";
 
 //Store the most recent timestamp for each chartType history in a global exported object with {ServiceChartType, Date}.
 //Update it each time after upsert/create.
@@ -15,53 +11,42 @@ export class Store implements IStore {
   historyStartTimestamp = async (
     chartType: ServiceChartType,
   ): Promise<Date> => {
-    let record;
-    switch (chartType) {
-      case ServiceChartType.index:
-        record = await db.feeIndex.orderBy("createdAt").first();
-        break;
+    try {
+      switch (chartType) {
+        case ServiceChartType.index:
+          const date = await db.feeIndex.orderBy("time").first()["time"];
+          return date;
 
-      case ServiceChartType.movingAverage:
-        record = await db.movingAverages.orderBy("createdAt").first();
-        break;
+        case ServiceChartType.movingAverage:
+          return await db.movingAverages.orderBy("day").first()["day"];
 
-      case ServiceChartType.feeEstimate:
-        record = await db.feeEstimates.orderBy("time").first();
-        break;
+        case ServiceChartType.feeEstimate:
+          return await db.feeEstimates.orderBy("time").first()["time"];
 
-      default:
-        throw new Error("Unknown ServiceChartType requested");
+        default:
+          throw new Error("Unknown ServiceChartType requested");
+      }
+    } catch (e) {
+      throw e;
     }
-
-    if (!record) {
-      return new Date();
-    }
-    return record.createdAt || record.time;
   };
 
   historyEndTimestamp = async (
     chartType: ServiceChartType,
   ): Promise<Date> => {
-    let record;
     switch (chartType) {
       case ServiceChartType.index:
-        record = await db.feeIndex.orderBy("createdAt").reverse().first();
-        break;
+        return await db.feeIndex.orderBy("time").reverse().first()["time"];
 
       case ServiceChartType.movingAverage:
-        record = await db.movingAverages.orderBy("createdAt").reverse().first();
-        break;
+        return await db.movingAverages.orderBy("day").reverse().first()["day"];
 
       case ServiceChartType.feeEstimate:
-        record = await db.feeEstimates.orderBy("time").reverse().first();
-        break;
+        return await db.feeEstimates.orderBy("time").reverse().first()["time"];
 
       default:
         throw new Error("Unknown ServiceChartType requested");
     }
-
-    if (!record) throw new Error("No records found");
-    return record.createdAt || record.time;
   };
 
   async create(
@@ -86,6 +71,26 @@ export class Store implements IStore {
     }
   }
 
+  async readLatest(chartType: ServiceChartType): Promise<any | Error> {
+    let data;
+    switch (chartType) {
+      case ServiceChartType.index:
+        data = await db.feeIndex.orderBy("time").reverse().first().then(
+          (latestEntry) => {
+            if (latestEntry) {
+              return latestEntry;
+            } else {
+              console.log("No entries found in the database for readLatest.");
+            }
+          },
+        ).catch((error) => {
+          console.error("Failed to find the most recent entry: ", error);
+        });
+        break;
+    }
+    return data;
+  }
+
   async read(
     chartType: ServiceChartType,
     // from: Date,
@@ -95,7 +100,8 @@ export class Store implements IStore {
     try {
       switch (chartType) {
         case ServiceChartType.index:
-          data = await db.feeIndex.toArray();
+          data = await db.feeIndex.orderBy("time").toArray();
+
           //  where("createdAt")
           //   .between(from, to, true, true)
           //   .toArray();
@@ -103,14 +109,15 @@ export class Store implements IStore {
           break;
 
         case ServiceChartType.movingAverage:
-          data = await db.movingAverages
+          data = await db.movingAverages.orderBy("day")
             // .where("createdAt")
             // .between(from, to, true, true)
             .toArray();
+
           break;
 
         case ServiceChartType.feeEstimate:
-          data = await db.feeEstimates
+          data = await db.feeEstimates.orderBy("time")
             // .where("time")
             // .between(from, to, true, true)
             .toArray();

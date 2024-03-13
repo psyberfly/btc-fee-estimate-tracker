@@ -19,7 +19,8 @@ Chart.defaults.scale.grid.color = "rgba(199, 199, 199, 0.2)";
 
 const titleColor = "#E21F26";
 const secondaryColor = "#FFFFFF";
-const fontFamily = 'Tahoma, sans-serif';
+const textColorSeconday = "rgb(225, 225, 225)";
+const fontFamily = 'Helvetica, sans-serif';
 
 const verticalLinePlugin = {
     id: "verticalLine",
@@ -68,14 +69,18 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
             break;
         case ServiceChartType.movingAverage:
             yText = "sats/B";
-            title = "Fee Estimate Moving Average"
-            subtitle = "sum(last n days fee estimates)/count(last n days fee estimates)";
+            title = "Fee Estimate Weighted Moving Average"
+            subtitle = "weighted sum(last n days fee estimates)/total weight";
             break;
         case ServiceChartType.feeEstimate:
             yText = "sats/B";
             title = "Fee Estimate History"
             subtitle = "mempool.space (fastest/1-2 blocks)";
             break;
+        default:
+            yText = "Y Label";
+            title = "Unknown chart type"
+            subtitle = "Subtitle";
 
     }
 
@@ -100,7 +105,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 title: {
                     display: true,
                     text: xText,
-                    color: secondaryColor,
+                    color: textColorSeconday,
                     font: {
                         size: 18,
                         family: fontFamily,
@@ -117,7 +122,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 title: {
                     display: true,
                     text: yText,
-                    color: secondaryColor,
+                    color: textColorSeconday,
                     font: {
                         size: 18,
                         family: fontFamily,

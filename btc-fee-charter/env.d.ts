@@ -9,3 +9,8 @@ interface ImportMetaEnv {
     readonly env: ImportMetaEnv
   }
   
+  declare module '*.yaml' {
+    const data: any;
+    export default data;
+  }
+  

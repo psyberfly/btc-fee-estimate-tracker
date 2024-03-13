@@ -10,28 +10,42 @@ datasource db {
   url      = env("DB_URL")
 }
 
-model FeeEstimate {
-  id          Int       @id @default(autoincrement())
-  time        DateTime
-  satsPerByte Decimal
-  feeIndex    FeeIndex?
+model FeeEstimates {
+  id                        Int                         @id @default(autoincrement())
+  time                      DateTime                    @unique
+  satsPerByte               Decimal
+  FeeIndexes                FeeIndexes?
+  createdAt                 DateTime                    @default(now())
+  MovingAverageFeeEstimates MovingAverageFeeEstimates[]
 }
 
-model MovingAverage {
-  id          Int        @id @default(autoincrement())
-  last365Days Decimal
-  last30Days  Decimal
-  createdAt   DateTime   @default(now())
-  feeIndex    FeeIndex[]
+model MovingAverages {
+  id           Int                         @id @default(autoincrement())
+  day          DateTime                    @unique
+  last365Days  Decimal
+  last30Days   Decimal
+  feeIndex     FeeIndexes[]
+  feeEstimates MovingAverageFeeEstimates[]
+  createdAt    DateTime                    @default(now())
 }
 
-model FeeIndex {
-  id               Int           @id @default(autoincrement())
-  feeEstimateId    Int           @unique
-  feeEstimate      FeeEstimate   @relation(fields: [feeEstimateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+model MovingAverageFeeEstimates {
+  feeEstimateId   Int
+  movingAverageId Int
+  feeEstimate     FeeEstimates   @relation(fields: [feeEstimateId], references: [id])
+  movingAverage   MovingAverages @relation(fields: [movingAverageId], references: [id])
+
+  @@id([feeEstimateId, movingAverageId])
+}
+
+model FeeIndexes {
+  id               Int            @id @default(autoincrement())
+  time             DateTime       @unique
+  feeEstimateId    Int            @unique
+  feeEstimate      FeeEstimates   @relation(fields: [feeEstimateId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   movingAverageId  Int
-  movingAverage    MovingAverage @relation(fields: [movingAverageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  movingAverage    MovingAverages @relation(fields: [movingAverageId], references: [id], onDelete: NoAction, onUpdate: NoAction)
   ratioLast365Days Decimal
   ratioLast30Days  Decimal
-  createdAt        DateTime      @default(now())
+  createdAt        DateTime       @default(now())
 }

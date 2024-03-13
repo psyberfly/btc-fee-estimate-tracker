@@ -8,8 +8,8 @@ export enum TimeRange {
   Last1Month = "Last 1 month",
   Last5Months = "Last 5 months",
   Last1Year = "Last 1 year",
+  Last5Years = "Last 5 years",
 }
-
 
 enum TimescaleUnit {
   minute = "minute",
@@ -38,8 +38,6 @@ function calculateYMax(xMin: number, xMax: number, datasets: any): number {
   );
 
   for (const dataPoint of dataPoints) {
-    // console.log(dataPoint.x, xMin);
-
     const date: Date = new Date(dataPoint.x);
     const dateUnixTime: number = date.getTime();
 
@@ -51,6 +49,8 @@ function calculateYMax(xMin: number, xMax: number, datasets: any): number {
 
   if (maxYInXRange >= 1 && maxYInXRange <= 10) {
     yMax = Math.ceil(maxYInXRange);
+  } else if (maxYInXRange >= 10 && maxYInXRange <= 50) {
+    yMax = (Math.ceil(maxYInXRange / 10) * 10);
   } else if (maxYInXRange >= 10 && maxYInXRange <= 100) {
     yMax = (Math.ceil(maxYInXRange / 10) * 10) + 10;
     // Round up to the next whole multiple of 1
@@ -130,6 +130,15 @@ export class ChartTimescale {
       unit: TimescaleUnit.month,
       stepSize: 1,
     },
+    [TimeRange.Last5Years]: {
+      setup: () => {
+        const xMin = TimeLib.getMsSinceEpochXYearsAgo(5);
+        const xMax = TimeLib.getMsSinceEpochXYearsAgo(0);
+        return { xMin, xMax };
+      },
+      unit: TimescaleUnit.year,
+      stepSize: 1,
+    },
   };
 
   public static getTimescaleOptions(
@@ -156,13 +165,17 @@ export class ChartTimescale {
     return Object.values(TimeRange);
   }
 
-  public static getStartEndTimestampsFromTimerange(selectedRange: TimeRange): [number, number] {
+  public static getStartEndTimestampsFromTimerange(
+    selectedRange: TimeRange,
+  ): [number, number] {
     const configuration = ChartTimescale.timescaleConfigurations[selectedRange];
     if (configuration) {
       const { xMin, xMax } = configuration.setup();
       return [xMin, xMax];
     } else {
-      throw new Error("Error: Could not find data start timestamp for the selected range!");
+      throw new Error(
+        "Error: Could not find data start timestamp for the selected range!",
+      );
     }
   }
 }

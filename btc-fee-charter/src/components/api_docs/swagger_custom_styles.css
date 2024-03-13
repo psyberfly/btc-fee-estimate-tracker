@@ -1,0 +1,109 @@
+:root {
+    --primary-color: #E21F26;
+    --secondary-color: #6c757d;
+    --secondary-color-dark: #3d4246;
+    --text-color-dark: rgb(0, 0, 0);
+    --bg-color: rgb(0, 0, 0);
+    --text-color: rgb(255, 255, 255);
+    --text-color-secondary: rgb(190, 190, 190);
+    --hover-color: rgb(13, 150, 255);
+    --title-font: "Bebas Neue", sans-serif;
+    --body-font: Helvetica, sans-serif;
+}
+
+.swagger-ui h1,
+.swagger-ui h2 {
+    font-family: var(--title-font), sans-serif !important;
+}
+
+.swagger-ui h3,
+.swagger-ui h4,
+.swagger-ui h5,
+.swagger-ui h6,
+.swagger-ui p {
+    font-family: var(--body-font), sans-serif !important;
+}
+
+.swagger-ui .opblock .description {
+    color: #fff !important;
+    /* Override text color */
+}
+
+.swagger-ui .servers label select {
+    position: relative;
+    padding: 10px 10px;
+    color: var(--primary-color) !important;
+    background-color: var(--bg-color) !important;
+}
+
+.swagger-ui .scheme-container {
+    position: relative;
+    padding: 10px;
+    color: var(--primary-color) !important;
+    background-color: var(--bg-color) !important;
+}
+
+.swagger-ui .examples-select .examples-select-element {
+    display: none;
+    top: 20px;
+    width: 10%;
+}
+
+.swagger-ui .response-control-media-type--accept-controller select {
+    display: none;
+  }
+
+.swagger-ui body {
+    margin: 0;
+}
+
+.swagger-ui .title {
+    color: var(--primary-color) !important
+}
+
+.swagger-ui p {
+    color: var(--text-color) !important
+}
+
+.swagger-ui span {
+    color: var(--text-color) !important
+}
+
+.swagger-ui .opblock-title span {
+    color: var(--text-color-dark) !important;
+    /* Set to white or any color you prefer */
+}
+
+.swagger-ui .opblock-section-header {
+    background-color: var(--text-color) !important
+}
+
+.swagger-ui .opblock-section-header h4 {
+    font-family: var(--body-font);
+    color: var(--text-color-dark) !important;
+    /* Set to white or any color you prefer */
+}
+
+.swagger-ui .opblock-summary-description {
+    font-family: var(--body-font);
+    color: var(--text-color-secondary) !important
+}
+
+.swagger-ui button {
+    color: green !important
+}
+
+.swagger-ui .responses-header td {
+    font-family: var(--body-font);
+    color: var(--text-color) !important
+}
+
+.swagger-ui .response td {
+    font-family: var(--body-font);
+    color: var(--text-color) !important
+}
+
+.swagger-ui .opblock-control-arrow {
+    background-color: var(--secondary-color) !important;
+    /* Change arrow color */
+}
