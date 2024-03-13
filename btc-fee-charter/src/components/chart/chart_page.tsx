@@ -80,7 +80,7 @@ const ChartPage = () => {
                     }
 
                     if (data instanceof Error) {
-                        console.error(`Error fetching data for ${chartType}`);
+                        console.error(`Error fetching data for ${chartType} : ${data}`);
                         throw data;
                     }
 
