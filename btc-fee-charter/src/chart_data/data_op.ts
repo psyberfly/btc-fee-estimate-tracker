@@ -17,10 +17,6 @@ export class DataOp implements IDataOp {
         AxiosHeaders.from(`x-api-key: ${this.apiKey}`),
       );
 
-      console.log({ url });
-      console.log(this.apiKey);
-
-      console.log({ res });
       if (res instanceof Error) {
         console.error(res);
         return res;
