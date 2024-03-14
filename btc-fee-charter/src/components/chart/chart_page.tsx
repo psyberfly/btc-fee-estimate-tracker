@@ -11,6 +11,15 @@ import { useParams } from 'react-router-dom';
 
 const ChartPage = () => {
 
+    function calculatePercentageHigher(lastYearIndexes: number[], currentFeeIndex: number): string {
+        // Calculate percentage higher for last year
+        const percentageHigherLastYear = (lastYearIndexes.filter(value => value > currentFeeIndex).length / lastYearIndexes.length) * 100;
+
+        // Return a formatted statement
+        return `The current fee index has been higher ${percentageHigherLastYear.toFixed(2)}% of the time during the last year.`;
+    }
+
+
     const getChartTypeFromParams = (): ServiceChartType => {
         let chartTypeKey = useParams()["chartType"] as string;
 
@@ -31,6 +40,8 @@ const ChartPage = () => {
         }
 
     };
+
+
 
     const chartType = getChartTypeFromParams();
     const [chartData, setChartData] = useState(null);

@@ -125,6 +125,13 @@ export class Store implements IStore {
           break;
       }
 
+      const length = data.length;
+      const dataSizeBytes = new Blob([JSON.stringify(data)]).size;
+      const dataSizeKB = dataSizeBytes / 1024;
+      const dataSizeMB = dataSizeKB / 1024;
+      console.log("Data Length:", length);
+      console.log("Size of data (KB):", dataSizeKB.toFixed(2), "KB");
+      console.log("Size of data (MB):", dataSizeMB.toFixed(2), "MB");
       return data;
     } catch (e) {
       return e;
