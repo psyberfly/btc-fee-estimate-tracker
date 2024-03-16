@@ -4,7 +4,7 @@ import "chartjs-adapter-date-fns";
 import gradient from "chartjs-plugin-gradient";
 Chart.register(gradient);
 import annotationPlugin from "chartjs-plugin-annotation";
-import { ServiceChartType } from '../../chart_data/interface';
+import { ChartType } from '../../chart_data/interface';
 import { ChartTimescale, TimescaleOptions } from "../../chart_data/chart_timescale";
 Chart.register(annotationPlugin);
 
@@ -50,7 +50,7 @@ Chart.register(verticalLinePlugin);
 
 //This is of type ChartOptions<"line"> but TS compiler confuses Types with this lib.
 //INDEX CHART:
-const getChartOptions = (chartType: ServiceChartType, timescaleOptions: TimescaleOptions, width: number) => {
+const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOptions, width: number) => {
     let yMin: number = 0;
     let yText: string;
     let xText: string = "time";
@@ -62,17 +62,17 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
 
 
     switch (chartType) {
-        case ServiceChartType.index:
+        case ChartType.feeIndex:
             yText = "current fee est / moving average";
             title = "Fee Estimate Index"
             subtitle = "current fee estimate/fee estimate moving average";
             break;
-        case ServiceChartType.movingAverage:
+        case ChartType.movingAverage:
             yText = "sats/B";
             title = "Fee Estimate Weighted Moving Average"
             subtitle = "weighted sum(last n days fee estimates)/total weight";
             break;
-        case ServiceChartType.feeEstimate:
+        case ChartType.feeEstimate:
             yText = "sats/B";
             title = "Fee Estimate History"
             subtitle = "mempool.space (fastest/1-2 blocks)";
@@ -186,7 +186,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 lineColor: "rgba(255, 0, 0, 0.75)" as const,
             },
             annotation:
-                chartType == ServiceChartType.index ?
+                chartType == ChartType.feeIndex ?
                     {
                         annotations: {
                             line1: {

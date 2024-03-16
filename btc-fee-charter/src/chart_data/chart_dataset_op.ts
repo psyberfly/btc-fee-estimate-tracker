@@ -1,22 +1,22 @@
 import { FeeEstimate, FeeIndex, MovingAverage } from "../store/interface";
-import { IChartDatasetOp, ServiceChartType } from "./interface";
+import { ChartType, IChartDatasetOp } from "./interface";
 
 export class ChartDatasetOp implements IChartDatasetOp {
   getFromData<T extends FeeIndex[] | MovingAverage[] | FeeEstimate[]>(
     data: T,
-    kind: ServiceChartType,
+    kind: ChartType,
   ): object | Error {
     try {
       switch (kind) {
-        case ServiceChartType.index:
+        case ChartType.feeIndex:
           return this.getIndexDataset(
             data as unknown as FeeIndex[],
           );
-        case ServiceChartType.movingAverage:
+        case ChartType.movingAverage:
           return this.getMovingAverageDataset(
             data as unknown as MovingAverage[],
           );
-        case ServiceChartType.feeEstimate:
+        case ChartType.feeEstimate:
           return this.getFeeEstimateDataset(data as unknown as FeeEstimate[]);
         default:
           throw new Error("This functionality is not yet implemented.");
@@ -60,11 +60,11 @@ export class ChartDatasetOp implements IChartDatasetOp {
 
     data.forEach((element) => {
       dataSet30Day.push({
-        x: element.day,
+        x: element.time,
         y: element.last30Days,
       });
       dataSet365Day.push({
-        x: element.day,
+        x: element.time,
         y: element.last365Days,
       });
     });
