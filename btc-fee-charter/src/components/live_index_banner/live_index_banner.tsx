@@ -1,7 +1,20 @@
 import React from 'react';
+import { ChartTimescale, TimeRange } from '../../chart_data/chart_timescale';
+import { LokiStore } from '../../store/lokijs_store';
+import { ChartType } from '../../chart_data/interface';
+import { FeeIndex } from '../../store/interface';
 
 // Props might include the data it needs to display
-const LiveIndexBanner = ({ currentFeeIndex }) => {
+const LiveIndexBanner = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
+
+    function getIndexPercentageHigher(currentFeeIndex: FeeIndex, feeIndexHistoryLastYear: FeeIndex[]): string {
+        console.log(currentFeeIndex, feeIndexHistoryLastYear);
+
+        const percentageHigherLastYear = (feeIndexHistoryLastYear.filter(index => index.ratioLast365Days > currentFeeIndex.ratioLast365Days).length / feeIndexHistoryLastYear.length) * 100;
+
+        return `The current fee index has been higher ${percentageHigherLastYear.toFixed(2)}% of the time during the last year.`;
+    }
+
     return (
         <>
             <h1 style={{ paddingTop: "10vh", textAlign: "center" }}>Fee Estimate Index</h1>
@@ -28,18 +41,8 @@ const LiveIndexBanner = ({ currentFeeIndex }) => {
                     })}</h3>
                 </div>
             </div>
-            <h3 style={{ paddingTop: "10px", paddingBottom: "10vh", textAlign: "center" }}>
-                The current fee estimate is {Math.abs((Number(currentFeeIndex.ratioLast365Days) - 1) * 100).toFixed(2)}%
-                {' '}
-                <span style={{ color: Number(currentFeeIndex.ratioLast365Days) >= 1 ? 'red' : 'green' }}>
-                    {Number(currentFeeIndex.ratioLast365Days) >= 1 ? 'more' : 'less'}
-                </span>
-                {' '} than last year and {Math.abs((Number(currentFeeIndex.ratioLast30Days) - 1) * 100).toFixed(2)}%
-                {' '}
-                <span style={{ color: Number(currentFeeIndex.ratioLast30Days) >= 1 ? 'red' : 'green' }}>
-                    {Number(currentFeeIndex.ratioLast30Days) >= 1 ? 'more' : 'less'}
-                </span>
-                {' '} than last month.
+            <h3 style={{ paddingTop: "10px", paddingBottom: "0vh", textAlign: "center" }}>
+                {getIndexPercentageHigher(currentFeeIndex, feeIndexHistoryLastYear)}
             </h3>
         </>
     );

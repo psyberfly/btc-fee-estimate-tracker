@@ -12,12 +12,19 @@ export class LokiStore implements IStore {
   ): Promise<any | Error> {
     try {
       // Note: Adjust the query as needed. This is a basic example.
-      return this.collection(chartType)
+      const results = this.collection(chartType)
         .chain()
         .find({})
         .simplesort("time", true) // Sorts in descending order
         .limit(1) // Limits to only 1 entry, the most recent
         .data();
+
+      if (results.length === 0) {
+        return null;
+      }
+
+      // Return the first element of the results array
+      return results[0];
     } catch (error) {
       return error;
     }
@@ -57,30 +64,22 @@ export class LokiStore implements IStore {
     }
   }
 
-  // async create(
-  //   chartType: ChartType,
-  //   data: any,
-  // ): Promise<boolean | Error> {
-  //   try {
-  //     const collection = db.getCollection(chartType);
-  //     collection.insert(data);
-  //     return true;
-  //   } catch (error) {
-  //     return error;
-  //   }
-  // }
-
   async readMany(
     chartType: ChartType,
-    // from: Date,
-    // to: Date,
+    from?: Date,
+    to?: Date,
   ): Promise<any | Error> {
     try {
+      let query = {};
+      if (from || to) {
+        query = { "time": { "$gte": from, "$lte": to } };
+      }
+
       return this.collection(chartType)
         .chain()
-        .find({
-          // "time": { "$gte": from, "$lte": to }
-        })
+        .find(
+          query,
+        )
         .simplesort("time")
         .data();
     } catch (error) {
@@ -92,14 +91,6 @@ export class LokiStore implements IStore {
     data: any,
   ): Promise<boolean | Error> {
     try {
-      // let index: string;
-      // switch (chartType) {
-      //   case ChartType.feeEstimate:
-      //   case ChartType.feeIndex:
-      //     index = "time";
-      //   case ChartType.movingAverage:
-      //     index = "day";
-      // }
       const collection = this.collection(chartType);
       data.forEach((item) => {
         const existing = collection.findOne({ time: item["time"] }); // Assuming each item has an id

@@ -10,6 +10,8 @@ import { useParams } from 'react-router-dom';
 import { LokiStore } from "../../store/lokijs_store";
 import LiveIndexBanner from "../live_index_banner/live_index_banner";
 import CircularProgressIndicator from "../loader/loader";
+import { FeeIndex } from "../../store/interface";
+import GaugeChart from "./gauge_chart";
 
 
 const ChartPage = () => {
@@ -17,17 +19,6 @@ const ChartPage = () => {
     // Ref to track the scrollable content div's scroll position
     const scrollableContentRef = useRef(null);
     const scrollPositionRef = useRef(0); // Ref to remember the scroll position
-
-    function calculatePercentageHigher(lastYearIndexes: number[], currentFeeIndex: number): string {
-        // Calculate percentage higher for last year
-        const percentageHigherLastYear = (lastYearIndexes.filter(value => value > currentFeeIndex).length / lastYearIndexes.length) * 100;
-
-        // Return a formatted statement
-        return `The current fee index has been higher ${percentageHigherLastYear.toFixed(2)}% of the time during the last year.`;
-    }
-
-
-
 
     const getChartTypeFromParams = (): ChartType => {
         let chartTypeKey = useParams()["chartType"] as string;
@@ -69,8 +60,18 @@ const ChartPage = () => {
         return data;
     }
 
+    async function getFeeIndexHistoryLastYear(): Promise<FeeIndex[]> {
 
 
+        const [requiredHistoryStart, requiredHistoryEnd] = ChartTimescale.getStartEndTimestampsFromTimerange(TimeRange.Last1Year);
+        const requiredHistoryStartTime = new Date(requiredHistoryStart);
+        const requiredHistoryEndTime = new Date(requiredHistoryEnd);
+
+        const historyLastYear = await store.readMany(ChartType.feeIndex, requiredHistoryStartTime, requiredHistoryEndTime);
+
+        return historyLastYear as FeeIndex[];
+
+    }
 
     const chartType = getChartTypeFromParams();
     const [chartData, setChartData] = useState(null);
@@ -82,7 +83,7 @@ const ChartPage = () => {
     const store = new LokiStore();
     const [selectedRange, setSelectedRange] = useState(TimeRange.Last1Month); // Default 
     const [currentFeeIndex, setCurrentFeeIndex] = useState({ ratioLast365Days: 0, ratioLast30Days: 0, time: new Date() });
-
+    const [feeIndexHistoryLastYear, setFeeIndexHistoryLastYear] = useState([]);
 
 
     // Save and restore the scroll position
@@ -110,21 +111,20 @@ const ChartPage = () => {
                 }
                 setLoading(prev => ({ ...prev, [chartType]: true }));
 
-                let isHistoryAvailable = true;
-                //first read latest timestamp from DB
                 let availableHistoryStartTime = await store.getHistoryStartTime(chartType);
 
                 if (availableHistoryStartTime instanceof Error) {
-                    isHistoryAvailable = false;
+
                     availableHistoryStartTime = new Date();
                 }
                 else {
-                    isHistoryAvailable = true;
+
                     availableHistoryStartTime = new Date(availableHistoryStartTime);
                 }
 
                 const [requiredHistoryStart, requiredHistoryEnd] = ChartTimescale.getStartEndTimestampsFromTimerange(selectedRange);
                 const requiredHistoryStartTime = new Date(requiredHistoryStart);
+                const requiredHistoryEndTime = new Date(requiredHistoryEnd);
                 let data;
 
                 if (availableHistoryStartTime > requiredHistoryStartTime) {
@@ -143,17 +143,30 @@ const ChartPage = () => {
                         throw new Error(`Error storing data to DB: ${isDataStored}`);
                     }
 
-                    const currentFeeIndex = await latestFeeIndex();
-                    if (currentFeeIndex instanceof Error || !currentFeeIndex) {
-                        console.log(`Error fetching latest fee index: ${currentFeeIndex}`);
-                        setCurrentFeeIndex({ ratioLast30Days: 0, ratioLast365Days: 0, time: new Date() });
-                    }
-                    else {
-                        setCurrentFeeIndex(currentFeeIndex);
+
+                    if (chartType === ChartType.feeIndex) {
+                        const currentFeeIndex = await latestFeeIndex();
+                        if (currentFeeIndex instanceof Error || !currentFeeIndex) {
+                            console.log(`Error fetching latest fee index: ${currentFeeIndex}`);
+                            setCurrentFeeIndex({ ratioLast30Days: 0, ratioLast365Days: 0, time: new Date() });
+                        }
+                        else {
+                            setCurrentFeeIndex(currentFeeIndex);
+                        }
+
+                        const feeIndexHistoryLastYear = await getFeeIndexHistoryLastYear();
+
+
+                        if (feeIndexHistoryLastYear instanceof Error) {
+                            console.error(`Error fetching feeIndexHistoryLastyear: ${feeIndexHistoryLastYear} `);
+                            throw (feeIndexHistoryLastYear);
+                        }
+
+                        setFeeIndexHistoryLastYear(feeIndexHistoryLastYear as any);
                     }
                 }
 
-                const history = await store.readMany(chartType); //this could be upgraded to fetch data from db by selectedRange?
+                const history = await store.readMany(chartType, requiredHistoryStartTime, requiredHistoryEndTime);
                 const chartData = chartDataOp.getFromData(history, chartType);
 
                 if (chartData instanceof Error) {
@@ -190,14 +203,27 @@ const ChartPage = () => {
             if (isDataStored instanceof Error) {
                 throw new Error(`Update data history: Error storing data to DB: ${isDataStored}`);
             }
-            const currentFeeIndex = await latestFeeIndex()
-            if (currentFeeIndex instanceof Error || !currentFeeIndex) {
-                console.log(`Error fetching latest fee index: ${currentFeeIndex}`);
-                setCurrentFeeIndex({ ratioLast30Days: 0, ratioLast365Days: 0, time: new Date() });
+
+            if (chartType === ChartType.feeIndex) {
+                const currentFeeIndex = await latestFeeIndex()
+                if (currentFeeIndex instanceof Error || !currentFeeIndex) {
+                    console.log(`Error fetching latest fee index: ${currentFeeIndex}`);
+                    setCurrentFeeIndex({ ratioLast30Days: 0, ratioLast365Days: 0, time: new Date() });
+                }
+                else {
+                    setCurrentFeeIndex(currentFeeIndex);
+                }
+                const feeIndexHistoryLastYear = await getFeeIndexHistoryLastYear();
+
+
+                if (feeIndexHistoryLastYear instanceof Error) {
+                    console.error(`Error fetching feeIndexHistoryLastyear: ${feeIndexHistoryLastYear} `);
+                    throw (feeIndexHistoryLastYear);
+                }
+
+                setFeeIndexHistoryLastYear(feeIndexHistoryLastYear as any);
             }
-            else {
-                setCurrentFeeIndex(currentFeeIndex);
-            }
+
         }
 
         fetchDataForChartType(chartType);
@@ -211,24 +237,27 @@ const ChartPage = () => {
     }, [chartType, selectedRange]);
 
     return (
-        <div className="scrollable-content">
-          {loading[chartType] && (
-            <CircularProgressIndicator />
-          )}
-          {!loading[chartType] && errorLoading[chartType] && (
-            <div className="banner-error">Error loading data. Please try again later.</div>
-          )}
-          {!loading[chartType] && !errorLoading[chartType] && chartType === ChartType.feeIndex && chartData && (
-            <>
-              <LiveIndexBanner currentFeeIndex={currentFeeIndex} />
-              <ChartView dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
-            </>
-          )}
-          {!loading[chartType] && !errorLoading[chartType] && chartType !== ChartType.feeIndex && chartData && (
-            <ChartView dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
-          )}
+        <div className="scrollable-content" ref={scrollableContentRef}>
+            {loading[chartType] && (
+                <CircularProgressIndicator />
+            )}
+            {!loading[chartType] && errorLoading[chartType] && (
+                <div className="banner-error">Error loading data. Please try again later.</div>
+            )}
+            {!loading[chartType] && !errorLoading[chartType] && chartType === ChartType.feeIndex && chartData && (
+                <>
+                    <LiveIndexBanner currentFeeIndex={currentFeeIndex} feeIndexHistoryLastYear={feeIndexHistoryLastYear} />
+                    <div className="gauge-container">
+                        <GaugeChart currentValue={currentFeeIndex.ratioLast365Days} />
+                    </div>
+                    <ChartView dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
+                </>
+            )}
+            {!loading[chartType] && !errorLoading[chartType] && chartType !== ChartType.feeIndex && chartData && (
+                <ChartView dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
+            )}
         </div>
-      );
+    );
 
 };
 

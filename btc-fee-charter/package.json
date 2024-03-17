@@ -16,6 +16,8 @@
     "lokijs": "^1.5.12",
     "react": "18.2.0",
     "react-dom": "18.2.0",
+    "react-gauge-component": "^1.2.0",
+    "react-plotly.js": "^2.6.0",
     "react-router-dom": "^6.22.1",
     "swagger-ui-dist": "^5.11.10",
     "swagger-ui-react": "^5.11.10"

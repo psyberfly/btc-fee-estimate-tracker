@@ -257,7 +257,7 @@ const ChartView = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
                 (chartInstance as any).destroy();
             }
         };
-    }, [dataset]); // Run this effect whenever data changes
+    }, [dataset, width]); // Run this effect whenever data changes
 
     useEffect(() => {
         if (chartInstance) {
