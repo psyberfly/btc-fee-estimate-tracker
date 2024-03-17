@@ -71,7 +71,7 @@ export class LokiStore implements IStore {
   ): Promise<any | Error> {
     try {
       let query = {};
-      if (from || to) {
+      if (from && to) {
         query = { "time": { "$gte": from, "$lte": to } };
       }
 

@@ -208,9 +208,7 @@ const timescales = ChartTimescale.getRangeOptions();
 
 const ChartView = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
     const chartContainer = useRef(null);
-    const [chartInstance, setChartInstance] = useState(null);
-
-    // //FOR RESPONSIVE VIEW:
+    const chartInstance = useRef(null);    // //FOR RESPONSIVE VIEW:
     const [width, height] = useWindowSize();
 
     function useWindowSize() {
@@ -229,44 +227,39 @@ const ChartView = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
 
         return size;
     }
-
     useEffect(() => {
-        const createOrUpdateChartInstance = () => {
-            if (chartInstance) {
-                (chartInstance as any).destroy();
+        const createChart = () => {
+            if (!chartContainer.current) return;
+
+            // Ensure the existing chart instance is destroyed before creating a new one
+            if (chartInstance.current) {
+                (chartInstance.current as any).destroy();
+                chartInstance.current = null;
             }
 
-            if (chartContainer.current && dataset) {
-                const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedRange, dataset.datasets);
-                const options = getChartOptions(chartType, timescaleOptions, width) as ChartOptions<"line">;
-
-                const newChartInstance = new Chart(chartContainer.current, {
-                    type: 'line',
-                    data: dataset,
-                    options: options,
-
-                });
-                setChartInstance(newChartInstance as any);
-            }
-        };
-
-        createOrUpdateChartInstance();
-
-        return () => {
-            if (chartInstance) {
-                (chartInstance as any).destroy();
-            }
-        };
-    }, [dataset, width]); // Run this effect whenever data changes
-
-    useEffect(() => {
-        if (chartInstance) {
             const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedRange, dataset.datasets);
-            const updatedOptions = getChartOptions(chartType, timescaleOptions, width) as ChartOptions<"line">;
-            (chartInstance as any).options = updatedOptions;
-            (chartInstance as any).update();
-        }
-    }, [selectedRange, chartInstance, width]);
+            const options = getChartOptions(chartType, timescaleOptions, width) as ChartOptions<"line">;
+
+            const newChartInstance = new Chart(chartContainer.current, {
+                type: 'line',
+                data: dataset,
+                options,
+            });
+
+            chartInstance.current = newChartInstance as any;
+        };
+
+        createChart();
+
+        // Cleanup function to destroy the chart instance when the component unmounts
+        return () => {
+            if (chartInstance.current) {
+                (chartInstance.current as any).destroy();
+                chartInstance.current = null;
+            }
+        };
+    }, [dataset, selectedRange, width]); // Dependency array
+
 
     const handleScaleChange = (e) => {
         setSelectedRange(e.target.value);

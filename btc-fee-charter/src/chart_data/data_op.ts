@@ -64,6 +64,10 @@ export class DataOp implements IDataOp {
         };
         data.push(movingAverage);
       });
+
+      console.log("MOVING AVERAGE DATA:");
+      console.log({ data });
+
       return data;
     } catch (e) {
       return e;

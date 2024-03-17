@@ -41,7 +41,7 @@ const ChartPage = () => {
 
     };
 
-    const fetchData = async (charType: ChartType, sinceTime: Date): Promise<any | Error> => {
+    const fetchData = async (chartType: ChartType, sinceTime: Date): Promise<any | Error> => {
         let data;
         switch (chartType) {
             case ChartType.feeIndex:
@@ -110,26 +110,23 @@ const ChartPage = () => {
                     scrollPositionRef.current = (scrollableContentRef.current as any).scrollTop;
                 }
                 setLoading(prev => ({ ...prev, [chartType]: true }));
+                let availableHistoryStartTime;
+                const availableHistoryStart = await store.getHistoryStartTime(chartType);
 
-                let availableHistoryStartTime = await store.getHistoryStartTime(chartType);
-
-                if (availableHistoryStartTime instanceof Error) {
-
+                if (availableHistoryStart instanceof Error || !availableHistoryStart) {
                     availableHistoryStartTime = new Date();
                 }
                 else {
-
-                    availableHistoryStartTime = new Date(availableHistoryStartTime);
+                    availableHistoryStartTime = new Date(availableHistoryStart);
                 }
 
                 const [requiredHistoryStart, requiredHistoryEnd] = ChartTimescale.getStartEndTimestampsFromTimerange(selectedRange);
                 const requiredHistoryStartTime = new Date(requiredHistoryStart);
                 const requiredHistoryEndTime = new Date(requiredHistoryEnd);
+
                 let data;
 
                 if (availableHistoryStartTime > requiredHistoryStartTime) {
-
-
                     data = await fetchData(chartType, requiredHistoryStartTime);
 
                     if (data instanceof Error) {
@@ -155,7 +152,6 @@ const ChartPage = () => {
                         }
 
                         const feeIndexHistoryLastYear = await getFeeIndexHistoryLastYear();
-
 
                         if (feeIndexHistoryLastYear instanceof Error) {
                             console.error(`Error fetching feeIndexHistoryLastyear: ${feeIndexHistoryLastYear} `);

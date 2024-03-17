@@ -8,8 +8,6 @@ import { FeeIndex } from '../../store/interface';
 const LiveIndexBanner = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
 
     function getIndexPercentageHigher(currentFeeIndex: FeeIndex, feeIndexHistoryLastYear: FeeIndex[]): string {
-        console.log(currentFeeIndex, feeIndexHistoryLastYear);
-
         const percentageHigherLastYear = (feeIndexHistoryLastYear.filter(index => index.ratioLast365Days > currentFeeIndex.ratioLast365Days).length / feeIndexHistoryLastYear.length) * 100;
 
         return `The current fee index has been higher ${percentageHigherLastYear.toFixed(2)}% of the time during the last year.`;
