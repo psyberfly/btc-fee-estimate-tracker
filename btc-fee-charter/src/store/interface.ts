@@ -1,4 +1,4 @@
-import { ServiceChartType } from "../chart_data/interface";
+import { ChartType } from "../chart_data/interface";
 
 export interface FeeIndex {
   time: Date;
@@ -7,7 +7,7 @@ export interface FeeIndex {
 }
 
 export interface MovingAverage {
-  day: Date;
+  time: Date;
   last365Days: number;
   last30Days: number;
 }
@@ -17,9 +17,12 @@ export interface FeeEstimate {
   satsPerByte: number;
 }
 
-
 export interface IStore {
-  create(chartType: ServiceChartType, data: any): Promise<boolean | Error>;
-  read(chartType: ServiceChartType, from: Date, to: Date): Promise<any | Error>;
-  upsert(chartType: ServiceChartType, data:any): Promise<boolean | Error>;
+  //create(chartType: ChartType, data: any): Promise<boolean | Error>;
+  getHistoryStartTime(chartType: ChartType): Promise<Date | Error>;
+  getHistoryEndTime(chartType: ChartType): Promise<Date | Error>;
+  readMany(chartType: ChartType// from: Date, to: Date
+  ): Promise<any | Error>;
+  readLatest(chartType: ChartType): Promise<any | Error>;
+  upsert(chartType: ChartType, data: any): Promise<boolean | Error>;
 }

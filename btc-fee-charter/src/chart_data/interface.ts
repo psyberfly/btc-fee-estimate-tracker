@@ -1,9 +1,9 @@
 import { FeeEstimate, FeeIndex, MovingAverage } from "../store/interface";
 
-export enum ServiceChartType {
-  index,
-  movingAverage,
-  feeEstimate,
+export enum ChartType {
+  feeIndex = "feeIndex",
+  movingAverage = "movingAverage",
+  feeEstimate = "feeEstimate",
 }
 
 export interface IndexResponse {
@@ -41,7 +41,7 @@ export interface IChartDatasetOp {
 
   getFromData<T extends FeeIndex[] | MovingAverage[] | FeeEstimate[]>(
     data: T,
-    kind: ServiceChartType,
+    kind: ChartType,
   ): object | Error;
 
   //new

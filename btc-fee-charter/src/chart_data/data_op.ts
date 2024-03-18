@@ -1,5 +1,5 @@
 import { AxiosHeaders } from "axios";
-import { makeApiCall } from "../lib/network/network";
+import { makeApiCall } from "../lib/network";
 import { IDataOp, IndexDataResponse, IndexResponse } from "./interface";
 import { FeeEstimate, FeeIndex, MovingAverage } from "../store/interface";
 
@@ -58,12 +58,16 @@ export class DataOp implements IDataOp {
 
       res.forEach((element) => {
         const movingAverage: MovingAverage = {
-          day: element["day"],
+          time: element["day"],
           last30Days: parseFloat(element["last30Days"]),
           last365Days: parseFloat(element["last365Days"]),
         };
         data.push(movingAverage);
       });
+
+      console.log("MOVING AVERAGE DATA:");
+      console.log({ data });
+
       return data;
     } catch (e) {
       return e;

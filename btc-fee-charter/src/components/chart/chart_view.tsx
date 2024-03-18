@@ -4,7 +4,7 @@ import "chartjs-adapter-date-fns";
 import gradient from "chartjs-plugin-gradient";
 Chart.register(gradient);
 import annotationPlugin from "chartjs-plugin-annotation";
-import { ServiceChartType } from '../../chart_data/interface';
+import { ChartType } from '../../chart_data/interface';
 import { ChartTimescale, TimescaleOptions } from "../../chart_data/chart_timescale";
 Chart.register(annotationPlugin);
 
@@ -50,7 +50,7 @@ Chart.register(verticalLinePlugin);
 
 //This is of type ChartOptions<"line"> but TS compiler confuses Types with this lib.
 //INDEX CHART:
-const getChartOptions = (chartType: ServiceChartType, timescaleOptions: TimescaleOptions, width: number) => {
+const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOptions, width: number) => {
     let yMin: number = 0;
     let yText: string;
     let xText: string = "time";
@@ -62,17 +62,17 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
 
 
     switch (chartType) {
-        case ServiceChartType.index:
+        case ChartType.feeIndex:
             yText = "current fee est / moving average";
             title = "Fee Estimate Index"
             subtitle = "current fee estimate/fee estimate moving average";
             break;
-        case ServiceChartType.movingAverage:
+        case ChartType.movingAverage:
             yText = "sats/B";
             title = "Fee Estimate Weighted Moving Average"
             subtitle = "weighted sum(last n days fee estimates)/total weight";
             break;
-        case ServiceChartType.feeEstimate:
+        case ChartType.feeEstimate:
             yText = "sats/B";
             title = "Fee Estimate History"
             subtitle = "mempool.space (fastest/1-2 blocks)";
@@ -186,7 +186,7 @@ const getChartOptions = (chartType: ServiceChartType, timescaleOptions: Timescal
                 lineColor: "rgba(255, 0, 0, 0.75)" as const,
             },
             annotation:
-                chartType == ServiceChartType.index ?
+                chartType == ChartType.feeIndex ?
                     {
                         annotations: {
                             line1: {
@@ -208,9 +208,7 @@ const timescales = ChartTimescale.getRangeOptions();
 
 const ChartView = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
     const chartContainer = useRef(null);
-    const [chartInstance, setChartInstance] = useState(null);
-
-    // //FOR RESPONSIVE VIEW:
+    const chartInstance = useRef(null);    // //FOR RESPONSIVE VIEW:
     const [width, height] = useWindowSize();
 
     function useWindowSize() {
@@ -229,44 +227,39 @@ const ChartView = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
 
         return size;
     }
-
     useEffect(() => {
-        const createOrUpdateChartInstance = () => {
-            if (chartInstance) {
-                (chartInstance as any).destroy();
+        const createChart = () => {
+            if (!chartContainer.current) return;
+
+            // Ensure the existing chart instance is destroyed before creating a new one
+            if (chartInstance.current) {
+                (chartInstance.current as any).destroy();
+                chartInstance.current = null;
             }
 
-            if (chartContainer.current && dataset) {
-                const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedRange, dataset.datasets);
-                const options = getChartOptions(chartType, timescaleOptions, width) as ChartOptions<"line">;
-
-                const newChartInstance = new Chart(chartContainer.current, {
-                    type: 'line',
-                    data: dataset,
-                    options: options,
-
-                });
-                setChartInstance(newChartInstance as any);
-            }
-        };
-
-        createOrUpdateChartInstance();
-
-        return () => {
-            if (chartInstance) {
-                (chartInstance as any).destroy();
-            }
-        };
-    }, [dataset]); // Run this effect whenever data changes
-
-    useEffect(() => {
-        if (chartInstance) {
             const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedRange, dataset.datasets);
-            const updatedOptions = getChartOptions(chartType, timescaleOptions, width) as ChartOptions<"line">;
-            (chartInstance as any).options = updatedOptions;
-            (chartInstance as any).update();
-        }
-    }, [selectedRange, chartInstance, width]);
+            const options = getChartOptions(chartType, timescaleOptions, width) as ChartOptions<"line">;
+
+            const newChartInstance = new Chart(chartContainer.current, {
+                type: 'line',
+                data: dataset,
+                options,
+            });
+
+            chartInstance.current = newChartInstance as any;
+        };
+
+        createChart();
+
+        // Cleanup function to destroy the chart instance when the component unmounts
+        return () => {
+            if (chartInstance.current) {
+                (chartInstance.current as any).destroy();
+                chartInstance.current = null;
+            }
+        };
+    }, [dataset, selectedRange, width]); // Dependency array
+
 
     const handleScaleChange = (e) => {
         setSelectedRange(e.target.value);

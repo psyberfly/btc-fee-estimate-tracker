@@ -19,10 +19,20 @@
 }
 
 .logo {
-  height: 40px; /* Adjust based on your needs */
-  margin-left: 5px; /* Space between the logo and the title */
+  height: 40px;
+  /* Adjust based on your needs */
+  margin-left: 5px;
+  /* Space between the logo and the title */
 }
 
+.gauge-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  /* Center the gauge chart horizontally */
+  overflow: hidden;
+  /* Hide overflow. Adjust as needed */
+}
 
 body {
   font-family: var(--body-font);
@@ -31,7 +41,7 @@ body {
   background-color: var(--bg-color);
 }
 
-h4{
+h4 {
   font-size: 16px;
   font-family: var(--body-font);
   color: var(--text-color-secondary);
@@ -40,8 +50,8 @@ h4{
 
 
 h1 {
-  font-family: var(--body-font);
-  font-size: 32px;
+  font-family: var(--title-font);
+  font-size: 40px;
   color: var(--text-color);
   padding: 0px 5px;
 }
@@ -69,7 +79,8 @@ h3 {
   h2 {
     font-size: 18px;
   }
-  h3{
+
+  h3 {
     font-size: 12px;
   }
 
@@ -232,8 +243,10 @@ button:hover {
 
 
 .chart-container {
-  flex: 2; /* Occupies 2/3 of the space */
-  overflow-y: auto; /* Allows the chart to scroll if it overflows vertically */
+  flex: 2;
+  /* Occupies 2/3 of the space */
+  overflow-y: auto;
+  /* Allows the chart to scroll if it overflows vertically */
   width: 100%;
   height: 94vh;
   display: flex;
@@ -271,7 +284,8 @@ button:hover {
 .scrollable-content {
   flex: 1;
   overflow-y: auto;
-  padding: 20px; /* Adjust based on your design */
+  padding: 20px;
+  /* Adjust based on your design */
 }
 
 
@@ -289,7 +303,7 @@ button:hover {
 }
 
 .banner-title {
-   position: fixed;
+  position: fixed;
   /* top: 50%;
   left: 50%;
   transform: translate(-50%, -50%); */
