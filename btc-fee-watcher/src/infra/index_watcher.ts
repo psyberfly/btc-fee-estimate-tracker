@@ -26,6 +26,26 @@ async function seedIndexes() {
   await indexOp.seed(seedIndexStartDate);
 }
 
+async function scheduleMovingAverageUpdate() {
+  // Calculate the time now
+  const now = new Date();
+  // Calculate the start of the next day
+  const nextDay = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate() + 1,
+  );
+  // Calculate the delay until the start of the next day
+  const delayUntilNextDay = nextDay.getTime() - now.getTime();
+
+  // Schedule the updateMovingAverage to run at the start of the next day
+  setTimeout(async () => {
+    await updateMovingAverage();
+    // After running, schedule the next execution
+    scheduleMovingAverageUpdate();
+  }, delayUntilNextDay);
+}
+
 async function updateMovingAverage() {
   try {
     console.log("Updating Moving Average...");
@@ -51,7 +71,7 @@ async function updateMovingAverage() {
   }
 }
 
-async function udpateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
+async function updateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
   try {
     console.log("Updating latest Fee Estimate...");
     // fetch current fee estimate and update DB
@@ -127,18 +147,19 @@ export async function runIndexWatcher() {
 
     await updateMovingAverage();
 
-    await udpateAndBroadcastIndex(alertStreamServer);
+    await updateAndBroadcastIndex(alertStreamServer);
 
     // every day:
-    setInterval(async () => {
-      await updateMovingAverage();
-    }, movingAverageWatchInterval);
+    // setInterval(async () => {
+    //   await updateMovingAverage();
+    // }, movingAverageWatchInterval);
 
-    // every 10 mins (block):
+   // every 10 mins (block):
     setInterval(async () => {
-      udpateAndBroadcastIndex(alertStreamServer);
+      updateAndBroadcastIndex(alertStreamServer);
     }, indexWatchInterval //change to ten mins for prod
     );
+    scheduleMovingAverageUpdate();
   } catch (error) {
     console.error("Error starting server:", error);
     process.exit(1);

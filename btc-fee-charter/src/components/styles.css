@@ -50,8 +50,8 @@ h4 {
 
 
 h1 {
-  font-family: var(--body-font);
-  font-size: 32px;
+  font-family: var(--title-font);
+  font-size: 40px;
   color: var(--text-color);
   padding: 0px 5px;
 }
