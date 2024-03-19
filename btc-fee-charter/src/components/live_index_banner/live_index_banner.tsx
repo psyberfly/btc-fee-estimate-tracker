@@ -7,10 +7,20 @@ import { FeeIndex } from '../../store/interface';
 // Props might include the data it needs to display
 const LiveIndexBanner = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
 
-    function getIndexPercentageHigher(currentFeeIndex: FeeIndex, feeIndexHistoryLastYear: FeeIndex[]): string {
-        const percentageHigherLastYear = (feeIndexHistoryLastYear.filter(index => index.ratioLast365Days > currentFeeIndex.ratioLast365Days).length / feeIndexHistoryLastYear.length) * 100;
+    function getIndexPercentageDiff(currentFeeIndex: FeeIndex, feeIndexHistoryLastYear: FeeIndex[]): string {
 
-        return `The current fee index has been higher ${percentageHigherLastYear.toFixed(2)}% of the time during the last year.`;
+
+        if (currentFeeIndex.ratioLast365Days > 1) {
+            const percentageHigherLastYear = (feeIndexHistoryLastYear.filter(index => index.ratioLast365Days > currentFeeIndex.ratioLast365Days).length / feeIndexHistoryLastYear.length) * 100;
+            return `The fee estimate index has been higher ${percentageHigherLastYear.toFixed(2)}% of the time during the last year.`;
+
+        }
+        else {
+            const percentageLowerLastYear = (feeIndexHistoryLastYear.filter(index => index.ratioLast365Days < currentFeeIndex.ratioLast365Days).length / feeIndexHistoryLastYear.length) * 100;
+            return `The fee estimate index has been lower ${percentageLowerLastYear.toFixed(2)}% of the time during the last year.`;
+
+        }
+
     }
 
     return (
@@ -40,7 +50,7 @@ const LiveIndexBanner = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
                 </div>
             </div>
             <h3 style={{ paddingTop: "10px", paddingBottom: "0vh", textAlign: "center" }}>
-                {getIndexPercentageHigher(currentFeeIndex, feeIndexHistoryLastYear)}
+                {getIndexPercentageDiff(currentFeeIndex, feeIndexHistoryLastYear)}
             </h3>
         </>
     );

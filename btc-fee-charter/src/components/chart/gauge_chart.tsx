@@ -39,8 +39,7 @@ const GaugeChart = ({ currentValue }) => {
         labels: {
             valueLabel: {
                 style: {
-                    fontSize: 28,
-                    
+                    fontSize: 42,
                 },
                 matchColorWithArc: true,
                 formatTextValue: (value) => {
