@@ -25,8 +25,9 @@ const LiveIndexBanner = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
 
     return (
         <>
-            <h1 style={{ paddingTop: "10vh", textAlign: "center" }}>Fee Estimate Index</h1>
-            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "10px" }}>
+            <h1 style={{ textAlign: "center" }}>Bitcoin Fee Estimate Index</h1>
+            <p style={{ textAlign: "center",}}>This index mesaures how expensive the current Bitcoin fee estimate is against the yearly average. Fee estimates taken from mempool.space - 1-2 blocks/fastest. </p>
+            <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "0px" }}>
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "baseline" }}>
                     <div style={{ textAlign: "center", paddingRight: "50px" }}>
                         <h2>Last 365 Days</h2>
@@ -37,8 +38,8 @@ const LiveIndexBanner = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
                         <h2 style={{ fontSize: "30px" }}>{Number(currentFeeIndex.ratioLast30Days).toFixed(2)}</h2>
                     </div>
                 </div>
-                <div style={{ textAlign: "center", paddingTop: "0px" }}>
-                    <h3 style={{ fontSize: "20px" }}> at {new Date(currentFeeIndex.time).toLocaleString('en-US', {
+                {/* <div style={{ textAlign: "center", paddingTop: "0px" }}> */}
+                    <p> at {new Date(currentFeeIndex.time).toLocaleString('en-US', {
                         year: 'numeric',
                         month: 'numeric',
                         day: 'numeric',
@@ -46,10 +47,10 @@ const LiveIndexBanner = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
                         minute: 'numeric',
                         second: 'numeric',
                         hour12: true
-                    })}</h3>
-                </div>
+                    })}</p>
+                {/* </div> */}
             </div>
-            <h3 style={{ paddingTop: "10px", paddingBottom: "0vh", textAlign: "center" }}>
+            <h3 style={{ paddingTop: "0px", paddingBottom: "0vh", textAlign: "center" }}>
                 {getIndexPercentageDiff(currentFeeIndex, feeIndexHistoryLastYear)}
             </h3>
         </>

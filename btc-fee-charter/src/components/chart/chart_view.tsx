@@ -65,17 +65,17 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
         case ChartType.feeIndex:
             yText = "current fee est / moving average";
             title = "Fee Estimate Index"
-            subtitle = "current fee estimate/fee estimate moving average";
+            subtitle = "current fee estimate / moving average";
             break;
         case ChartType.movingAverage:
             yText = "sats/B";
             title = "Fee Estimate Weighted Moving Average"
-            subtitle = "weighted sum(last n days fee estimates)/total weight";
+            subtitle = "weighted sum(last n days fee estimates) / total weight";
             break;
         case ChartType.feeEstimate:
             yText = "sats/B";
             title = "Fee Estimate History"
-            subtitle = "mempool.space (fastest/1-2 blocks)";
+            subtitle = "mempool.space (fastest / 1-2 blocks)";
             break;
         default:
             yText = "Y Label";
