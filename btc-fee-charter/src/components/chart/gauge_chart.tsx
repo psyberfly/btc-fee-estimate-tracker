@@ -61,7 +61,7 @@ const GaugeChart = ({ currentValue }) => {
         labels: {
             valueLabel: {
                 style: {
-                    fontSize: 42,
+                    fontSize: 35,
                     padding: "100px",
                 },
                 matchColorWithArc: true,
@@ -91,7 +91,7 @@ const GaugeChart = ({ currentValue }) => {
         // Include any other props as needed
     };
 
-    const addTextLabel = (svg, content, x, y, fillColor = "white") => {
+    const addTickLabel = (svg, content, x, y, fillColor = "white") => {
         const textLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
         textLabel.setAttribute("x", x);
         textLabel.setAttribute("y", y);
@@ -99,6 +99,43 @@ const GaugeChart = ({ currentValue }) => {
         textLabel.textContent = content;
         textLabel.style.fontSize = "14px";
         textLabel.style.fontWeight = "bold";
+        textLabel.style.fill = fillColor;
+        svg.appendChild(textLabel);
+    };
+
+    const addValueLabel = (svg, x, y,) => {
+        let fillColor: string;
+        let text: string = "";
+        if (currentValue < 0.5) {
+            fillColor = "rgb(0,255,0)";
+            text = "Very Low";
+        }
+
+        else if (currentValue > 0.5 && currentValue < 1) {
+            fillColor = "rgb(255,255,0)";
+            text = "Low";
+        }
+        else if (currentValue > 1 && currentValue < 2) {
+            fillColor = "rgb(255,165,0)";
+            text = "High"
+        }
+        else if (currentValue > 2 && currentValue < 3) {
+            fillColor = "rgb(255, 82, 0)";
+            text = "Very High"
+        }
+        else {
+            fillColor = "rgb(255,0,0)";
+            text = "Very High"
+        }
+
+
+        const textLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
+        textLabel.setAttribute("x", x);
+        textLabel.setAttribute("y", y);
+        textLabel.setAttribute("text-anchor", "middle");
+        textLabel.textContent = text;
+        textLabel.style.fontSize = "28px";
+        textLabel.style.fontWeight = "normal";
         textLabel.style.fill = fillColor;
         svg.appendChild(textLabel);
     };
@@ -113,12 +150,13 @@ const GaugeChart = ({ currentValue }) => {
             const svg = chartContainer.querySelector('svg');
             if (svg) {
                 if (svg) {
-                    addTextLabel(svg, "Very Low", "10%", "90%");
-                    addTextLabel(svg, "Half", "7%", "73%");
-                    addTextLabel(svg, "Nominal", "7%", "50%");
-                    addTextLabel(svg, "Double", "27%", "12%");
-                    addTextLabel(svg, "Triple", "72%", "12%");
-                    addTextLabel(svg, "Very High", "92%", "90%");
+                    addTickLabel(svg, "Very Low", "10%", "90%");
+                    addTickLabel(svg, "Half", "7%", "73%");
+                    addTickLabel(svg, "Nominal", "7%", "50%");
+                    addTickLabel(svg, "Double", "27%", "12%");
+                    addTickLabel(svg, "Triple", "72%", "12%");
+                    addTickLabel(svg, "Very High", "92%", "90%");
+                    addValueLabel(svg, "50%", "73%")
 
                 }
 
