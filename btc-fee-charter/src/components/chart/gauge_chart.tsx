@@ -18,22 +18,34 @@ const GaugeChart = ({ currentValue }) => {
         //padding: 22,
         //nbSubArcs: 4,
         //gradient: true,
-        colorArray: [
-            "rgb(0, 255, 0)",    // Green
-            "rgb(255, 255, 0)",  // Yellow
-            "rgb(255, 0, 0)"     // Red
-        ],
+        // colorArray: [
+
+        //     // "rgb(255, 255, 0)",  // Yellow
+        //     // "rgb(255, 165, 0)",  // Yellow
+        //     // "rgb(255, 0, 0)"     // Red
+        // ],
 
         subArcs: [
             {
                 limit: 0.5,
-                showTick: true
+                showTick: true,
+                color: "rgb(0, 255, 0)",    // Green
             },
-            { limit: 1, showTick: true },
-            { limit: 2, showTick: true },
-            { limit: 3, showTick: true },
+            {
+                limit: 1, showTick: true,
+                color: "rgb(255, 255, 0)",
+            }, // Yellow},
+            {
+                limit: 2, showTick: true,
+                color: "rgb(255, 165, 0)",
+            },
+            {
+                limit: 3, showTick: true, color: "rgb(255, 82, 0)",
+            },
             //{ limit: 4, showTick: false },
-            { limit: 5, },
+            {
+                limit: 5, color: "rgb(255, 0, 0)",
+            },
 
         ],
         cornerRadius: 1,
