@@ -26,13 +26,17 @@
 }
 
 .gauge-container {
-  width: 100%;
-  display: flex;
+  width: 400px;
   justify-content: center;
-  /* Center the gauge chart horizontally */
-  overflow: hidden;
+  /* This centers the child horizontally in the flex container */
+  align-items: center;
+  /* This would center the child vertically if needed */
+  overflow: auto;
   /* Hide overflow. Adjust as needed */
+  margin: 0 auto;
+  /* Additionally, center the container itself if it's not already within a flex container */
 }
+
 
 body {
   font-family: var(--body-font);
