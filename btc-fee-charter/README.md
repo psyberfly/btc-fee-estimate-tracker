@@ -15,7 +15,3 @@ nodejs, docker (optional)
 ### To Do:
 1. Instead of reading from DB for timescales smaller than current one, just use the chartData from memory (declare a var to hold chartData in memory) for faster loading.
 
-2. Rerender only chartView instead of chartPage when scale changes. Because at fee index page, it scrolls the entire page back up. 
-
-
-version of dexie store is set to 3 else browsers give error of lower database version than available?
