@@ -19,3 +19,14 @@ Linux, docker
 ## Dev:
 1. Infra: docker compose
 2. For more details, refer service components.
+
+## TODO:
+
+1. Make gauge chart based on last 1 year percentile of fee index with 10 arcs.
+2. Put horizontal lines for current values on charts
+3. Rename service to Bull Bitcoin Fee Index?
+4. Change stepsize to 6h for above 5d
+5. Rewrite live banner: remove explanation and put it in info section. Remove current value time and put it below chart.
+6. Double check %higher/lower formula for stepsize skewing.
+7. Run service by Ravi/expert
+ 
