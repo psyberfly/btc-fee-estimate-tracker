@@ -22,11 +22,11 @@ Linux, docker
 
 ## TODO:
 
-1. Make gauge chart based on last 1 year percentile of fee index with 10 arcs.
-2. Put horizontal lines for current values on charts
-3. Rename service to Bull Bitcoin Fee Index?
-4. Change stepsize to 6h for above 5d
-5. Rewrite live banner: remove explanation and put it in info section. Remove current value time and put it below chart.
-6. Double check %higher/lower formula for stepsize skewing.
-7. Run service by expert
+1. Recaliberate gauge chart to have 10 levels of 10 pecentile windows indicating how the current index compares to last year.
+2. Change stepsize of chart readings to 6h instead of 10m for timescales of over 5d to improve readibility. For timescales below 5d, keep 10min stepsize. 
+3. Add horizontal lines on charts indicating current values for better readability. 
+4. Rename service to Bull Bitcoin Fee Multiple (check exact name).
+5. Rewrite homepage banner: remove index explanation and put it in separate info section. Remove current index time and put it below charts.
+6. Correct the % higher/lower formula used in homepage banner above gauge: it does not account for data stepsize change and subsequent skewing.
+7. Run service by expert.
  
