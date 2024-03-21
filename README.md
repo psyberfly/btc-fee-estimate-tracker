@@ -28,5 +28,5 @@ Linux, docker
 4. Change stepsize to 6h for above 5d
 5. Rewrite live banner: remove explanation and put it in info section. Remove current value time and put it below chart.
 6. Double check %higher/lower formula for stepsize skewing.
-7. Run service by Ravi/expert
+7. Run service by expert
  
