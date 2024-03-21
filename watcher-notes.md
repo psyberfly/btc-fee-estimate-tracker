@@ -1,4 +1,4 @@
-## Explanation of the math used: 
+## BTC Fee Watcher: Index schedule & math used
 
 
 ### Watcher Process:
