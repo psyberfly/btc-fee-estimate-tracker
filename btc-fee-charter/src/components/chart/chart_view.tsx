@@ -58,8 +58,6 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
     let subtitle: string;
     const titleFontSize: number = width < 768 ? 16 : 24;
     const subTitleFontSize: number = width < 768 ? 14 : 20;
-    console.log({ latestValue365Day })
-    console.log({ latestValue30Day })
     const latestValue365DayText = latestValue365Day.toFixed(2);
     const latestValue30DayText = latestValue30Day ? latestValue30Day.toFixed(2) : "N/A";
 
