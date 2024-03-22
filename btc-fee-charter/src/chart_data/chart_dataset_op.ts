@@ -44,9 +44,9 @@ export class ChartDatasetOp implements IChartDatasetOp {
 
           label: "All Time",
           data: dataSet,
-          borderColor: "rgb(254, 112, 2)",
+          borderColor: "rgb(0,228, 255)",
           pointBorderColor: "rgba(0, 0, 0, 1)",
-          pointBackgroundColor: "rgb(254, 112, 2)",
+          pointBackgroundColor: "rgb(0,228, 255)",
         },
       ],
     };

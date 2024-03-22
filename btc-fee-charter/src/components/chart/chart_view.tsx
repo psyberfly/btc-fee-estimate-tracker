@@ -50,7 +50,7 @@ Chart.register(verticalLinePlugin);
 
 //This is of type ChartOptions<"line"> but TS compiler confuses Types with this lib.
 //INDEX CHART:
-const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOptions, width: number) => {
+const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOptions, width: number, latestValue365Day: number, latestValue30Day?: number) => {
     let yMin: number = 0;
     let yText: string;
     let xText: string = "time";
@@ -58,6 +58,143 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
     let subtitle: string;
     const titleFontSize: number = width < 768 ? 16 : 24;
     const subTitleFontSize: number = width < 768 ? 14 : 20;
+    console.log({ latestValue365Day })
+    console.log({ latestValue30Day })
+    const latestValue365DayText = latestValue365Day.toFixed(2);
+    const latestValue30DayText = latestValue30Day ? latestValue30Day.toFixed(2) : "N/A";
+
+    const annotations = () => {
+
+        if (latestValue30Day) {
+            if (chartType === ChartType.feeIndex)
+                return {
+                    line1: { // Additional line annotation for the latest value
+                        type: "line",
+                        yMin: latestValue30DayText,
+                        yMax: latestValue30DayText,
+                        borderColor: "rgb(254, 112, 2)", // Example: red color for the latest value line
+                        borderWidth: 1,
+                        borderDash: [6, 6], // Optional: Makes the line dashed
+                        label: { // Label for the latest value line
+                            display: true,
+                            content: `${latestValue30DayText}`,
+                            position: "end",
+                            backgroundColor: 'rgba(0,0,0,0.5)',
+                            color: "rgb(254, 112, 2)",
+                            padding: 3,
+                            font: {
+                                family: fontFamily,
+                                size: 16
+                            },
+                            xAdjust: 5, // Adjust this value as needed to position the label more to the right
+                            yAdjust: -10, // Adjust vertically if needed
+                        }
+                    },
+                    line2: { // Additional line annotation for the latest value
+                        type: "line",
+                        yMin: latestValue365DayText,
+                        yMax: latestValue365DayText,
+                        borderColor: "rgb(0,228, 255)", // Example: red color for the latest value line
+                        borderWidth: 1,
+                        borderDash: [6, 6], // Optional: Makes the line dashed
+                        label: { // Label for the latest value line
+                            display: true,
+                            content: `${latestValue365DayText}`,
+                            position: "end",
+                            backgroundColor: 'rgba(0,0,0,0.5)',
+                            color: "rgb(0,228, 255)",
+                            padding: 3,
+                            font: {
+                                family: fontFamily,
+                                size: 16
+                            },
+                            xAdjust: 5, // Adjust this value as needed to position the label more to the right
+                            yAdjust: -10, // Adjust vertically if needed
+                        }
+                    },
+                    line3: {
+                        type: "line" as const,
+                        yMin: 1,
+                        yMax: 1,
+                        borderColor: "rgba(255,255,255,0.75)",
+                        borderWidth: 1,
+                    },
+                }
+
+            else return {
+                line1: { // Additional line annotation for the latest value
+                    type: "line",
+                    yMin: latestValue30DayText,
+                    yMax: latestValue30DayText,
+                    borderColor: "rgb(254, 112, 2)", // Example: red color for the latest value line
+                    borderWidth: 1,
+                    borderDash: [6, 6], // Optional: Makes the line dashed
+                    label: { // Label for the latest value line
+                        display: true,
+                        content: `${latestValue30DayText} sats/B`,
+                        position: "end",
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        color: "rgb(254, 112, 2)",
+                        padding: 3,
+                        font: {
+                            family: fontFamily,
+                            size: 16
+                        },
+                        xAdjust: 5, // Adjust this value as needed to position the label more to the right
+                        yAdjust: -10, // Adjust vertically if needed
+                    }
+                },
+                line2: { // Additional line annotation for the latest value
+                    type: "line",
+                    yMin: latestValue365DayText,
+                    yMax: latestValue365DayText,
+                    borderColor: "rgb(0,228, 255)", // Example: red color for the latest value line
+                    borderWidth: 1,
+                    borderDash: [6, 6], // Optional: Makes the line dashed
+                    label: { // Label for the latest value line
+                        display: true,
+                        content: `${latestValue365DayText} sats/B`,
+                        position: "end",
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        color: "rgb(0,228, 255)",
+                        padding: 3,
+                        font: {
+                            family: fontFamily,
+                            size: 16
+                        },
+                        xAdjust: 5, // Adjust this value as needed to position the label more to the right
+                        yAdjust: -10, // Adjust vertically if needed
+                    }
+                },
+            }
+        }
+        else {
+            return {
+                line1: { // Additional line annotation for the latest value
+                    type: "line",
+                    yMin: latestValue365DayText,
+                    yMax: latestValue365DayText,
+                    borderColor: "rgb(0,228, 255)", // Example: red color for the latest value line
+                    borderWidth: 1,
+                    borderDash: [6, 6], // Optional: Makes the line dashed
+                    label: { // Label for the latest value line
+                        display: true,
+                        content: `${latestValue365DayText} sats/B`,
+                        position: "end",
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        color: "rgb(0,228, 255)",
+                        padding: 3,
+                        font: {
+                            family: fontFamily,
+                            size: 16
+                        },
+                        xAdjust: 5, // Adjust this value as needed to position the label more to the right
+                        yAdjust: -10, // Adjust vertically if needed
+                    }
+                },
+            }
+        }
+    }
 
 
 
@@ -186,18 +323,10 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
                 lineColor: "rgba(255, 0, 0, 0.75)" as const,
             },
             annotation:
-                chartType == ChartType.feeIndex ?
-                    {
-                        annotations: {
-                            line1: {
-                                type: "line" as const,
-                                yMin: 1,
-                                yMax: 1,
-                                borderColor: "rgba(255,255,255,0.75)",
-                                borderWidth: 1,
-                            },
-                        },
-                    } : {},
+
+            {
+                annotations: annotations()
+            },
             filler: {},
             //gradient: {},
         }
@@ -238,7 +367,18 @@ const ChartView = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
             }
 
             const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedRange, dataset.datasets);
-            const options = getChartOptions(chartType, timescaleOptions, width) as ChartOptions<"line">;
+            let latestValue30Day: number | undefined;
+            let latestValue365Day: number;
+            if (dataset.datasets.length > 1) {
+                latestValue30Day = parseFloat(dataset.datasets[0]["data"][dataset.datasets[0].data.length - 1]["y"]);
+
+                latestValue365Day = parseFloat(dataset.datasets[1]["data"][dataset.datasets[0].data.length - 1]["y"]);
+            }
+            else {
+                latestValue365Day = parseFloat(dataset.datasets[0]["data"][dataset.datasets[0].data.length - 1]["y"]);
+                latestValue30Day = undefined;
+            }
+            const options = getChartOptions(chartType, timescaleOptions, width, latestValue365Day, latestValue30Day) as ChartOptions<"line">;
 
             const newChartInstance = new Chart(chartContainer.current, {
                 type: 'line',
