@@ -13,6 +13,8 @@ import CircularProgressIndicator from "../loader/loader";
 import { FeeIndex } from "../../store/interface";
 import GaugeChart from "./gauge_chart";
 
+let _feeIndexHistoryLastYearBackup: FeeIndex[] = [];
+let _currentFeeIndexBackup: FeeIndex = { time: new Date(), ratioLast30Days: -1, ratioLast365Days: -1, };
 
 const ChartPage = () => {
 
@@ -82,8 +84,8 @@ const ChartPage = () => {
     // const store = new DexieStore();
     const store = new LokiStore();
     const [selectedRange, setSelectedRange] = useState(TimeRange.Last1Year); // Default 
-    const [currentFeeIndex, setCurrentFeeIndex] = useState({ ratioLast365Days: 0, ratioLast30Days: 0, time: new Date() });
-    const [feeIndexHistoryLastYear, setFeeIndexHistoryLastYear] = useState([]);
+    const [currentFeeIndex, setCurrentFeeIndex] = useState(_currentFeeIndexBackup);
+    const [feeIndexHistoryLastYear, setFeeIndexHistoryLastYear] = useState(_feeIndexHistoryLastYearBackup);
 
 
     // Save and restore the scroll position
@@ -150,6 +152,7 @@ const ChartPage = () => {
                         else {
                             setCurrentFeeIndex(currentFeeIndex);
                         }
+                        _currentFeeIndexBackup = currentFeeIndex;
 
                         const feeIndexHistoryLastYear = await getFeeIndexHistoryLastYear();
 
@@ -159,6 +162,8 @@ const ChartPage = () => {
                         }
 
                         setFeeIndexHistoryLastYear(feeIndexHistoryLastYear as any);
+                        _feeIndexHistoryLastYearBackup = feeIndexHistoryLastYear;
+
                     }
                 }
 
@@ -209,8 +214,9 @@ const ChartPage = () => {
                 else {
                     setCurrentFeeIndex(currentFeeIndex);
                 }
-                const feeIndexHistoryLastYear = await getFeeIndexHistoryLastYear();
+                _currentFeeIndexBackup = currentFeeIndex;
 
+                const feeIndexHistoryLastYear = await getFeeIndexHistoryLastYear();
 
                 if (feeIndexHistoryLastYear instanceof Error) {
                     console.error(`Error fetching feeIndexHistoryLastyear: ${feeIndexHistoryLastYear} `);
@@ -218,6 +224,7 @@ const ChartPage = () => {
                 }
 
                 setFeeIndexHistoryLastYear(feeIndexHistoryLastYear as any);
+                _feeIndexHistoryLastYearBackup = feeIndexHistoryLastYear;
             }
 
         }

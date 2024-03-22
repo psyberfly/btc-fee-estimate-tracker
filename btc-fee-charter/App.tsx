@@ -15,7 +15,7 @@ const App = () => {
         <div className="title-bar">
           <NavMenu />
           <img src={logo} alt="Logo" className="logo" />
-          <h1>BTC Fee Estimate Tracker</h1>
+          <h1>Bull Bitcoin Fee Multiple</h1>
           <h4 style={{ marginLeft: 'auto' }}>Updated every 10m</h4>
         </div>
         <Routes>

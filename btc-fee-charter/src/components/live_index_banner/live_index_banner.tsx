@@ -6,8 +6,6 @@ import { FeeIndex } from '../../store/interface';
 
 const LiveIndexBanner = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
 
-
-
     function aggregateByDay(feeIndexHistory: FeeIndex[]): FeeIndex[] {
         // Object to hold the sum and count for each date
         const aggregates: { [dateKey: string]: { sum365: number, sum30: number, count: number } } = {};
@@ -56,7 +54,7 @@ const LiveIndexBanner = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
 
     return (
         <>
-            <h1 style={{ textAlign: "center" }}>Bitcoin Fee Estimate Index</h1>
+            <h1 style={{ textAlign: "center" }}>Bull Bitcoin Fee Multiple</h1>
             {/* <p style={{ textAlign: "center",}}>This index mesaures how expensive the current Bitcoin fee estimate is against the yearly average. Fee estimates taken from mempool.space - 1-2 blocks/fastest. </p> */}
             <div style={{ display: "flex", flexDirection: "column", alignItems: "center", paddingTop: "0px" }}>
                 <div style={{ display: "flex", justifyContent: "center", alignItems: "baseline" }}>

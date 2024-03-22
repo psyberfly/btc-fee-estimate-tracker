@@ -24,9 +24,6 @@ Linux, docker
 
 1. Recaliberate gauge chart to have 10 levels of 10 pecentile windows indicating how the current index compares to last year.
 2. Change stepsize of chart readings to 6h instead of 10m for timescales of over 5d to improve readibility. For timescales below 5d, keep 10min stepsize. 
-3. Add horizontal lines on charts indicating current values for better readability. 
-4. Rename service to Bull Bitcoin Fee Multiple (check exact name).
-5. Rewrite homepage banner: remove index explanation and put it in separate info section. Remove current index time and put it below charts.
-6. Correct the % higher/lower formula used in homepage banner above gauge: it does not account for data stepsize change and subsequent skewing.
-7. Run service by expert.
+3. Add chart info to info section below charts. Get from Francis.
+4. Run service by expert.
  

@@ -1,7 +1,7 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "BTC Fee Tracker API",
+    "title": "Bull Bitcoin Fee Multiple",
     "description": "Public API serving current index and other historic data",
     "version": "1.0.0"
   },
