@@ -81,7 +81,7 @@ const ChartPage = () => {
     const chartDataOp = new ChartDatasetOp();
     // const store = new DexieStore();
     const store = new LokiStore();
-    const [selectedRange, setSelectedRange] = useState(TimeRange.Last1Month); // Default 
+    const [selectedRange, setSelectedRange] = useState(TimeRange.Last1Year); // Default 
     const [currentFeeIndex, setCurrentFeeIndex] = useState({ ratioLast365Days: 0, ratioLast30Days: 0, time: new Date() });
     const [feeIndexHistoryLastYear, setFeeIndexHistoryLastYear] = useState([]);
 
