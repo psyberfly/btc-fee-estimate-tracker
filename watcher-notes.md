@@ -30,7 +30,7 @@ graph TD
     O --> P(Serve Fee Index History)
     P --> Q(Serve Fee Index WebSocket)
 ```
-### Statistical details:
+### Statistics used:
 
 For more details on the exact math used to compute the values used for the fee index, refer:
 https://colab.research.google.com/drive/1Fsn03dJQw3Agyii14YEic99WgKHzB_a-?usp=sharing
