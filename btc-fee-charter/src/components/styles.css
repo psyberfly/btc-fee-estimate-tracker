@@ -27,14 +27,14 @@
 
 .gauge-container {
   width: 400px;
-  height: 800px;
+  height: 400px;
   justify-content: center;
   /* This centers the child horizontally in the flex container */
   align-items: center;
   /* This would center the child vertically if needed */
   overflow: auto;
   /* Hide overflow. Adjust as needed */
-  margin: 30px auto;
+ margin: auto
   /* Additionally, center the container itself if it's not already within a flex container */
 }
 
