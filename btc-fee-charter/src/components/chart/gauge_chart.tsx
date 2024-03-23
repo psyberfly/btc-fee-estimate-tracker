@@ -4,6 +4,7 @@ import { Arc, SubArc } from 'react-gauge-component/dist/lib/GaugeComponent/types
 import { GaugeComponentProps, GaugeType } from 'react-gauge-component/dist/lib/GaugeComponent/types/GaugeComponentProps';
 import { PointerProps } from 'react-gauge-component/dist/lib/GaugeComponent/types/Pointer';
 import { FeeIndex } from '../../store/interface';
+import { Tick } from 'react-gauge-component/dist/lib/GaugeComponent/types/Tick';
 
 const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
     // Define the gauge properties based on the GaugeComponentProps interface
@@ -70,13 +71,32 @@ const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
         return representatives;
     }
 
+    function getTicks(values: number[]): Tick[] {
+        let ticks: Tick[] = [];
+        values.forEach((value) => {
+            ticks.push({
+                value: value, valueConfig: {
+                    // style: {
+                    //     //fontSize: 30,
+                    //     //color: "rgba(255,0,0,1)",
 
-    function getSubArcs(): SubArc[] {
-        const values = getPercentileRepresentatives(feeIndexesLastYear);
-        console.log({ values })
+                    // },
+                   // formatTextValue: (value) => value,
+                    maxDecimalDigits: 2,
+                    hide: false
+
+                }
+            })
+        });
+
+        return ticks;
+    }
+
+
+    function getSubArcs(values: number[]): SubArc[] {
         let subArcs: SubArc[] = [];
         values.forEach((value) => {
-            subArcs.push({ limit: value, showTick: true, length:0.1 })
+            subArcs.push({ limit: value, })
         });
 
         return subArcs as SubArc[];
@@ -90,6 +110,13 @@ const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
         animate: true,
     }
 
+    const scaleValues = getPercentileRepresentatives(feeIndexesLastYear);
+
+    const subArcs = getSubArcs(scaleValues);
+    const tickValues = getTicks(scaleValues);
+    const minValue = scaleValues[0];
+    const maxValue = scaleValues[scaleValues.length - 1]
+
     const arc: Arc = {
         //        gradient: true,
         colorArray: [
@@ -97,7 +124,7 @@ const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
             "rgb(255, 255, 0)",  // Yellow
             "rgb(255, 0, 0)"     // Red
         ],
-        subArcs: getSubArcs(),
+        subArcs: subArcs,
 
 
         // subArcs: [
@@ -130,7 +157,7 @@ const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
         id: 'gaugeChartContainer',
         value: currentValue,
         minValue: 0,
-        maxValue: 5,
+        maxValue: maxValue,
         type: GaugeType.Radial,
         pointer: pointerProps,
         labels: {
@@ -153,11 +180,12 @@ const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
                 type: "outer",
                 defaultTickValueConfig: {
                     style: {
-                        fontSize: 24,
+                        fontSize: "12px",
                         color: "rgb(255,255,255)",
+                        fontWeight: "bold"
                     },
                 },
-                // ticks: [{ value: 0, }, { value: 1 }, { value: 2 }, { value: 3 }, { value: 5, valueConfig: { formatTextValue: (value) => "5+" } }],
+                ticks: tickValues,
             }
         },
 
