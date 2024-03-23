@@ -251,7 +251,7 @@ const ChartPage = () => {
                 <>
                     <LiveIndexBanner currentFeeIndex={currentFeeIndex} feeIndexHistoryLastYear={feeIndexHistoryLastYear} />
                     <div className="gauge-container">
-                        <GaugeChart currentValue={currentFeeIndex.ratioLast365Days} />
+                        <GaugeChart currentValue={currentFeeIndex.ratioLast365Days} feeIndexesLastYear={feeIndexHistoryLastYear} />
                     </div>
                     <ChartView dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
                 </>
