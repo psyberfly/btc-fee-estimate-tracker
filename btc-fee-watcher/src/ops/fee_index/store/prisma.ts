@@ -1,4 +1,4 @@
-import { FeeIndexes } from "@prisma/client";
+import { FeeIndexes, FeeIndexesArchive } from "@prisma/client";
 import { handleError } from "../../../lib/errors/e";
 import { prisma } from "../../../main";
 import { FeeIndexDetailed, FeeIndexesArchiveBulkInsert } from "../interface";
@@ -55,16 +55,42 @@ export class FeeIndexPrismaStore {
         orderBy: { time: "asc" },
       };
 
-      // If since is provided, add a where clause to the query parameters
+ 
       if (since) {
         queryParameters.where = {
           time: {
-            gt: since, // Use the "gt" (greater than) operator to filter records after the "since" date
+            gte: since, 
           },
         };
       }
 
       const allFeeIndexRes = await prisma.feeIndexes.findMany(queryParameters);
+
+      return allFeeIndexRes;
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
+  async fetchAllArchived(since?: Date): Promise<FeeIndexesArchive[] | Error> {
+    try {
+
+      let queryParameters: any = {
+        orderBy: { startTime: "asc" },
+      };
+
+  
+      if (since) {
+        queryParameters.where = {
+          startTime: {
+            gte: since, 
+          },
+        };
+      }
+
+      const allFeeIndexRes = await prisma.feeIndexesArchive.findMany(
+        queryParameters,
+      );
 
       return allFeeIndexRes;
     } catch (error) {

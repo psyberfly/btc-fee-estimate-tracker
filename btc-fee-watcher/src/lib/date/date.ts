@@ -1,3 +1,5 @@
+import { isBefore, isEqual, subMonths } from "date-fns";
+
 export enum UTCDate {
   today,
   lastMonth,
@@ -34,4 +36,16 @@ export function fetchDate(reqDate: UTCDate): string {
     default:
       throw (Error("Unknown UTCDate argument"));
   }
+}
+
+export function isFiveMonthsAgoOrMore(dateToCheck: Date): boolean {
+  // Create a Date object for the current time
+  const now = new Date();
+
+  // Subtract 5 months from the current date to get the threshold date
+  const fiveMonthsAgo = subMonths(now, 5);
+
+  // Check if the dateToCheck is before or equal to fiveMonthsAgo
+  return isBefore(dateToCheck, fiveMonthsAgo) ||
+    isEqual(dateToCheck, fiveMonthsAgo);
 }

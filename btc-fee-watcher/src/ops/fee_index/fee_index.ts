@@ -1,4 +1,4 @@
-import { FeeEstimates, FeeIndexes } from "@prisma/client";
+import { FeeEstimates, FeeIndexes, FeeIndexesArchive } from "@prisma/client";
 import { handleError } from "../../lib/errors/e";
 import { FeeOp } from "../fee_estimate/fee_estimate";
 import {
@@ -10,14 +10,12 @@ import { FeeIndexPrismaStore } from "./store/prisma";
 import { MovingAveragePrismaStore } from "../moving_average/store/prisma";
 import { FeeEstimatePrismaStore } from "../fee_estimate/store/prisma";
 import { Decimal } from "@prisma/client/runtime/library";
-import { FeeEstimatesArchiveBulkInsert } from "../fee_estimate/interface";
 import { calculateFeeIndexWeightedAverage } from "../../lib/math/average";
 
 export class IndexOp implements IIndexOp {
   private feeOp = new FeeOp();
   private store = new FeeIndexPrismaStore();
   private movingAvgStore = new MovingAveragePrismaStore();
-  private feeEstStore = new FeeEstimatePrismaStore();
 
   async readLatest(): Promise<FeeIndexDetailed | Error> {
     const res = await this.store.fetchLatest();
@@ -39,6 +37,15 @@ export class IndexOp implements IIndexOp {
 
   async readAll(since: Date): Promise<FeeIndexes[] | Error> {
     const res = await this.store.fetchAll(since);
+    if (res instanceof Error) {
+      return handleError(res);
+    }
+
+    return res;
+  }
+
+  async readAllArchived(since: Date): Promise<FeeIndexesArchive[] | Error> {
+    const res = await this.store.fetchAllArchived(since);
     if (res instanceof Error) {
       return handleError(res);
     }

@@ -62,6 +62,12 @@ export class FeeOp implements IFeeEstimateOp {
     return res;
   }
 
+  async readAllArchived(since: Date): Promise<FeeEstimatesArchive[] | Error> {
+    const res = await this.store.readAllArchived(since);
+    return res;
+  }
+
+
   async create(): Promise<FeeEstimates | Error> {
     const res = await makeApiCall(this.mempoolApiUrl, "GET");
 

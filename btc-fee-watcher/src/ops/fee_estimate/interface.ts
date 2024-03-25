@@ -11,4 +11,5 @@ export interface IFeeEstimateOp {
   create(): Promise<FeeEstimates | Error>;
   seedHistory(history: FeeEstimates[]): Promise<boolean | Error>;
   archiveData(from:Date,to:Date, stepSizeMs: number): Promise<boolean | Error>;
+  readAllArchived(since:Date): Promise<FeeEstimatesArchive[] | Error>;
 }

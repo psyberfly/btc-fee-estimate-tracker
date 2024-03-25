@@ -9,13 +9,7 @@ export class FeeEstimatePrismaStore {
       const res = await prisma.feeEstimates.findFirst({
         orderBy: { time: "asc" },
       });
-      const feeEstimateLatest: FeeEstimates = {
-        id: res.id,
-        time: res.time,
-        satsPerByte: res.satsPerByte,
-        createdAt: res.createdAt,
-      };
-      return feeEstimateLatest;
+      return res;
     } catch (e) {
       return handleError(e);
     }
@@ -65,7 +59,7 @@ export class FeeEstimatePrismaStore {
           time: "asc", // (old to new)
         },
       });
-     return feeEstHistory;
+      return feeEstHistory;
     } catch (error) {
       return handleError(error);
     }
@@ -88,6 +82,30 @@ export class FeeEstimatePrismaStore {
       }
 
       const allFeeEstRes = await prisma.feeEstimates.findMany(queryParameters);
+
+      return allFeeEstRes;
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
+  async readAllArchived(since: Date): Promise<FeeEstimatesArchive[] | Error> {
+    try {
+      // Initialize the query parameters with orderBy
+      let queryParameters: any = {
+        orderBy: { startTime: "asc" },
+      };
+
+      // If since is provided, add a where clause to the query parameters
+      if (since) {
+        queryParameters.where = {
+          startTime: {
+            gte: since, // Use the "gt" (greater than) operator to filter records after the "since" date
+          },
+        };
+      }
+
+      const allFeeEstRes = await prisma.feeEstimatesArchive.findMany(queryParameters);
 
       return allFeeEstRes;
     } catch (error) {
@@ -137,7 +155,7 @@ export class FeeEstimatePrismaStore {
           createdAt: "asc", // (old to new)
         },
       });
-      return feeEstHistory as FeeEstimatesArchive[];
+      return feeEstHistory;
     } catch (error) {
       return handleError(error);
     }
