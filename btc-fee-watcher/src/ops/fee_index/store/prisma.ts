@@ -1,7 +1,7 @@
 import { FeeIndexes } from "@prisma/client";
 import { handleError } from "../../../lib/errors/e";
 import { prisma } from "../../../main";
-import { FeeIndexDetailed } from "../interface";
+import { FeeIndexDetailed, FeeIndexesArchiveBulkInsert } from "../interface";
 export class FeeIndexPrismaStore {
   async fetchLatest(): Promise<FeeIndexDetailed | Error> {
     try {
@@ -120,6 +120,28 @@ export class FeeIndexPrismaStore {
     }
   }
 
+  async readByRange(
+    fromDate: string,
+    toDate: string,
+  ): Promise<FeeIndexes[] | Error> {
+    try {
+      const feeIndexes = await prisma.feeIndexes.findMany({
+        where: {
+          AND: [
+            { time: { gte: new Date(fromDate) } },
+            { time: { lte: new Date(toDate) } },
+          ],
+        },
+        orderBy: {
+          time: "asc", // (old to new)
+        },
+      });
+      return feeIndexes;
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
   async insert(index: FeeIndexes): Promise<boolean | Error> {
     try {
       const upserted = await prisma.feeIndexes.upsert({
@@ -139,6 +161,20 @@ export class FeeIndexPrismaStore {
           ratioLast30Days: index.ratioLast30Days,
         },
       });
+      return true;
+    } catch (error) {
+      return handleError(error);
+    }
+  }
+
+  async insertManyArchive(
+    rows: FeeIndexesArchiveBulkInsert[],
+  ): Promise<boolean | Error> {
+    try {
+      const created = await prisma.feeIndexesArchive.createMany({
+        data: rows,
+      });
+
       return true;
     } catch (error) {
       return handleError(error);

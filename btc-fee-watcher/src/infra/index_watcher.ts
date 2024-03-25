@@ -1,17 +1,24 @@
 import { getFeeEstimateHistoryFromCsv } from "../lib/csv_parser/csv_parser";
 import { handleError } from "../lib/errors/e";
-import { ONE_DAY_MS, ONE_MINUTE_MS, TEN_MINUTES_MS } from "../lib/time/time";
+import {
+  ONE_DAY_MS,
+  ONE_MINUTE_MS,
+  TEN_MINUTES_MS,
+  TWELVE_HOURS_MS,
+} from "../lib/time/time";
 import { FeeOp } from "../ops/fee_estimate/fee_estimate";
 import { IndexOp } from "../ops/fee_index/fee_index";
 import { MovingAverageOp } from "../ops/moving_average/moving_average";
 import { AlertStreamServer } from "./ws";
 
 export const indexWatchInterval = TEN_MINUTES_MS;
-export const movingAverageWatchInterval = ONE_DAY_MS;
+const archivalStepSize = TWELVE_HOURS_MS;
 
 const movingAverageOp = new MovingAverageOp();
 const feeOp = new FeeOp();
 const indexOp = new IndexOp();
+let archiveStartTime: Date;
+let archiveEndTime: Date;
 
 async function seedIndexes() {
   console.log("Seeding indexes since start date...");
@@ -21,9 +28,28 @@ async function seedIndexes() {
   const timestampNumber: number = parseInt(seedIndexStartTimestamp, 10);
   const seedIndexStartDate = new Date(timestampNumber);
   console.log("Seeding moving averages...");
-  await movingAverageOp.seed(seedIndexStartDate);
+  const isMovingAvgSeeded = await movingAverageOp.seed(seedIndexStartDate);
+  if (isMovingAvgSeeded instanceof Error) {
+    console.error(`Error seeding moving averages: ${isMovingAvgSeeded}`);
+    return;
+  }
   console.log("Seeding indexes...");
-  await indexOp.seed(seedIndexStartDate);
+  const isIndexesSeeded = await indexOp.seed(seedIndexStartDate);
+  if (isIndexesSeeded instanceof Error) {
+    console.error(`Error seeding indexes: ${isIndexesSeeded}`);
+    return;
+  }
+  const isHistoryArchived = await indexOp.archiveData(
+    archiveStartTime,
+    archiveEndTime,
+    archivalStepSize,
+  );
+
+  if (isHistoryArchived instanceof Error) {
+    console.error(`Error archiving history: ${isHistoryArchived}`);
+    return;
+  }
+  console.log("Fee Index History archived.");
 }
 
 async function scheduleMovingAverageUpdate() {
@@ -44,6 +70,25 @@ async function scheduleMovingAverageUpdate() {
     // After running, schedule the next execution
     scheduleMovingAverageUpdate();
   }, delayUntilNextDay);
+}
+
+async function scheduleDataArchive() {
+  // Set delay for 6 hours in milliseconds (6 hours * 60 minutes * 60 seconds * 1000 milliseconds)
+  const interval = TWELVE_HOURS_MS;
+
+  // Schedule the updateMovingAverage to run every 6 hours
+  setTimeout(async () => {
+    await archiveData();
+    // After running, schedule the next execution
+    scheduleDataArchive();
+  }, interval);
+}
+
+async function archiveData() {
+  const toTime = new Date();
+  const fromTime = new Date(toTime.getTime() - archivalStepSize);
+  await feeOp.archiveData(fromTime, toTime, archivalStepSize);
+  await indexOp.archiveData(fromTime, toTime, archivalStepSize);
 }
 
 async function updateMovingAverage() {
@@ -128,10 +173,24 @@ async function seedHistory() {
     console.error(
       `Error seeding Fee Estimate history to DB!: ${isHistorySeeded}`,
     );
-  } else {
-    console.log("Fee Estimate History seeded from .csv.");
     return;
   }
+
+  console.log("Fee Estimate History seeded from .csv.");
+
+  archiveStartTime = feeHistory[0].time;
+  archiveEndTime = feeHistory[feeHistory.length - 1].time;
+  const isHistoryArchived = await feeOp.archiveData(
+    archiveStartTime,
+    archiveEndTime,
+    archivalStepSize,
+  );
+
+  if (isHistoryArchived instanceof Error) {
+    console.error(`Error archiving history: ${isHistoryArchived}`);
+    return;
+  }
+  console.log("Fee Estimate History archived.");
 }
 
 export async function runIndexWatcher() {
@@ -149,12 +208,7 @@ export async function runIndexWatcher() {
 
     await updateAndBroadcastIndex(alertStreamServer);
 
-    // every day:
-    // setInterval(async () => {
-    //   await updateMovingAverage();
-    // }, movingAverageWatchInterval);
-
-   // every 10 mins (block):
+    // every 10 mins (block):
     setInterval(async () => {
       updateAndBroadcastIndex(alertStreamServer);
     }, indexWatchInterval //change to ten mins for prod
