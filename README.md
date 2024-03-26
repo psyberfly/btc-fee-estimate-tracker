@@ -26,4 +26,4 @@ Linux, docker
 2. Change stepsize of chart readings to 6h instead of 10m for timescales of over 5d to improve readibility. For timescales below 5d, keep 10min stepsize. Status:: TO TEST
 3. Run service by expert. Status: Provide variable stepsize dataset, consult about weighted average calculation and simplification.
 4. Patch bug: gauge and live index is still going NaN after going from Docs>Index;possible from other routes too.
- 
+5. Make a gauge chart for 30day index as well? 

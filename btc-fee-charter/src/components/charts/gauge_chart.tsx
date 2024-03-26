@@ -52,50 +52,82 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
     }
     const currentGaugeValue = (): number => {
         const percentageHigherLastYear = indexPercentageHigher();
-      
+
         if (percentageHigherLastYear >= 90) {
-          return 1; // "Fees are at extremely low"
+            return 1; // "Fees are at extremely low"
         } else if (percentageHigherLastYear >= 80) {
-          return 2; // "Fees are very low"
+            return 2; // "Fees are very low"
         } else if (percentageHigherLastYear >= 70) {
-          return 3; // "Fees are low"
+            return 3; // "Fees are low"
         } else if (percentageHigherLastYear >= 60) {
-          return 4; // "Fees are average-low"
+            return 4; // "Fees are average-low"
         } else if (percentageHigherLastYear >= 50) {
-          return 5; // "Fees average"
+            return 5; // "Fees average"
         } else if (percentageHigherLastYear >= 40) {
-          return 6; // "Fees are average-high"
+            return 6; // "Fees are average-high"
         } else if (percentageHigherLastYear >= 30) {
-          return 7; // "Fees are high"
+            return 7; // "Fees are high"
         } else if (percentageHigherLastYear >= 20) {
-          return 8; // "Fees are very high"
+            return 8; // "Fees are very high"
         } else if (percentageHigherLastYear >= 10) {
-          return 9; // "Fees are extremely high"
+            return 9; // "Fees are extremely high"
         } else {
-          return 10; // "Warning: fees are at their highest"
+            return 10; // "Warning: fees are at their highest"
         }
-      };
-      
+    };
 
+    const currentGaugeValueLabel = (value: number): string => {
+        switch (value) {
+            case 1:
+                return "extremely low";
+            case 2:
+                return "very low";
+            case 3:
+                return "low";
+            case 4:
+                return "average-low";
+            case 5:
+                return "average";
+            case 6:
+                return "average-high";
+            case 7:
+                return "high";
+            case 8:
+                return "very high";
+            case 9:
+                return "extremely high";
+            case 10:
+                return "at their highest";
+            default:
+                return "Invalid value";
+        }
+    };
 
+    const adjustFontSizeForLabel = (label) => {
+        const baseSize = 18; // Starting font size for very short strings
+        const growthFactor = 2; // How much the font size increases with each additional character
+    
+        // Calculate the adjusted font size based on the length of the label
+        const adjustedFontSize = baseSize + (label.length * growthFactor);
+    
+        // Optionally, you can set a maximum font size
+        const maxFontSize = 60;
+    
+        // Clamp the adjusted font size to not exceed the maximum font size
+        const clampedFontSize = Math.min(adjustedFontSize, maxFontSize);
+    
+        return `${clampedFontSize}px`;
+    };
 
     function getScaleValues(): number[] {
         return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
     }
-
-
 
     function getTicks(values: number[]): Tick[] {
         let ticks: Tick[] = [];
         values.forEach((value) => {
             ticks.push({
                 value: value, valueConfig: {
-                    // style: {
-                    //     //fontSize: 30,
-                    //     //color: "rgba(255,0,0,1)",
-
-                    // },
-                    // formatTextValue: (value) => value,
                     maxDecimalDigits: 2,
                     hide: false
 
@@ -130,73 +162,53 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
     const tickValues = getTicks(scaleValues);
     const minValue = scaleValues[0];
     const maxValue = scaleValues[scaleValues.length - 1]
+    const fontFamily = 'Helvetica, sans-serif';
 
     const arc: Arc = {
         //        gradient: true,
+        width: 0.15,
         colorArray: [
             "rgb(0, 255, 0)",
             "rgb(255, 255, 0)",  // Yellow
             "rgb(255, 0, 0)"     // Red
         ],
         subArcs: subArcs,
-
-
-        // subArcs: [
-        //     {
-        //         limit: 0.5,
-        //         showTick: true,
-        //         color: "rgb(0, 255, 0)",    // Green
-        //     },
-        //     {
-        //         limit: 1, showTick: true,
-        //         color: "rgb(255, 255, 0)",
-        //     }, // Yellow},
-        //     {
-        //         limit: 2, showTick: true,
-        //         color: "rgb(255, 165, 0)",
-        //     },
-        //     {
-        //         limit: 3, showTick: true, color: "rgb(255, 82, 0)",
-        //     },
-        //     //{ limit: 4, showTick: false },
-        //     {
-        //         limit: 5, color: "rgb(255, 0, 0)",
-        //     },
-
-        // ],
         cornerRadius: 1,
     }
 
+    const currentValue = currentGaugeValue();
+    const currentValueLabel = currentGaugeValueLabel(currentValue);
+    const currentValueLabelSize = adjustFontSizeForLabel(currentValueLabel);
+
     const gaugeProps: GaugeComponentProps = {
         id: 'gaugeChartContainer',
-        value: currentGaugeValue(),
-        minValue: 0,
+        value:  currentValue,
+        minValue: minValue,
         maxValue: maxValue,
         type: GaugeType.Radial,
         pointer: pointerProps,
         labels: {
             valueLabel: {
                 style: {
-                    fontSize: 35,
-                    padding: "100px",
+                    fontSize: currentValueLabelSize,
+                    fontFamily: fontFamily,
+                    backgroundColor: "rgb(255,255,255)"
+
                 },
                 matchColorWithArc: true,
                 maxDecimalDigits: 2,
-                // formatTextValue: (value) => {
-                //     if (value < 1)
-                //         return "Low Fee"
+                formatTextValue: (value) =>
+                    currentValueLabel
 
-                //     else
-                //         return "High Fee"
-                // }
             },
             tickLabels: {
-                type: "outer",
+                type: "inner",
                 defaultTickValueConfig: {
                     style: {
-                        fontSize: "12px",
+                        fontSize: "14px",
                         color: "rgb(255,255,255)",
-                        fontWeight: "bold"
+                        fontWeight: "bold",
+                        fontFamily: fontFamily,
                     },
                 },
                 ticks: tickValues,
@@ -205,81 +217,36 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
 
         arc: arc,
 
-        // Include any other props as needed
     };
 
-    const addTickLabel = (svg, content, x, y, fillColor = "white") => {
+    const addAdditionalLabel = (svg, content, x, y, fillColor = "white") => {
         const textLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
         textLabel.setAttribute("x", x);
         textLabel.setAttribute("y", y);
         textLabel.setAttribute("text-anchor", "middle");
         textLabel.textContent = content;
-        textLabel.style.fontSize = "14px";
-        textLabel.style.fontWeight = "bold";
+        textLabel.style.fontSize = "20px";
+        textLabel.style.fontFamily = fontFamily;
         textLabel.style.fill = fillColor;
         svg.appendChild(textLabel);
     };
-
-    const addValueLabel = (svg, x, y,) => {
-        let fillColor: string;
-        let text: string = "";
-        if (currentFeeIndex < 0.5) {
-            fillColor = "rgb(0,255,0)";
-            text = "Very Low";
-        }
-
-        else if (currentFeeIndex > 0.5 && currentFeeIndex < 1) {
-            fillColor = "rgb(255,255,0)";
-            text = "Low";
-        }
-        else if (currentFeeIndex > 1 && currentFeeIndex < 2) {
-            fillColor = "rgb(255,165,0)";
-            text = "High"
-        }
-        else if (currentFeeIndex > 2 && currentFeeIndex < 3) {
-            fillColor = "rgb(255, 82, 0)";
-            text = "Very High"
-        }
-        else {
-            fillColor = "rgb(255,0,0)";
-            text = "Very High"
-        }
-
-
-        const textLabel = document.createElementNS("http://www.w3.org/2000/svg", "text");
-        textLabel.setAttribute("x", x);
-        textLabel.setAttribute("y", y);
-        textLabel.setAttribute("text-anchor", "middle");
-        textLabel.textContent = text;
-        textLabel.style.fontSize = "28px";
-        textLabel.style.fontWeight = "normal";
-        textLabel.style.fill = fillColor;
-        svg.appendChild(textLabel);
-    };
-
-
 
     useEffect(() => {
         // This effect runs after the component mounts and whenever currentValue changes
-        // const chartContainer = document.getElementById('gaugeChartContainer');
+        const chartContainer = document.getElementById('gaugeChartContainer');
 
-        // if (chartContainer) {
-        //     const svg = chartContainer.querySelector('svg');
-        //     if (svg) {
-        //         if (svg) {
-        //             addTickLabel(svg, "Very Low", "10%", "90%");
-        //             addTickLabel(svg, "Half", "7%", "73%");
-        //             addTickLabel(svg, "Nominal", "7%", "50%");
-        //             addTickLabel(svg, "Double", "27%", "12%");
-        //             addTickLabel(svg, "Triple", "72%", "12%");
-        //             addTickLabel(svg, "Very High", "92%", "90%");
-        //             addValueLabel(svg, "50%", "73%")
+        if (chartContainer) {
+            const svg = chartContainer.querySelector('svg');
+            if (svg) {
+                if (svg) {
+                    addAdditionalLabel(svg, "fees are", "50%", "77.5%");
 
-        //         }
+                }
 
-        //     }
-        // }
-    }, [currentFeeIndex]); // Dependency array ensures this runs when currentValue changes
+            }
+        }
+    }, [currentFeeIndex]);
+
 
     return (
         <>
