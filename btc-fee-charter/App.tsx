@@ -17,7 +17,7 @@ const App = () => {
           <NavMenu />
           <img src={logo} alt="Logo" className="logo" />
           <h1>Bull Bitcoin Fee Multiple</h1>
-          <h4 style={{ marginLeft: 'auto' }}>Updated every 10m</h4>
+          <p style={{ marginLeft: 'auto' }}>Updated every 10m</p>
         </div>
         <Routes>
         <Route path="/" element={<Navigate to="/chart/index" replace />} />
