@@ -6,70 +6,84 @@ import { PointerProps } from 'react-gauge-component/dist/lib/GaugeComponent/type
 import { FeeIndex } from '../../store/interface';
 import { Tick } from 'react-gauge-component/dist/lib/GaugeComponent/types/Tick';
 
-const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
-    // Define the gauge properties based on the GaugeComponentProps interface
+const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
 
+    function aggregateByDay(feeIndexHistory: FeeIndex[]): FeeIndex[] {
+        // Object to hold the sum and count for each date
+        const aggregates: { [dateKey: string]: { sum365: number, sum30: number, count: number } } = {};
 
-    function getPercentileRepresentatives(feeIndexes: FeeIndex[]): number[] {
+        // Iterate over each entry in the fee index history
+        feeIndexHistory.forEach(entry => {
+            // Ensure time is a Date object
+            const entryTime = entry.time instanceof Date ? entry.time : new Date(entry.time);
+            // Convert time to a string key (YYYY-MM-DD)
+            const dateKey = entryTime.toISOString().split('T')[0];
 
+            // Initialize the date key in aggregates if not present
+            if (!aggregates[dateKey]) {
+                aggregates[dateKey] = { sum365: 0, sum30: 0, count: 0 };
+            }
 
-        const normalizedFeeIndexes = feeIndexes.map(feeIndex => ({
-            ...feeIndex,
-            ratioLast365Days: Number(feeIndex.ratioLast365Days),
-            ratioLast30Days: Number(feeIndex.ratioLast30Days), // Similarly, ensure ratioLast30Days is a number
-            time: feeIndex.time instanceof Date ? feeIndex.time : new Date(feeIndex.time) // Ensuring time is a Date object
+            // Accumulate sums and increment count
+            aggregates[dateKey].sum365 += Number(entry.ratioLast365Days);
+            aggregates[dateKey].sum30 += Number(entry.ratioLast30Days);
+            aggregates[dateKey].count++;
+        });
+
+        // Convert the aggregates object into an array of FeeIndex
+        return Object.keys(aggregates).map(date => ({
+            time: new Date(date),
+            ratioLast365Days: aggregates[date].sum365 / aggregates[date].count,
+            ratioLast30Days: aggregates[date].sum30 / aggregates[date].count,
         }));
-
-
-        // Aggregate by day: Calculate daily averages for ratioLast365Day    
-
-        const dailyAverages: { [key: string]: number[] } = {};
-        normalizedFeeIndexes.forEach(feeIndex => {
-            const entryTime = feeIndex.time; // Already ensured to be a Date object
-            const dayKey = entryTime.toISOString().split('T')[0]; // Extract date part
-            if (!dailyAverages[dayKey]) {
-                dailyAverages[dayKey] = [];
-            }
-            dailyAverages[dayKey].push(feeIndex.ratioLast365Days);
-        });
-        const dailyRepresentatives: FeeIndex[] = Object.keys(dailyAverages).map(day => {
-            const averages = dailyAverages[day];
-            const sum = averages.reduce((acc, curr) => acc + curr, 0);
-            const ratioLast365Days = averages.length > 0 ? sum / averages.length : 0;
-            if (isNaN(ratioLast365Days)) {
-                console.log('NaN Ratio:', ratioLast365Days, sum, averages.length);
-
-            }
-            return {
-                time: new Date(day),
-                ratioLast365Days: ratioLast365Days, // Daily average
-                ratioLast30Days: 0 // Placeholder, adjust as needed
-            };
-        });
-
-        // Proceed with the percentile calculation on the aggregated data
-        // Step 1: Sort the aggregated data
-        const sortedIndexes = dailyRepresentatives.sort((a, b) => a.ratioLast365Days - b.ratioLast365Days);
-
-        // Step 2: Calculate the number of items per percentile
-        const itemsPerPercentile = Math.ceil(sortedIndexes.length / 10);
-
-        // Step 3: Extract a representative value for each percentile
-        const representatives: number[] = [];
-
-        for (let i = 0; i < 10; i++) {
-            const percentileGroup = sortedIndexes.slice(i * itemsPerPercentile, (i + 1) * itemsPerPercentile);
-            if (percentileGroup.length > 0) {
-                // Choosing the median value as the representative
-                const midIndex = Math.floor(percentileGroup.length / 2);
-                const representativeValue = percentileGroup[midIndex].ratioLast365Days;
-                representatives.push(representativeValue);
-
-            }
-        }
-
-        return representatives;
     }
+
+    const indexPercentageHigher = (): number => {
+
+        const aggregatedHistory = aggregateByDay(feeIndexHistoryLastYear);
+
+        const percentageHigherLastYear = aggregatedHistory.filter(index => index.ratioLast365Days > currentFeeIndex.ratioLast365Days).length / aggregatedHistory.length * 100;
+
+        // const percentageHigherLastMonth = (aggregatedHistory.filter(index => index.ratioLast30Days > currentFeeIndex.ratioLast30Days).length / aggregatedHistory.length) * 100;
+
+        // return `The multiple has been higher ${percentageHigherLastYear.toFixed(2)}% of the time last year and ${percentageHigherLastMonth.toFixed(2)}%. of the time last month`;
+
+        return percentageHigherLastYear;
+    }
+    const currentGaugeValue = (): number => {
+        const percentageHigherLastYear = indexPercentageHigher();
+      
+        if (percentageHigherLastYear >= 90) {
+          return 1; // "Fees are at extremely low"
+        } else if (percentageHigherLastYear >= 80) {
+          return 2; // "Fees are very low"
+        } else if (percentageHigherLastYear >= 70) {
+          return 3; // "Fees are low"
+        } else if (percentageHigherLastYear >= 60) {
+          return 4; // "Fees are average-low"
+        } else if (percentageHigherLastYear >= 50) {
+          return 5; // "Fees average"
+        } else if (percentageHigherLastYear >= 40) {
+          return 6; // "Fees are average-high"
+        } else if (percentageHigherLastYear >= 30) {
+          return 7; // "Fees are high"
+        } else if (percentageHigherLastYear >= 20) {
+          return 8; // "Fees are very high"
+        } else if (percentageHigherLastYear >= 10) {
+          return 9; // "Fees are extremely high"
+        } else {
+          return 10; // "Warning: fees are at their highest"
+        }
+      };
+      
+
+
+
+    function getScaleValues(): number[] {
+        return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    }
+
+
 
     function getTicks(values: number[]): Tick[] {
         let ticks: Tick[] = [];
@@ -81,7 +95,7 @@ const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
                     //     //color: "rgba(255,0,0,1)",
 
                     // },
-                   // formatTextValue: (value) => value,
+                    // formatTextValue: (value) => value,
                     maxDecimalDigits: 2,
                     hide: false
 
@@ -110,7 +124,7 @@ const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
         animate: true,
     }
 
-    const scaleValues = getPercentileRepresentatives(feeIndexesLastYear);
+    const scaleValues = getScaleValues();
 
     const subArcs = getSubArcs(scaleValues);
     const tickValues = getTicks(scaleValues);
@@ -155,7 +169,7 @@ const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
 
     const gaugeProps: GaugeComponentProps = {
         id: 'gaugeChartContainer',
-        value: currentValue,
+        value: currentGaugeValue(),
         minValue: 0,
         maxValue: maxValue,
         type: GaugeType.Radial,
@@ -209,20 +223,20 @@ const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
     const addValueLabel = (svg, x, y,) => {
         let fillColor: string;
         let text: string = "";
-        if (currentValue < 0.5) {
+        if (currentFeeIndex < 0.5) {
             fillColor = "rgb(0,255,0)";
             text = "Very Low";
         }
 
-        else if (currentValue > 0.5 && currentValue < 1) {
+        else if (currentFeeIndex > 0.5 && currentFeeIndex < 1) {
             fillColor = "rgb(255,255,0)";
             text = "Low";
         }
-        else if (currentValue > 1 && currentValue < 2) {
+        else if (currentFeeIndex > 1 && currentFeeIndex < 2) {
             fillColor = "rgb(255,165,0)";
             text = "High"
         }
-        else if (currentValue > 2 && currentValue < 3) {
+        else if (currentFeeIndex > 2 && currentFeeIndex < 3) {
             fillColor = "rgb(255, 82, 0)";
             text = "Very High"
         }
@@ -265,11 +279,18 @@ const GaugeChart = ({ currentValue, feeIndexesLastYear }) => {
 
         //     }
         // }
-    }, [currentValue]); // Dependency array ensures this runs when currentValue changes
+    }, [currentFeeIndex]); // Dependency array ensures this runs when currentValue changes
 
-    return <GaugeComponent {...gaugeProps} />;
+    return (
+        <>
+            <p style={{ paddingTop: "0px", paddingBottom: "0vh", textAlign: "center" }}>
+                The multiple has been higher {indexPercentageHigher()}% of the time last year
+            </p>
+            <GaugeComponent {...gaugeProps} />
+        </>
+    );
+
 };
-
 
 
 

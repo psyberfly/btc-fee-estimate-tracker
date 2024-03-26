@@ -1,22 +1,23 @@
 [
     {
-        "question": "What is the Bull Bitcoin Fee Multiple?",
-        "answer": "This indicator shows if the current Bitcoin Network fees are high or low relative to the average of the past year and the past month. The Bull Bitcoin fee multiple is calculated by dividing the current fees by the moving average of the fees over the past 365 days and 30 days."
+      "question": "What is the Bull Bitcoin Fee Multiple?",
+      "answer": "The Bull Bitcoin Fee Multiple is an indicator which shows clearly if the current Bitcoin Network fees are high or low relative to the average of the past year and the past month.\n\nThe Bull Bitcoin Fee Multiple is calculated as follows:\n\nCurrent fees / moving average of the fees over the past 365 days and 30 days"
     },
     {
-        "question": "How to use the Bull Bitcoin Fee Multiple?",
-        "answer": "The lower the value, the better time it is to make Bitcoin transactions. Depending on your time preference, you may want to wait for the multiple to be lower to make transactions that are non-urgent, such as consolidating your utxos or conjoining your bitcoins."
+      "question": "How to use the Bull Bitcoin Fee Multiple?",
+      "answer": "It's simple: the lower the value, the better time it is to make Bitcoin transactions\n\nDepending on your time preference, you may want to wait for the multiple to be lower to make transactions that are non-urgent. For example, consolidating your utxos or conjoining your bitcoins."
     },
     {
-        "question": "What do the labels mean?",
-        "answer": "The labels correspond to a 10th percentile within the distribution of the multiple, helping to make a more informed decision on when it is a good time to make Bitcoin transactions. Labels range from 'Fees are at extremely low' (the multiple has been higher 90% of the time or more) to 'Warning: fees are at their highest' (the multiple has been higher 0% to 10% of the time)."
+      "question": "What do the labels mean?",
+      "answer": "The labels are here to help make a more informed decision on when it is a good time to make Bitcoin transactions. We have 10 labels which correspond to a 10th percentile within the distribution of the multiple:\n\n1. Fees are at extremely low: the multiple has been higher 90% of the time or more\n2. Fees are very low: the multiple has been higher 80% to 90% of the time\n3. Fees are low: the multiple has been higher 70% to 80% of the time\n4. Fees are average-low: the multiple has been higher 60% to 70% of the time\n5. Fees average: the multiple has been higher 50% to 60% of the time\n6. Fees are average-high: the multiple has been higher 40% to 50% of the time\n7. Fees are high: the multiple has been higher 30% to 40% of the time\n8. Fees are very high: the multiple has been higher 20% to 30% of the time\n9. Fees are extremely high: the multiple has been higher 10% to 20% of the time\n10. Warning: fees are at their highest: the multiple has been higher 0% to 10% of the time"
     },
     {
-        "question": "What is the difference between 365 days and 30 days?",
-        "answer": "These timeframes refer to the period over which the moving average of past fees is calculated. A lower value for 365 days and a higher value for 30 days means fees are low compared to the past year but not as low for the past 30 days. Conversely, a higher value for 365 days and a lower value for 30 days indicates fees are higher relative to the past year but there's a recent dip in fees."
+      "question": "What is the difference between 365 days and 30 days?",
+      "answer": "These are the timeframe for which the moving average of the past fees is calculated.\n\nIf the value is lower for 365 days and higher for 30 days, it means that the fees are low compared to the past year but they aren't as low for the past 30 days because the fees have also been low in the recent past.\n\nIf the value is higher for 365 days and lower for 30 days, it means that the fees are still higher relative to the past year but there is a dip in the fees compared to the last month.\n\nIf you are in a hurry to make a Bitcoin transaction, you can look at the 30 day value. If you are not in a rush, you would wait for the 365 day value to be at its lowest."
     },
     {
-        "question": "What is the data source?",
-        "answer": "The mempool.space fee estimates for the “high priority” setting are used, aiming for transactions to be included in 1-2 blocks. Historical data is from txstats.com and current data (March 2024 onward) is taken directly from the mempool API."
+      "question": "What is the data source?",
+      "answer": "We use the mempool.space fee estimates for the “high priority” setting, which means essentially that the fees would likely lead to a transaction being included in 1-2 blocks. Historical data was taken from txstats.com and current data (March 2024 onward) is taken directly from the mempool API."
     }
-]
+  ]
+  
