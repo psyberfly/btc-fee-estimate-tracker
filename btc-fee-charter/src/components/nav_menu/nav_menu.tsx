@@ -66,6 +66,8 @@ const NavMenu = () => {
         <button onClick={() => navigateTo('/chart/feeEstimate')}>Fee Estimate</button>
         <h2>API</h2>
         <button onClick={() => navigateTo('/api')}>Docs</button>
+        <h2>About</h2>
+        <button onClick={() => navigateTo('/faq')}>FAQ</button>
       </div>
     </div>
   );

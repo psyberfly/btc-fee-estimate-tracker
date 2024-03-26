@@ -11,9 +11,9 @@
   --secondary-color: #6c757d;
   --secondary-color-dark: #3d4246;
   --bg-color: rgb(0, 0, 0);
-  --text-color: rgb(255, 255, 255);
+  --text-color: rgb(215, 215, 215);
   --text-color-secondary: rgb(190, 190, 190);
-  --hover-color: rgb(13, 150, 255);
+  --hover-color: rgb(45, 155, 240);
   --title-font: "Bebas Neue", sans-serif;
   --body-font: Helvetica, sans-serif;
 }
@@ -21,7 +21,7 @@
 .logo {
   height: 30px;
   /* Adjust based on your needs */
-  margin-left: 5px;
+  margin-left:5px;
   /* Space between the logo and the title */
 }
 

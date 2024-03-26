@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
 import ChartPage from './src/components/chart/chart_page';
 import ApiDocs from './src/components/api_docs/api_docs';
 import './src/components/styles.css'; // Path to your main styles file
+import { FaqPage } from './src/components/faq/faq_page';
 
 
 const App = () => {
@@ -22,7 +23,7 @@ const App = () => {
         <Route path="/" element={<Navigate to="/chart/index" replace />} />
           <Route path="/chart/:chartType" element={<ChartPage />} />
           <Route path="/api" element={<ApiDocs />} />
-          {/* Define other routes here */}
+          <Route path="/faq" element={<FaqPage />} />
         </Routes>
       </div>
     </BrowserRouter>

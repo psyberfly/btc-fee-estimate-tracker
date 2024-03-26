@@ -333,7 +333,7 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
 
 const timescales = ChartTimescale.getRangeOptions();
 
-const ChartView = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
+const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
     const chartContainer = useRef(null);
     const chartInstance = useRef(null);    // //FOR RESPONSIVE VIEW:
     const [width, height] = useWindowSize();
@@ -425,4 +425,4 @@ const ChartView = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
     );
 };
 
-export default ChartView;
+export default LineChart;

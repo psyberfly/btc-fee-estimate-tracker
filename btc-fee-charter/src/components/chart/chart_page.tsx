@@ -5,7 +5,7 @@ import { DataOp } from "../../chart_data/data_op";
 import { ChartType } from "../../chart_data/interface";
 import { TEN_MINUTES_MS } from "../../lib/time";
 // import { DexieStore } from "../../store/dexie_store";
-import ChartView from "./chart_view";
+import LineChart from "./line_chart";
 import { useParams } from 'react-router-dom';
 import { LokiStore } from "../../store/lokijs_store";
 import LiveIndexBanner from "../live_index_banner/live_index_banner";
@@ -253,11 +253,11 @@ const ChartPage = () => {
                     <div className="gauge-container">
                         <GaugeChart currentValue={currentFeeIndex.ratioLast365Days} feeIndexesLastYear={feeIndexHistoryLastYear} />
                     </div>
-                    <ChartView dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
+                    <LineChart dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
                 </>
             )}
             {!loading[chartType] && !errorLoading[chartType] && chartType !== ChartType.feeIndex && chartData && (
-                <ChartView dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
+                <LineChart dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
             )}
         </div>
     );

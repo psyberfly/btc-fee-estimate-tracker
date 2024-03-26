@@ -1,0 +1,22 @@
+[
+    {
+        "question": "What is the Bull Bitcoin Fee Multiple?",
+        "answer": "This indicator shows if the current Bitcoin Network fees are high or low relative to the average of the past year and the past month. The Bull Bitcoin fee multiple is calculated by dividing the current fees by the moving average of the fees over the past 365 days and 30 days."
+    },
+    {
+        "question": "How to use the Bull Bitcoin Fee Multiple?",
+        "answer": "The lower the value, the better time it is to make Bitcoin transactions. Depending on your time preference, you may want to wait for the multiple to be lower to make transactions that are non-urgent, such as consolidating your utxos or conjoining your bitcoins."
+    },
+    {
+        "question": "What do the labels mean?",
+        "answer": "The labels correspond to a 10th percentile within the distribution of the multiple, helping to make a more informed decision on when it is a good time to make Bitcoin transactions. Labels range from 'Fees are at extremely low' (the multiple has been higher 90% of the time or more) to 'Warning: fees are at their highest' (the multiple has been higher 0% to 10% of the time)."
+    },
+    {
+        "question": "What is the difference between 365 days and 30 days?",
+        "answer": "These timeframes refer to the period over which the moving average of past fees is calculated. A lower value for 365 days and a higher value for 30 days means fees are low compared to the past year but not as low for the past 30 days. Conversely, a higher value for 365 days and a lower value for 30 days indicates fees are higher relative to the past year but there's a recent dip in fees."
+    },
+    {
+        "question": "What is the data source?",
+        "answer": "The mempool.space fee estimates for the “high priority” setting are used, aiming for transactions to be included in 1-2 blocks. Historical data is from txstats.com and current data (March 2024 onward) is taken directly from the mempool API."
+    }
+]

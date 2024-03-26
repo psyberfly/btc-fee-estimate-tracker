@@ -1,0 +1,70 @@
+/* Ensure the container of the FAQs maintains a consistent width */
+.faqContainer {
+    max-width: 1000px;
+    min-width: 1000px; /* Adjust based on desired width */
+    margin: 0 auto;
+    padding: 30px;
+    box-sizing: border-box;
+}
+
+/* Maintain consistent styling for the question */
+.faqQuestion {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: var(--text-color);
+}
+
+/* Adjust the answer styling to ensure consistent width with the question */
+.faqAnswer {
+    font-size: 16px;
+    margin-top: 20px;
+    border-left: 2px solid #ccc;
+    padding-left: 10px;
+    color: var(--text-color);
+    box-sizing: border-box; /* Ensure padding and border are included in the width */
+}
+
+/* Adjust details styling to control width and padding consistently */
+details {
+    margin-bottom: 10px;
+    border-bottom: 1px solid var(--secondary-color-dark);
+    border-radius: 5px;
+    padding: 10px;
+    box-sizing: border-box; /* Include padding in the width calculation */
+}
+
+
+details[open] summary {
+    color: var(--primary-color);
+}
+
+
+summary {
+    cursor: pointer;
+}
+
+summary {
+    cursor: pointer;
+}
+
+/* Adding hover effect for the question */
+summary:hover {
+    color: var(--hover-color); /* Optional: change text color on hover */
+}
+
+
+/* Responsive design adjustments */
+@media (max-width: 900px) {
+    .faqContainer {
+        min-width:700px;
+        padding: 20px; /* Slightly reduce padding on smaller screens */
+    }
+}
+
+@media (max-width: 600px) {
+    .faqContainer {
+        min-width:400px;
+        padding: 10px; /* Further reduce padding for very small screens */
+    }
+}
