@@ -6,7 +6,9 @@ import { PointerProps } from 'react-gauge-component/dist/lib/GaugeComponent/type
 import { FeeIndex } from '../../store/interface';
 import { Tick } from 'react-gauge-component/dist/lib/GaugeComponent/types/Tick';
 
-const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
+export enum GaugeChartType { monthly, yearly };
+
+const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear, gaugeChartType }) => {
 
     function aggregateByDay(feeIndexHistory: FeeIndex[]): FeeIndex[] {
         // Object to hold the sum and count for each date
@@ -25,8 +27,14 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
             }
 
             // Accumulate sums and increment count
-            aggregates[dateKey].sum365 += Number(entry.ratioLast365Days);
-            aggregates[dateKey].sum30 += Number(entry.ratioLast30Days);
+            if (gaugeChartType === GaugeChartType.yearly) {
+                aggregates[dateKey].sum365 += Number(entry.ratioLast365Days);
+
+            }
+            else if (gaugeChartType === GaugeChartType.monthly) {
+                aggregates[dateKey].sum30 += Number(entry.ratioLast30Days);
+
+            }
             aggregates[dateKey].count++;
         });
 
@@ -42,14 +50,22 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
 
         const aggregatedHistory = aggregateByDay(feeIndexHistoryLastYear);
 
-        const percentageHigherLastYear = aggregatedHistory.filter(index => index.ratioLast365Days > currentFeeIndex.ratioLast365Days).length / aggregatedHistory.length * 100;
+        let percentageHigher: number;
 
-        // const percentageHigherLastMonth = (aggregatedHistory.filter(index => index.ratioLast30Days > currentFeeIndex.ratioLast30Days).length / aggregatedHistory.length) * 100;
+        if (gaugeChartType === GaugeChartType.yearly) {
+            const percentageHigherLastYear = aggregatedHistory.filter(index => index.ratioLast365Days > currentFeeIndex).length / aggregatedHistory.length * 100;
+            percentageHigher = percentageHigherLastYear;
+        }
 
-        // return `The multiple has been higher ${percentageHigherLastYear.toFixed(2)}% of the time last year and ${percentageHigherLastMonth.toFixed(2)}%. of the time last month`;
+        else {
+            const percentageHigherLastMonth = (aggregatedHistory.filter(index => index.ratioLast30Days > currentFeeIndex).length / aggregatedHistory.length) * 100;
+            percentageHigher = percentageHigherLastMonth;
 
-        return percentageHigherLastYear;
+        }
+
+        return percentageHigher;
     }
+
     const currentGaugeValue = (): number => {
         const percentageHigherLastYear = indexPercentageHigher();
 
@@ -106,16 +122,16 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
     const adjustFontSizeForLabel = (label) => {
         const baseSize = 18; // Starting font size for very short strings
         const growthFactor = 2; // How much the font size increases with each additional character
-    
+
         // Calculate the adjusted font size based on the length of the label
         const adjustedFontSize = baseSize + (label.length * growthFactor);
-    
+
         // Optionally, you can set a maximum font size
         const maxFontSize = 60;
-    
+
         // Clamp the adjusted font size to not exceed the maximum font size
         const clampedFontSize = Math.min(adjustedFontSize, maxFontSize);
-    
+
         return `${clampedFontSize}px`;
     };
 
@@ -179,10 +195,10 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
     const currentValue = currentGaugeValue();
     const currentValueLabel = currentGaugeValueLabel(currentValue);
     const currentValueLabelSize = adjustFontSizeForLabel(currentValueLabel);
-
+    const chartId = gaugeChartType === GaugeChartType.yearly ? "gaugeChartContainerYearly" : "gaugeChartContainerMonthly";
     const gaugeProps: GaugeComponentProps = {
-        id: 'gaugeChartContainer',
-        value:  currentValue,
+        id: chartId,
+        value: currentValue,
         minValue: minValue,
         maxValue: maxValue,
         type: GaugeType.Radial,
@@ -225,7 +241,7 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
         textLabel.setAttribute("y", y);
         textLabel.setAttribute("text-anchor", "middle");
         textLabel.textContent = content;
-        textLabel.style.fontSize = "20px";
+        textLabel.style.fontSize = "18px";
         textLabel.style.fontFamily = fontFamily;
         textLabel.style.fill = fillColor;
         svg.appendChild(textLabel);
@@ -233,14 +249,16 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
 
     useEffect(() => {
         // This effect runs after the component mounts and whenever currentValue changes
-        const chartContainer = document.getElementById('gaugeChartContainer');
+        const chartContainer = document.getElementById(chartId);
 
-        if (chartContainer) {
+        let xPos: string = "50%";
+        let yPos: string = "77.5%";
+
+              if (chartContainer) {
             const svg = chartContainer.querySelector('svg');
             if (svg) {
                 if (svg) {
-                    addAdditionalLabel(svg, "fees are", "50%", "77.5%");
-
+                    addAdditionalLabel(svg, "fees are", xPos, yPos);
                 }
 
             }
@@ -251,7 +269,7 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
     return (
         <>
             <p style={{ paddingTop: "0px", paddingBottom: "0vh", textAlign: "center" }}>
-                The multiple has been higher {indexPercentageHigher()}% of the time last year
+                The multiple has been higher {indexPercentageHigher().toFixed(2)}% of the time last {gaugeChartType === GaugeChartType.yearly? "year" : "month"}
             </p>
             <GaugeComponent {...gaugeProps} />
         </>

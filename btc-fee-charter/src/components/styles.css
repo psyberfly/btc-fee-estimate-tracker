@@ -26,8 +26,8 @@
 }
 
 .gauge-container {
-  width: 400px;
-  height: 400px;
+  width: 300px;
+  height: 350px;
   justify-content: center;
   /* This centers the child horizontally in the flex container */
   align-items: center;

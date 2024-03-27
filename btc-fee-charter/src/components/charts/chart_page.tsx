@@ -249,10 +249,10 @@ const ChartPage = () => {
             )}
             {!loading[chartType] && !errorLoading[chartType] && chartType === ChartType.feeIndex && chartData && (
                 <>
-                    <LiveIndexBanner currentFeeIndex={currentFeeIndex}/>
-                    <div className="gauge-container">
-                        <GaugeChart currentFeeIndex={currentFeeIndex} feeIndexHistoryLastYear={feeIndexHistoryLastYear}/>
-                    </div>
+                    <LiveIndexBanner currentFeeIndex={currentFeeIndex} feeIndexHistoryLastYear={feeIndexHistoryLastYear} />
+                    {/* <div className="gauge-container">
+                        <GaugeChart currentFeeIndex={currentFeeIndex.ratioLast365Days} feeIndexHistoryLastYear={feeIndexHistoryLastYear}/>
+                    </div> */}
                     <LineChart dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
                 </>
             )}
