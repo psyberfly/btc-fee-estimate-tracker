@@ -5,7 +5,7 @@ import gradient from "chartjs-plugin-gradient";
 Chart.register(gradient);
 import annotationPlugin from "chartjs-plugin-annotation";
 import { ChartType } from '../../chart_data/interface';
-import { ChartTimescale, TimescaleOptions } from "../../chart_data/chart_timescale";
+import { ChartTimescale, TimeRange, TimescaleOptions } from "../../chart_data/chart_timescale";
 Chart.register(annotationPlugin);
 
 Chart.defaults.elements.point.pointStyle = false;
@@ -333,6 +333,22 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
 
 const timescales = ChartTimescale.getRangeOptions();
 
+function filterDatasetFor12HrInterval(dataset, intervalHours = 12) {
+    // Assuming each dataset has a 'data' array with each point having an 'x' property (timestamp)
+    return dataset.map(dataSeries => {
+        let lastTimestamp: number;
+        const interval = intervalHours * 60 * 60 * 1000; // Convert hours to milliseconds
+        const filteredData = dataSeries.data.filter(point => {
+            if (!lastTimestamp || new Date(point.x).getTime() - lastTimestamp >= interval) {
+                lastTimestamp = new Date(point.x).getTime();
+                return true;
+            }
+            return false;
+        });
+        return { ...dataSeries, data: filteredData };
+    });
+}
+
 const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
     const chartContainer = useRef(null);
     const chartInstance = useRef(null);    // //FOR RESPONSIVE VIEW:
@@ -364,6 +380,19 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
                 chartInstance.current = null;
             }
 
+            let processedDataset = dataset;
+            // Check if selectedRange requires dataset filtering
+            if ([
+                TimeRange.Last5Days,
+                TimeRange.Last1Month,
+                TimeRange.Last5Months,
+                TimeRange.Last1Year,
+                TimeRange.Last5Years
+            ].includes(selectedRange)) {
+                // Filter dataset for every 12 hours if selectedRange is beyond the last 5 days
+                processedDataset = { ...dataset, datasets: filterDatasetFor12HrInterval(dataset.datasets) };
+            }
+
             const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedRange, dataset.datasets);
             let latestValue30Day: number | undefined;
             let latestValue365Day: number;
@@ -380,7 +409,7 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
 
             const newChartInstance = new Chart(chartContainer.current, {
                 type: 'line',
-                data: dataset,
+                data: processedDataset,
                 options,
             });
 
