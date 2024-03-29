@@ -1,10 +1,12 @@
 import { fetchDate, UTCDate } from "../../lib/date/date";
-import { IFeeEstimateOp } from "./interface";
+import { FeeEstimatesArchiveBulkInsert, IFeeEstimateOp } from "./interface";
 // import { FeeEstPgStore } from "./store/pg";
 import { makeApiCall } from "../../lib/network/network";
 import { handleError } from "../../lib/errors/e";
 import { FeeEstimatePrismaStore } from "./store/prisma";
-import { FeeEstimates } from "@prisma/client";
+import { FeeEstimates, FeeEstimatesArchive } from "@prisma/client";
+import { Decimal } from "@prisma/client/runtime/library";
+import { calculateFeeEstimateWeightedAverage } from "../../lib/math/average";
 
 export class FeeOp implements IFeeEstimateOp {
   private mempoolApiUrl = "https://mempool.space/api/v1/fees/recommended";
@@ -60,6 +62,12 @@ export class FeeOp implements IFeeEstimateOp {
     return res;
   }
 
+  async readAllArchived(since: Date): Promise<FeeEstimatesArchive[] | Error> {
+    const res = await this.store.readAllArchived(since);
+    return res;
+  }
+
+
   async create(): Promise<FeeEstimates | Error> {
     const res = await makeApiCall(this.mempoolApiUrl, "GET");
 
@@ -112,5 +120,99 @@ export class FeeOp implements IFeeEstimateOp {
       return handleError(res);
     }
     return true;
+  }
+
+  async archiveData(
+    from: Date,
+    to: Date,
+    stepSizeMs: number,
+  ): Promise<boolean | Error> {
+    try {
+      const feeEstimates = await this.store.readByRange(
+        from.toISOString(),
+        to.toISOString(),
+      );
+
+      if (feeEstimates instanceof Error) {
+        return handleError(feeEstimates);
+      }
+
+      const feeEstimatesBatchedByStepSize = this.batchFeeEstimatesByStepSize(
+        feeEstimates,
+        stepSizeMs,
+      );
+
+      if (feeEstimatesBatchedByStepSize instanceof Error) {
+        console.error("Error batching fee estimates! ");
+        return handleError(feeEstimatesBatchedByStepSize);
+      }
+
+      const feeEstimatesToArchive: FeeEstimatesArchiveBulkInsert[] = [];
+
+      feeEstimatesBatchedByStepSize.forEach((estimates) => {
+        const feeEstimatesAverage: Decimal = calculateFeeEstimateWeightedAverage(
+          estimates,
+        );
+
+        const feeEstimateArchive: FeeEstimatesArchiveBulkInsert = {
+          startTime: estimates[0].time,
+          endTime: estimates[estimates.length - 1].time,
+          avgSatsPerByte: feeEstimatesAverage,
+        };
+
+        feeEstimatesToArchive.push(feeEstimateArchive);
+      });
+
+      const isArchived = await this.store.insertManyArchive(
+        feeEstimatesToArchive,
+      );
+
+      if (isArchived instanceof Error) {
+        return handleError(isArchived);
+      }
+      return true;
+    } catch (e) {
+      return handleError(e);
+    }
+  }
+  private batchFeeEstimatesByStepSize(
+    feeEstimates: FeeEstimates[],
+    stepSizeMs: number,
+  ): FeeEstimates[][] | Error {
+    try {
+      if (!feeEstimates.length) return [];
+
+      const batches: FeeEstimates[][] = [];
+      let batchStart = feeEstimates[0].time.getTime();
+      let currentBatch: FeeEstimates[] = [];
+
+      feeEstimates.forEach((estimate) => {
+        if (estimate.time.getTime() < batchStart + stepSizeMs) {
+          // The estimate belongs to the current batch
+          currentBatch.push(estimate);
+        } else {
+          // The estimate starts a new batch
+          batches.push(currentBatch); // Push the completed batch
+          batchStart += stepSizeMs; // Update the start time for the new batch
+
+          // Ensure the new batch start aligns with the estimate that exceeded the previous batch
+          while (estimate.time.getTime() >= batchStart + stepSizeMs) {
+            batchStart += stepSizeMs;
+          }
+
+          currentBatch = [estimate]; // Start a new batch with the current estimate
+        }
+      });
+
+      // Don't forget to add the last batch if it's not empty
+      if (currentBatch.length > 0) {
+        batches.push(currentBatch);
+      }
+
+      return batches;
+    } catch (e) {
+      console.error(e); // Modify as needed to handle the error properly
+      return handleError(e);
+    }
   }
 }

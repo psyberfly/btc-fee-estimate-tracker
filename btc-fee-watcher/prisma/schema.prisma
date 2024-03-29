@@ -49,3 +49,20 @@ model FeeIndexes {
   ratioLast30Days  Decimal
   createdAt        DateTime       @default(now())
 }
+
+model FeeEstimatesArchive {
+  id             Int      @id @default(autoincrement())
+  startTime      DateTime // Start of the averaging period
+  endTime        DateTime // End of the averaging period
+  avgSatsPerByte Decimal // Average of satsPerByte over the period
+  createdAt      DateTime @default(now())
+}
+
+model FeeIndexesArchive {
+  id                  Int      @id @default(autoincrement())
+  startTime           DateTime // Start of the averaging period
+  endTime             DateTime // End of the averaging period
+  avgRatioLast365Days Decimal // Average ratioLast365Days over the period
+  avgRatioLast30Days  Decimal // Average ratioLast30Days over the period
+  createdAt           DateTime @default(now())
+}

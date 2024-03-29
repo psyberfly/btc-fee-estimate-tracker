@@ -1,0 +1,42 @@
+.live-index-banner {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 0px;
+  }
+  
+  .gauge-charts-container {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+  }
+  
+  .gauge-chart {
+    text-align: center;
+  }
+  
+  .gauge-chart:first-child {
+    padding-right: 60px;
+  }
+  
+  .gauge-chart:last-child {
+    padding-left: 60px;
+  }
+  
+  @media screen and (max-width: 768px) {
+    .gauge-chart:first-child, .gauge-chart:last-child {
+      padding-right: 30px;
+      padding-left: 30px;
+    }
+  }
+  
+  @media screen and (max-width: 480px) {
+    .gauge-charts-container {
+      flex-direction: column;
+    }
+    
+    .gauge-chart {
+      padding: 0;
+    }
+  }
+  

@@ -33,7 +33,7 @@
 .swagger-ui .servers label select {
     position: relative;
     padding: 10px 10px;
-    color: var(--primary-color) !important;
+    color: var(--text-color) !important;
     background-color: var(--bg-color) !important;
 }
 
@@ -59,7 +59,7 @@
 }
 
 .swagger-ui .title {
-    color: var(--primary-color) !important
+    color: var(--text-color) !important
 }
 
 .swagger-ui p {

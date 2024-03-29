@@ -95,6 +95,8 @@ export class DataOp implements IDataOp {
         };
         data.push(index);
       });
+
+    
       return data;
     } catch (e) {
       return e;

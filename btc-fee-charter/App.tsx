@@ -3,9 +3,10 @@ import './src/components/styles.css';
 import logo from "/src/assets/images/logo.png";
 import NavMenu from './src/components/nav_menu/nav_menu';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
-import ChartPage from './src/components/chart/chart_page';
+import ChartPage from './src/components/charts/chart_page';
 import ApiDocs from './src/components/api_docs/api_docs';
 import './src/components/styles.css'; // Path to your main styles file
+import { FaqPage } from './src/components/faq/faq_page';
 
 
 const App = () => {
@@ -16,13 +17,13 @@ const App = () => {
           <NavMenu />
           <img src={logo} alt="Logo" className="logo" />
           <h1>Bull Bitcoin Fee Multiple</h1>
-          <h4 style={{ marginLeft: 'auto' }}>Updated every 10m</h4>
+          <p style={{ marginLeft: 'auto' }}>Updated every 10m</p>
         </div>
         <Routes>
         <Route path="/" element={<Navigate to="/chart/index" replace />} />
           <Route path="/chart/:chartType" element={<ChartPage />} />
           <Route path="/api" element={<ApiDocs />} />
-          {/* Define other routes here */}
+          <Route path="/faq" element={<FaqPage />} />
         </Routes>
       </div>
     </BrowserRouter>

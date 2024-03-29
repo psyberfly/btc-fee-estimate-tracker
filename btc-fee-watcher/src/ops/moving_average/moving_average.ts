@@ -4,7 +4,8 @@ import { handleError } from "../../lib/errors/e";
 import { Decimal } from "@prisma/client/runtime/library";
 import { MovingAveragePrismaStore } from "./store/prisma";
 import { fetchDate, UTCDate } from "../../lib/date/date";
-import { MovingAverages } from "@prisma/client";
+import { FeeEstimates, MovingAverages } from "@prisma/client";
+import { calculateFeeEstimateWeightedAverage } from "../../lib/math/average";
 
 export class MovingAverageOp implements IMovingAverageOp {
   private feeOp = new FeeOp();
@@ -74,42 +75,16 @@ export class MovingAverageOp implements IMovingAverageOp {
 
   async create(day: Date): Promise<boolean | Error> {
     try {
-      const calculateWeightedAverage = (
-        feeHistory: Array<{ id: number; time: Date; satsPerByte: Decimal }>,
-      ) => {
-        let weightedSum = 0;
-        let totalWeight = 0;
-
-        for (let i = 0; i < feeHistory.length - 1; i++) {
-          const stepSizeHours =
-            (feeHistory[i + 1].time.getTime() - feeHistory[i].time.getTime()) /
-            (1000 * 60 * 60); // Difference in hours
-          const weight = stepSizeHours; // Directly using step size in hours as weight
-          weightedSum += feeHistory[i].satsPerByte.toNumber() * weight;
-          totalWeight += weight;
-        }
-
-        // Handle last reading separately (assuming average of total weight as the penultimate step or default to 1 if only one reading)
-        const lastWeight = totalWeight > 0
-          ? totalWeight / (feeHistory.length - 1)
-          : 1;
-        weightedSum +=
-          feeHistory[feeHistory.length - 1].satsPerByte.toNumber() * lastWeight;
-        totalWeight += lastWeight;
-
-        const weightedMovingAverage = new Decimal(weightedSum / totalWeight);
-        return weightedMovingAverage;
-      };
-
       const feeHistoryLast365Days = await this.feeOp.readLast365Days(day);
 
       if (feeHistoryLast365Days instanceof Error) {
         return feeHistoryLast365Days;
       }
       if (feeHistoryLast365Days.length === 0) {
-        throw new Error("Array is empty, cannot calculate average.");
+        console.log("Array is empty, cannot calculate average.");
+        return;
       }
-      const averageLast365Days = calculateWeightedAverage(
+      const averageLast365Days = calculateFeeEstimateWeightedAverage(
         feeHistoryLast365Days,
       );
 
@@ -118,9 +93,12 @@ export class MovingAverageOp implements IMovingAverageOp {
         return feeHistoryLast30Days;
       }
       if (feeHistoryLast30Days.length === 0) {
-        throw new Error("Array is empty, cannot calculate average.");
+        console.log("Array is empty, cannot calculate average.");
+        return;
       }
-      const averageLast30Days = calculateWeightedAverage(feeHistoryLast30Days);
+      const averageLast30Days = calculateFeeEstimateWeightedAverage(
+        feeHistoryLast30Days,
+      );
 
       const update: MovingAverages = {
         id: null, // Added by DB
