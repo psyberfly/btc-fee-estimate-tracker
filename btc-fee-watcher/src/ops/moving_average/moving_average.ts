@@ -81,7 +81,8 @@ export class MovingAverageOp implements IMovingAverageOp {
         return feeHistoryLast365Days;
       }
       if (feeHistoryLast365Days.length === 0) {
-        throw new Error("Array is empty, cannot calculate average.");
+        console.log("Array is empty, cannot calculate average.");
+        return;
       }
       const averageLast365Days = calculateFeeEstimateWeightedAverage(
         feeHistoryLast365Days,
@@ -92,7 +93,8 @@ export class MovingAverageOp implements IMovingAverageOp {
         return feeHistoryLast30Days;
       }
       if (feeHistoryLast30Days.length === 0) {
-        throw new Error("Array is empty, cannot calculate average.");
+        console.log("Array is empty, cannot calculate average.");
+        return;
       }
       const averageLast30Days = calculateFeeEstimateWeightedAverage(
         feeHistoryLast30Days,
@@ -113,5 +115,3 @@ export class MovingAverageOp implements IMovingAverageOp {
     }
   }
 }
-
-

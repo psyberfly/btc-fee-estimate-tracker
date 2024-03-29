@@ -1,7 +1,6 @@
 import { getFeeEstimateHistoryFromCsv } from "../lib/csv_parser/csv_parser";
 import { handleError } from "../lib/errors/e";
 import {
-
   SIX_HOURS_MS,
   TEN_MINUTES_MS,
   TWELVE_HOURS_MS,
@@ -19,22 +18,20 @@ const feeOp = new FeeOp();
 const indexOp = new IndexOp();
 let archiveStartTime: Date;
 let archiveEndTime: Date;
+let indexStartDates = { "30Day": new Date(), "365Day": new Date() };
 
 async function seedIndexes() {
-  console.log("Seeding indexes since start date...");
-  //unix time
-  const seedIndexStartTimestamp: string =
-    process.env.SEED_INDEX_SINCE_TIMESTAMP;
-  const timestampNumber: number = parseInt(seedIndexStartTimestamp, 10);
-  const seedIndexStartDate = new Date(timestampNumber);
+  console.log(`Seeding indexes since ${indexStartDates["365Day"]}...`);
   console.log("Seeding moving averages...");
-  const isMovingAvgSeeded = await movingAverageOp.seed(seedIndexStartDate);
+  const isMovingAvgSeeded = await movingAverageOp.seed(
+    indexStartDates["365Day"],
+  );
   if (isMovingAvgSeeded instanceof Error) {
     console.error(`Error seeding moving averages: ${isMovingAvgSeeded}`);
     return;
   }
   console.log("Seeding indexes...");
-  const isIndexesSeeded = await indexOp.seed(seedIndexStartDate);
+  const isIndexesSeeded = await indexOp.seed(indexStartDates["365Day"]);
   if (isIndexesSeeded instanceof Error) {
     console.error(`Error seeding indexes: ${isIndexesSeeded}`);
     return;
@@ -160,6 +157,7 @@ async function seedHistory() {
   const csvFilePath = process.env.PATH_TO_CSV;
 
   const feeHistory = await getFeeEstimateHistoryFromCsv(csvFilePath);
+
   if (feeHistory instanceof Error) {
     console.error(
       `Error reading Fee Estimate history from .csv!: ${feeHistory}`,
@@ -167,6 +165,9 @@ async function seedHistory() {
     return;
   }
 
+  const feeHistoryStartDate = feeHistory[0].time;
+
+  setIndexStartDates(feeHistoryStartDate);
   const isHistorySeeded = await feeOp.seedHistory(feeHistory);
 
   if (isHistorySeeded instanceof Error) {
@@ -193,6 +194,18 @@ async function seedHistory() {
   console.log("Fee Estimate History archived.");
 }
 
+function setIndexStartDates(feeHistoryStartDate: Date) {
+  let startDate30Day: Date = new Date(feeHistoryStartDate);
+  startDate30Day.setDate(startDate30Day.getDate() + 30);
+
+  // Calculate 365 days after indexStartDate
+  let startDate365Day: Date = new Date(feeHistoryStartDate);
+  startDate365Day.setDate(startDate365Day.getDate() + 365);
+
+  indexStartDates["30Day"] = startDate30Day;
+  indexStartDates["365Day"] = startDate365Day;
+}
+
 export async function runIndexWatcher() {
   try {
     const port: string = process.env.WSS_PORT;
@@ -207,9 +220,8 @@ export async function runIndexWatcher() {
 
     await updateAndBroadcastIndex(alertStreamServer);
 
-  
     scheduleUpdateAndBroadcastIndex(alertStreamServer);
-    
+
     scheduleMovingAverageUpdate();
 
     await scheduleDataArchive();
@@ -223,7 +235,5 @@ export async function runIndexWatcher() {
 function scheduleUpdateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
   setInterval(async () => {
     updateAndBroadcastIndex(alertStreamServer);
-  }, indexWatchInterval
-  );
+  }, indexWatchInterval);
 }
-

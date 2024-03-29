@@ -22,8 +22,7 @@ Linux, docker
 
 ## TODO:
 
-1. Recaliberate gauge chart to have 10 levels of 10 pecentile windows indicating how the current index compares to last year.
-2. Change stepsize of chart readings to 6h instead of 10m for timescales of over 5d to improve readibility. For timescales below 5d, keep 10min stepsize. Status:: TO TEST
-3. Run service by expert. Status: Provide variable stepsize dataset, consult about weighted average calculation and simplification.
-4. Patch bug: gauge and live index is still going NaN after going from Docs>Index;possible from other routes too.
-5. Make a gauge chart for 30day index as well? 
+1. Run service by expert. Status: Provide variable stepsize dataset, consult about weighted average calculation and simplification.
+2. Patch bug: gauge and live index is still going NaN after going from Docs>Index;possible from other routes too. If data is NaN, try force refreshing page?
+3. Set Watcher to seed indexes from 30 and 365 days post fee estimate history start date. 
+
