@@ -33,7 +33,7 @@ export class ApiService implements IApiService {
           time: feeEst.startTime,
           satsPerByte: feeEst.avgSatsPerByte,
         }));
-        res = feeEstArchivedHistory;
+        res = feeEstsArchived;
       } else {
         const feeEstHistory = await this.feeOp.readAll(since);
         if (feeEstHistory instanceof Error) {

@@ -1,8 +1,8 @@
 import { getFeeEstimateHistoryFromCsv } from "../lib/csv_parser/csv_parser";
 import { handleError } from "../lib/errors/e";
 import {
-  ONE_DAY_MS,
-  ONE_MINUTE_MS,
+
+  SIX_HOURS_MS,
   TEN_MINUTES_MS,
   TWELVE_HOURS_MS,
 } from "../lib/time/time";
@@ -12,7 +12,7 @@ import { MovingAverageOp } from "../ops/moving_average/moving_average";
 import { AlertStreamServer } from "./ws";
 
 export const indexWatchInterval = TEN_MINUTES_MS;
-const archivalStepSize = TWELVE_HOURS_MS;
+const archivalStepSize = SIX_HOURS_MS;
 
 const movingAverageOp = new MovingAverageOp();
 const feeOp = new FeeOp();
@@ -74,7 +74,7 @@ async function scheduleMovingAverageUpdate() {
 
 async function scheduleDataArchive() {
   // Set delay for 6 hours in milliseconds (6 hours * 60 minutes * 60 seconds * 1000 milliseconds)
-  const interval = TWELVE_HOURS_MS;
+  const interval = archivalStepSize;
 
   // Schedule the updateMovingAverage to run every 6 hours
   setTimeout(async () => {
@@ -199,7 +199,6 @@ export async function runIndexWatcher() {
     const baseApiRoute = "/api/v1";
     const alertStreamServer = new AlertStreamServer(port, baseApiRoute);
 
-    //At server start:
     await seedHistory();
 
     await seedIndexes();
@@ -208,12 +207,12 @@ export async function runIndexWatcher() {
 
     await updateAndBroadcastIndex(alertStreamServer);
 
-    // every 10 mins (block):
-    setInterval(async () => {
-      updateAndBroadcastIndex(alertStreamServer);
-    }, indexWatchInterval //change to ten mins for prod
-    );
+  
+    scheduleUpdateAndBroadcastIndex(alertStreamServer);
+    
     scheduleMovingAverageUpdate();
+
+    await scheduleDataArchive();
   } catch (error) {
     console.error("Error starting server:", error);
     process.exit(1);
@@ -221,3 +220,10 @@ export async function runIndexWatcher() {
     console.log("Index Watcher running...");
   }
 }
+function scheduleUpdateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
+  setInterval(async () => {
+    updateAndBroadcastIndex(alertStreamServer);
+  }, indexWatchInterval
+  );
+}
+

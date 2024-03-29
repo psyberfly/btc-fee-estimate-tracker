@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import "./faq.css";
 import faqs from "../../assets/faq/faq.json"; // Ensure the path is correct
-
 export const FaqPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -15,7 +14,6 @@ export const FaqPage = () => {
   );
 
   const createMarkup = (htmlContent) => {
-    // This function replaces line breaks in the JSON content with HTML <br> tags for proper rendering
     return {__html: htmlContent.replace(/\n/g, '<br />')};
   };
 
@@ -33,7 +31,8 @@ export const FaqPage = () => {
       </div>
       {filteredFaqs.length > 0 ? (
         filteredFaqs.map((faq, index) => (
-          <details key={index} className="faqItem">
+          // Check if the item is the first in the filtered list to decide whether to open it
+          <details key={index} className="faqItem" open={index === 0}>
             <summary className="faqQuestion">{faq.question}</summary>
             {/* Render the answer with line breaks as HTML */}
             <p className="faqAnswer" dangerouslySetInnerHTML={createMarkup(faq.answer)}></p>

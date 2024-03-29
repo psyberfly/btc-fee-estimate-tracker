@@ -11,7 +11,7 @@ Chart.register(annotationPlugin);
 Chart.defaults.elements.point.pointStyle = false;
 Chart.defaults.elements.point.radius = 0;
 Chart.defaults.elements.line.borderWidth = 1.5;
-Chart.defaults.elements.line.tension = 0;
+Chart.defaults.elements.line.tension = 0.0;
 Chart.defaults.scales.time.adapters.date = { "timezone": "UTC" };
 // Chart.defaults.backgroundColor = "rgba(0,255,0,0.2)";
 Chart.defaults.scale.ticks.color = "rgb(255,255,255)";
@@ -199,7 +199,7 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
     switch (chartType) {
         case ChartType.feeIndex:
             yText = "current fee est / moving average";
-            title = "Fee Estimate Index"
+            title = "Fee Multiple"
             subtitle = "current fee estimate / moving average";
             break;
         case ChartType.movingAverage:
@@ -333,7 +333,7 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
 
 const timescales = ChartTimescale.getRangeOptions();
 
-function filterDatasetFor12HrInterval(dataset, intervalHours = 12) {
+function filterDatasetStepsize(dataset, intervalHours = 12) {
     // Assuming each dataset has a 'data' array with each point having an 'x' property (timestamp)
     return dataset.map(dataSeries => {
         let lastTimestamp: number;
@@ -390,7 +390,11 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
                 TimeRange.Last5Years
             ].includes(selectedRange)) {
                 // Filter dataset for every 12 hours if selectedRange is beyond the last 5 days
-                processedDataset = { ...dataset, datasets: filterDatasetFor12HrInterval(dataset.datasets) };
+                let intervalHours = 12;
+                if (selectedRange === TimeRange.Last5Years) {
+                    intervalHours = 24;
+                }
+                processedDataset = { ...dataset, datasets: filterDatasetStepsize(dataset.datasets, intervalHours) };
             }
 
             const timescaleOptions = ChartTimescale.getTimescaleOptions(selectedRange, dataset.datasets);

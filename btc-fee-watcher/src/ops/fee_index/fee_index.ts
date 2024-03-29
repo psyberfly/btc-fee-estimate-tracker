@@ -156,7 +156,7 @@ export class IndexOp implements IIndexOp {
           startTime: indexes[0].time,
           endTime: indexes[indexes.length - 1].time,
           avgRatioLast365Days: average.weightedAverage365Days,
-          avgRatioLast30Days: average.weightedAverage365Days,
+          avgRatioLast30Days: average.weightedAverage30Days,
         };
 
         feeIndexesToArchive.push(feeEstimateArchive);
