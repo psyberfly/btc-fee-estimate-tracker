@@ -9,6 +9,7 @@ export enum TimeRange {
   Last5Months = "Last 5 months",
   Last1Year = "Last 1 year",
   Last5Years = "Last 5 years",
+  AllTime = "All Time",
 }
 
 enum TimescaleUnit {
@@ -133,6 +134,15 @@ export class ChartTimescale {
     [TimeRange.Last5Years]: {
       setup: () => {
         const xMin = TimeLib.getMsSinceEpochXYearsAgo(5);
+        const xMax = TimeLib.getMsSinceEpochXYearsAgo(0);
+        return { xMin, xMax };
+      },
+      unit: TimescaleUnit.year,
+      stepSize: 1,
+    },
+    [TimeRange.AllTime]: {
+      setup: () => {
+        const xMin = 1590105600000 //22 May 2020, fee estimate data start;
         const xMax = TimeLib.getMsSinceEpochXYearsAgo(0);
         return { xMin, xMax };
       },
