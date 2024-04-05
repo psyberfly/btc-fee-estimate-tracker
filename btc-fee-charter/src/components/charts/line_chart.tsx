@@ -383,8 +383,8 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
             let processedDataset = dataset;
             // Check if selectedRange requires dataset filtering
             if ([
-                TimeRange.Last5Days,
-                TimeRange.Last1Month,
+                // TimeRange.Last5Days,
+                // TimeRange.Last1Month,
                 TimeRange.Last5Months,
                 TimeRange.Last1Year,
                 TimeRange.Last5Years
