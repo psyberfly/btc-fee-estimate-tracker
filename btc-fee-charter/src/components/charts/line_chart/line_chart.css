@@ -1,0 +1,22 @@
+.chart-container {
+    flex: 2;
+    /* Occupies 2/3 of the space */
+    overflow-y: auto;
+    overflow-x: auto;
+    /* Allows the chart to scroll if it overflows vertically */
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: start;
+  }
+  
+  .chart-wrapper {
+    max-width: 90%;
+    max-height: 100vh;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+

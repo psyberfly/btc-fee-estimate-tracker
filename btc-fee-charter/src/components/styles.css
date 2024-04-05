@@ -25,20 +25,6 @@
   /* Space between the logo and the title */
 }
 
-.gauge-container {
-  width: 300px;
-  height: 350px;
-  justify-content: center;
-  /* This centers the child horizontally in the flex container */
-  align-items: center;
-  /* This would center the child vertically if needed */
-  overflow: auto;
-  /* Hide overflow. Adjust as needed */
- margin: auto
-  /* Additionally, center the container itself if it's not already within a flex container */
-}
-
-
 body {
   font-family: var(--body-font);
   margin: 0;
@@ -255,27 +241,6 @@ button:hover {
   font-size: 24px;
   color: var(--text-color);
   padding: 0px 0px;
-}
-
-
-.chart-container {
-  flex: 2;
-  /* Occupies 2/3 of the space */
-  overflow-y: auto;
-  /* Allows the chart to scroll if it overflows vertically */
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: start;
-}
-
-.chart-wrapper {
-  max-width: 90%;
-  max-height: 100vh;
-  width: 100%;
-  height: 100%;
-  position: relative;
 }
 
 .banner-error {

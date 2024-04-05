@@ -1,5 +1,5 @@
 import React from 'react';
-import GaugeChart, { GaugeChartType } from '../charts/gauge_chart';
+import GaugeChart, { GaugeChartType } from '../charts/gauge_chart/gauge_chart';
 import "./live_index_banner.css";
 const LiveIndexBanner = ({ currentFeeIndex, feeIndexHistoryLastYear }) => {
 

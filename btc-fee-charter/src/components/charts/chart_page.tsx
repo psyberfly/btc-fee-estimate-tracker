@@ -5,13 +5,13 @@ import { DataOp } from "../../chart_data/data_op";
 import { ChartType } from "../../chart_data/interface";
 import { TEN_MINUTES_MS } from "../../lib/time";
 // import { DexieStore } from "../../store/dexie_store";
-import LineChart from "./line_chart";
+import LineChart from "./line_chart/line_chart";
 import { useParams } from 'react-router-dom';
 import { LokiStore } from "../../store/lokijs_store";
 import LiveIndexBanner from "../live_index_banner/live_index_banner";
 import CircularProgressIndicator from "../loader/loader";
 import { FeeIndex } from "../../store/interface";
-import GaugeChart from "./gauge_chart";
+import GaugeChart from "./gauge_chart/gauge_chart";
 
 let _feeIndexHistoryLastYearBackup: FeeIndex[] = [];
 let _currentFeeIndexBackup: FeeIndex = { time: new Date(), ratioLast30Days: -1, ratioLast365Days: -1, };
@@ -250,9 +250,7 @@ const ChartPage = () => {
             {!loading[chartType] && !errorLoading[chartType] && chartType === ChartType.feeIndex && chartData && (
                 <>
                     <LiveIndexBanner currentFeeIndex={currentFeeIndex} feeIndexHistoryLastYear={feeIndexHistoryLastYear} />
-                    {/* <div className="gauge-container">
-                        <GaugeChart currentFeeIndex={currentFeeIndex.ratioLast365Days} feeIndexHistoryLastYear={feeIndexHistoryLastYear}/>
-                    </div> */}
+                 
                     <LineChart dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
                 </>
             )}

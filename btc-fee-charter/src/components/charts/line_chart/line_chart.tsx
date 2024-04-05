@@ -4,9 +4,11 @@ import "chartjs-adapter-date-fns";
 import gradient from "chartjs-plugin-gradient";
 Chart.register(gradient);
 import annotationPlugin from "chartjs-plugin-annotation";
-import { ChartType } from '../../chart_data/interface';
-import { ChartTimescale, TimeRange, TimescaleOptions } from "../../chart_data/chart_timescale";
+import { ChartType } from '../../../chart_data/interface';
+import { ChartTimescale, TimeRange, TimescaleOptions } from "../../../chart_data/chart_timescale";
+import "./line_chart.css";
 Chart.register(annotationPlugin);
+
 
 Chart.defaults.elements.point.pointStyle = false;
 Chart.defaults.elements.point.radius = 0;
@@ -50,7 +52,7 @@ Chart.register(verticalLinePlugin);
 
 //This is of type ChartOptions<"line"> but TS compiler confuses Types with this lib.
 //INDEX CHART:
-const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOptions, width: number, latestValue365Day: number, latestValue30Day?: number) => {
+const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOptions, width: number, height: number, latestValue365Day: number, latestValue30Day?: number) => {
     let yMin: number = 0;
     let yText: string;
     let xText: string = "time";
@@ -58,6 +60,7 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
     let subtitle: string;
     const titleFontSize: number = width < 768 ? 16 : 24;
     const subTitleFontSize: number = width < 768 ? 14 : 20;
+    const axesLabelSize:number = height < 550 ? 12: 18; 
     const latestValue365DayText = latestValue365Day.toFixed(2);
     const latestValue30DayText = latestValue30Day ? latestValue30Day.toFixed(2) : "N/A";
 
@@ -198,9 +201,9 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
 
     switch (chartType) {
         case ChartType.feeIndex:
-            yText = "current fee est / moving average";
+            yText = "fee estimate / moving average";
             title = "Fee Multiple"
-            subtitle = "current fee estimate / moving average";
+            subtitle = "fee estimate / moving average";
             break;
         case ChartType.movingAverage:
             yText = "sats/B";
@@ -242,7 +245,7 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
                     text: xText,
                     color: textColorSeconday,
                     font: {
-                        size: 18,
+                        size: axesLabelSize,
                         family: fontFamily,
                     },
                     padding: { top: 20 }
@@ -260,7 +263,7 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
                     text: yText,
                     color: textColorSeconday,
                     font: {
-                        size: 18,
+                        size: axesLabelSize,
                         family: fontFamily,
                     },
                     padding: { bottom: 20 }
@@ -420,7 +423,7 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
                 latestValue365Day = parseFloat(dataset.datasets[0]["data"][dataset.datasets[0].data.length - 1]["y"]);
                 latestValue30Day = undefined;
             }
-            const options = getChartOptions(chartType, timescaleOptions, width, latestValue365Day, latestValue30Day) as ChartOptions<"line">;
+            const options = getChartOptions(chartType, timescaleOptions, width, height, latestValue365Day, latestValue30Day) as ChartOptions<"line">;
 
             const newChartInstance = new Chart(chartContainer.current, {
                 type: 'line',
@@ -440,7 +443,7 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
                 chartInstance.current = null;
             }
         };
-    }, [dataset, selectedRange, width]); // Dependency array
+    }, [dataset, selectedRange, width, height]); // Dependency array
 
 
     const handleScaleChange = (e) => {
@@ -461,7 +464,7 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
 
                 <canvas
                     ref={chartContainer}
-                    style={{ width: '100%', height: '100%' }}
+                    //style={{ width: '100%', height: '100%' }}
                 ></canvas>
 
             </div>
