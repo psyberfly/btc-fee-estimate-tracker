@@ -399,17 +399,11 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
                 else if (selectedRange === TimeRange.Last1Month) {
                     intervalHours = 6;
                 }
-                else if (selectedRange === TimeRange.Last5Months) {
+                else if (selectedRange === TimeRange.Last5Months || selectedRange === TimeRange.Last1Year) {
                     intervalHours = 12;
-                }
-                else if (selectedRange === TimeRange.Last1Year) {
-                    intervalHours = 24;
-                }
-                else if (selectedRange === TimeRange.Last5Years || selectedRange === TimeRange.AllTime) {
-                    intervalHours = 48;
                 }
                 else {
-                    intervalHours = 12;
+                    intervalHours = 24;
                 }
                 processedDataset = { ...dataset, datasets: filterDatasetStepsize(dataset.datasets, intervalHours) };
             }
