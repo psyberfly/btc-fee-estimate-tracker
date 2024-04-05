@@ -383,16 +383,33 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
             let processedDataset = dataset;
             // Check if selectedRange requires dataset filtering
             if ([
-                // TimeRange.Last5Days,
-                // TimeRange.Last1Month,
+                TimeRange.Last5Days,
+                TimeRange.Last1Month,
                 TimeRange.Last5Months,
                 TimeRange.Last1Year,
-                TimeRange.Last5Years
+                TimeRange.Last5Years,
+                TimeRange.AllTime,
+
             ].includes(selectedRange)) {
                 // Filter dataset for every 12 hours if selectedRange is beyond the last 5 days
-                let intervalHours = 12;
-                if (selectedRange === TimeRange.Last5Years) {
+                let intervalHours: number;
+                if (selectedRange === TimeRange.Last5Days) {
+                    intervalHours = 1;
+                }
+                else if (selectedRange === TimeRange.Last1Month) {
+                    intervalHours = 6;
+                }
+                else if (selectedRange === TimeRange.Last5Months) {
+                    intervalHours = 12;
+                }
+                else if (selectedRange === TimeRange.Last1Year) {
                     intervalHours = 24;
+                }
+                else if (selectedRange === TimeRange.Last5Years || selectedRange === TimeRange.AllTime) {
+                    intervalHours = 48;
+                }
+                else {
+                    intervalHours = 12;
                 }
                 processedDataset = { ...dataset, datasets: filterDatasetStepsize(dataset.datasets, intervalHours) };
             }

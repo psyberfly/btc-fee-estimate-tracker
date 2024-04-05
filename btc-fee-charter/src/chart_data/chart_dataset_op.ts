@@ -44,7 +44,7 @@ export class ChartDatasetOp implements IChartDatasetOp {
           //fill: true,
           gradient: {},
 
-          label: "All Time",
+          label: "Fee Estimate",
           data: dataSet,
           borderColor: "rgb(0,228, 255)",
           pointBorderColor: "rgba(0, 0, 0, 1)",
