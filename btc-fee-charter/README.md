@@ -12,6 +12,7 @@ nodejs, docker (optional)
   2. Update .env
   3. npm start
 
-### To Do:
+## Dev:
+### Improvements:
 1. Instead of reading from DB for timescales smaller than current one, just use the chartData from memory (declare a var to hold chartData in memory) for faster loading.
 
