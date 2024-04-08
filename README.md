@@ -20,9 +20,4 @@ Linux, docker
 1. Infra: docker compose
 2. For more details, refer service components.
 
-## TODO:
-
-1. Run service by expert. Status: Provide variable stepsize dataset, consult about weighted average calculation and simplification.
-2. Patch bug: gauge and live index is still going NaN after going from Docs>Index;possible from other routes too. If data is NaN, try force refreshing page?
-3. Set Watcher to seed indexes from 30 and 365 days post fee estimate history start date. 
 
