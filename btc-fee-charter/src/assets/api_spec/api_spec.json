@@ -58,7 +58,7 @@
       "get": {
         "summary": "Get historic fee estimate indexes",
         "operationId": "getIndexHistory",
-        "description": "Get a list of historic fee indexes, along with the fee estimates and moving averages used to compute them.\n\n History starts from {fromDate} and goes up to next 90 days. If {fromDate} not provided, defaults to last 90 days.  \n\nExample request:\n`GET http://myserviceurl/api/v1/history?since=1709251200000`",
+        "description": "Get a list of historic fee indexes, along with the fee estimates and moving averages used to compute them.\n\n History starts from {fromDate} and goes up to next 90 days. If {fromDate} not provided, defaults to last 90 days.  \n\nExample request:\n`GET http://myserviceurl/api/v1/history?fromDate=1709251200000`",
         "tags": [
           "indexHistory"
         ],
