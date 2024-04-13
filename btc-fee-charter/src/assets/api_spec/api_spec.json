@@ -7,7 +7,7 @@
   },
   "servers": [
     {
-      "url": "http://localhost:3561/api/v1",
+      "url": "http://myserviceurl/api/v1",
       "description": "Production server"
     }
   ],
@@ -16,7 +16,7 @@
       "get": {
         "summary": "Get the latest fee estimate index",
         "operationId": "getIndex",
-        "description": "Get the current fee estimate index, along with the current fee estimate and daily moving average used to compute it.\n\nExample request:\n`GET http://localhost:3561/api/v1/index`",
+        "description": "Get the current fee estimate index, along with the current fee estimate and daily moving average used to compute it.\n\nExample request:\n`GET http://myserviceurl/api/v1/index`",
         "tags": [
           "index"
         ],
@@ -58,7 +58,7 @@
       "get": {
         "summary": "Get historic fee estimate indexes",
         "operationId": "getIndexHistory",
-        "description": "Get a list of historic fee indexes, along with the fee estimates and moving averages used to compute them.\n\n History starts from {fromDate} and goes up to next 90 days. If {fromDate} not provided, defaults to last 90 days.  \n\nExample request:\n`GET http://localhost:3561/api/v1/index`",
+        "description": "Get a list of historic fee indexes, along with the fee estimates and moving averages used to compute them.\n\n History starts from {fromDate} and goes up to next 90 days. If {fromDate} not provided, defaults to last 90 days.  \n\nExample request:\n`GET http://myserviceurl/api/v1/history?since=1709251200000`",
         "tags": [
           "indexHistory"
         ],
