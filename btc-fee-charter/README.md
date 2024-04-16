@@ -16,3 +16,6 @@ nodejs, docker (optional)
 ### Improvements:
 1. Instead of reading from DB for timescales smaller than current one, just use the chartData from memory (declare a var to hold chartData in memory) for faster loading.
 
+## TO DO:
+1. Fix autoscroll for index page again. Not working anymore.
+2. Add average fee to live banner as per Franci's image.
