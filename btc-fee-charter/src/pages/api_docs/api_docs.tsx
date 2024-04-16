@@ -4,7 +4,7 @@ import 'swagger-ui-react/swagger-ui.css';
 import apiDocs from "../../assets/api_spec/api_spec.json"
 //import './theme-flattop.css';
 import "./swagger_ui_custom_styles.css"
-import CircularProgressIndicator from '../loader/loader';
+import CircularProgressIndicator from '../../components/loader/loader';
 
 const ApiDocs = () => {
 

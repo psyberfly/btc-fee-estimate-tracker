@@ -13,5 +13,6 @@ export default defineConfig({
   preview:{
     port: port,
   },
+  
   plugins: [react()],
 });

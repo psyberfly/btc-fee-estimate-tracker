@@ -3,9 +3,9 @@ import GaugeComponent from 'react-gauge-component'; // Adjust with the correct i
 import { Arc, SubArc } from 'react-gauge-component/dist/lib/GaugeComponent/types/Arc';
 import { GaugeComponentProps, GaugeType } from 'react-gauge-component/dist/lib/GaugeComponent/types/GaugeComponentProps';
 import { PointerProps } from 'react-gauge-component/dist/lib/GaugeComponent/types/Pointer';
-import { FeeIndex } from '../../../store/interface';
 import { Tick } from 'react-gauge-component/dist/lib/GaugeComponent/types/Tick';
 import "./gauge_chart.css";
+import { FeeIndex } from '../../../../../store/interface';
 
 export enum GaugeChartType { monthly, yearly };
 

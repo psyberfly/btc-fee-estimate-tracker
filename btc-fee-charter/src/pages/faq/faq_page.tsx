@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import "./faq.css";
 import faqs from "../../assets/faq/faq.json"; // Ensure the path is correct
-export const FaqPage = () => {
+ const FaqPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
 
   const handleSearchChange = (event) => {
@@ -44,3 +44,4 @@ export const FaqPage = () => {
     </div>
   );
 };
+export default FaqPage;

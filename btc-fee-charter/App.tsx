@@ -1,13 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
-import './src/components/styles.css';
+import './src/assets/styles.css';
 import logo from "/src/assets/images/logo.png";
-import NavMenu from './src/components/nav_menu/nav_menu';
 import { BrowserRouter, Route, Routes, Navigate } from 'react-router-dom';
-import ChartPage from './src/components/charts/chart_page';
-import ApiDocs from './src/components/api_docs/api_docs';
-import './src/components/styles.css'; // Path to your main styles file
-import { FaqPage } from './src/components/faq/faq_page';
-
+import './src/assets/styles.css'; // Path to your main styles file
+import ChartPage from './src/pages/home/chart_page';
+import NavMenu from './src/pages/home/components/nav_menu/nav_menu';
+import FaqPage from './src/pages/faq/faq_page';
+import ApiDocs from "./src/pages/api_docs/api_docs"
 
 const App = () => {
   return (

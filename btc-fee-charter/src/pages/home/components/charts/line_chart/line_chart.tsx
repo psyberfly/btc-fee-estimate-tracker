@@ -4,8 +4,8 @@ import "chartjs-adapter-date-fns";
 import gradient from "chartjs-plugin-gradient";
 Chart.register(gradient);
 import annotationPlugin from "chartjs-plugin-annotation";
-import { ChartType } from '../../../chart_data/interface';
-import { ChartTimescale, TimeRange, TimescaleOptions } from "../../../chart_data/chart_timescale";
+import { ChartType } from '../../../../../chart_data/interface';
+import { ChartTimescale, TimeRange, TimescaleOptions } from "../../../../../chart_data/chart_timescale";
 import "./line_chart.css";
 Chart.register(annotationPlugin);
 
@@ -60,7 +60,7 @@ const getChartOptions = (chartType: ChartType, timescaleOptions: TimescaleOption
     let subtitle: string;
     const titleFontSize: number = width < 768 ? 16 : 24;
     const subTitleFontSize: number = width < 768 ? 14 : 20;
-    const axesLabelSize:number = height < 550 ? 12: 18; 
+    const axesLabelSize: number = height < 550 ? 12 : 18;
     const latestValue365DayText = latestValue365Day.toFixed(2);
     const latestValue30DayText = latestValue30Day ? latestValue30Day.toFixed(2) : "N/A";
 
@@ -415,9 +415,10 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
             let latestValue30Day: number | undefined;
             let latestValue365Day: number;
             if (dataset.datasets.length > 1) {
-                latestValue30Day = parseFloat(dataset.datasets[0]["data"][dataset.datasets[0].data.length - 1]["y"]);
 
-                latestValue365Day = parseFloat(dataset.datasets[1]["data"][dataset.datasets[0].data.length - 1]["y"]);
+                latestValue30Day = !dataset.datasets[0]["data"][dataset.datasets[0].data.length - 1] ? NaN : parseFloat(dataset.datasets[0]["data"][dataset.datasets[0].data.length - 1]["y"]);
+
+                latestValue365Day = !dataset.datasets[0]["data"][dataset.datasets[0].data.length - 1] ? NaN : parseFloat(dataset.datasets[1]["data"][dataset.datasets[0].data.length - 1]["y"]);
             }
             else {
                 latestValue365Day = parseFloat(dataset.datasets[0]["data"][dataset.datasets[0].data.length - 1]["y"]);
@@ -464,7 +465,7 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
 
                 <canvas
                     ref={chartContainer}
-                    //style={{ width: '100%', height: '100%' }}
+                //style={{ width: '100%', height: '100%' }}
                 ></canvas>
 
             </div>
