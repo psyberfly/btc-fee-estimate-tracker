@@ -25,7 +25,31 @@
   .gauge-chart:last-child {
     padding-left: 60px;
   }
+
+  .gauge-chart h1 {
+    font-family: var(--title-font);
+    font-size: 30px;
+    font-weight: normal;
+    color: var(--text-color);
+    padding: 0px 0px;
+  }
   
+  .gauge-chart h2 {
+    font-family: var(--body-font);
+    font-size: 18px;
+    font-weight: normal;
+    color: var(--text-color);
+    padding: 0px 0px;
+  }
+
+  .gauge-chart h3 {
+    font-family: var(--body-font);
+    font-size: 16px;
+    font-weight: normal;
+    color: var(--text-color);
+    padding: 0px 0px;
+  }
+
   @media screen and (max-width: 768px) {
     .gauge-chart:first-child, .gauge-chart:last-child {
       padding-right: 30px;
@@ -40,6 +64,18 @@
     
     .gauge-chart {
       padding: 0;
+    }
+
+    .gauge-chart h1{
+      font-size: 26px;
+    }
+
+    .gauge-chart h2{
+      font-size: 16px;
+    }
+
+    .gauge-chart h3{
+      font-size: 14px;
     }
   }
   

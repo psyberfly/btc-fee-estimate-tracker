@@ -196,7 +196,6 @@ const ChartPage = () => {
                     }
 
                     const latestFeeAverage= latestIndexDetailed.movingAverage;
-                  
                      setCurrentFeeAverage(latestFeeAverage as any);
 
                      const latestFeeEstimate= latestIndexDetailed.currentFeeEstimate;
@@ -261,7 +260,7 @@ const ChartPage = () => {
             }, TEN_MINUTES_MS) as any;
 
             _currentIntervalId = intervalIdRef.current;
-            console.log(`Data update scheduled with ID: ${intervalIdRef.current}`);
+            // console.log(`Data update scheduled with ID: ${intervalIdRef.current}`);
 
         }
 
