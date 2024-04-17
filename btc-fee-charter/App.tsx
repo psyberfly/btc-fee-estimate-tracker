@@ -15,7 +15,7 @@ const App = () => {
         <div className="title-bar" style={{ display: 'flex', alignItems: 'center' }}>
           <NavMenu />
           <img src={logo} alt="Logo" className="logo" />
-          <h1 style={{ marginRight: 'auto' }}>Bull Bitcoin Fee Multiple</h1>
+          <h1 style={{ marginRight: 'auto', fontWeight: "normal" }}>Bull Bitcoin Fee Multiple</h1>
         </div>
         <Routes>
           <Route path="/" element={<Navigate to="/chart/index" replace />} />
