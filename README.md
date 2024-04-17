@@ -20,9 +20,7 @@ Linux, docker
 1. Infra: docker compose
 2. For more details, refer service components.
 
-## TODO Issues:
-1. Homepage live banner & gauge are going NaN sometimes.
-2. Data isn't refreshing automatically in Charter unless browser refresed. 
+
 
 
 
