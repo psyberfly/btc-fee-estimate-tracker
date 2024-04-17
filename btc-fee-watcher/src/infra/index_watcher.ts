@@ -132,7 +132,7 @@ async function updateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
       return handleError(isIndexUpdated);
     }
     console.log("Index updated.");
-    const latestIndex = await indexOp.readLatest();
+    const latestIndex = await indexOp.readLatestDetailed();
 
     if (latestIndex instanceof Error) {
       return handleError(latestIndex);

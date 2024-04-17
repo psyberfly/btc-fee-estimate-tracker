@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from "react";
 import { ChartDatasetOp } from "../../chart_data/chart_dataset_op";
 import { TimeRange, ChartTimescale } from "../../chart_data/chart_timescale";
 import { DataOp } from "../../chart_data/data_op";
-import { ChartType } from "../../chart_data/interface";
+import { ChartType, IndexDetailed } from "../../chart_data/interface";
 import { ONE_MINUTE_MS, TEN_MINUTES_MS } from "../../lib/time";
 // import { DexieStore } from "../../store/dexie_store";
 import LineChart from "./components/charts/line_chart/line_chart";
@@ -10,12 +10,22 @@ import { useParams } from 'react-router-dom';
 import { LokiStore } from "../../store/lokijs_store";
 import LiveIndexBanner from "./components/live_index_banner/live_index_banner";
 import CircularProgressIndicator from "../../components/loader/loader";
-import { FeeIndex } from "../../store/interface";
+import { FeeEstimate, FeeIndex, MovingAverage } from "../../store/interface";
 import GaugeChart from "./components/charts/gauge_chart/gauge_chart";
 
 let _feeIndexHistoryLastYearBackup: FeeIndex[] = [];
 let _currentFeeIndexBackup: FeeIndex = { time: new Date(), ratioLast30Days: -1, ratioLast365Days: -1, };
-//let _dataBackup = [];
+let _currentFeeEstimateBackup: FeeEstimate = {
+    time: new Date(),
+    satsPerByte: -1
+};
+let _currentFeeAverageBackup: MovingAverage = {
+    time: new Date(),
+    last365Days: -1,
+    last30Days: -1
+};
+
+
 let _currentIntervalId;
 const ChartPage = () => {
 
@@ -89,6 +99,15 @@ const ChartPage = () => {
 
     }
 
+    async function getLatestFeeIndexDetailed(): Promise<IndexDetailed | Error> {
+        const res = await dataOp.fetchIndexDetailed();
+        if (res instanceof Error) {
+            console.error(`Error fetching latest index detailed: ${res}`);
+            return Error('Error fetching latest index detailed: ${res}');
+        }
+        return res;
+    };
+
     const chartType = getChartTypeFromParams();
     const [chartData, setChartData] = useState(null);
     const [loading, setLoading] = useState({ [ChartType.feeIndex]: true });
@@ -99,19 +118,12 @@ const ChartPage = () => {
     const store = new LokiStore();
     const [selectedRange, setSelectedRange] = useState(TimeRange.Last1Year); // Default 
     const [currentFeeIndex, setCurrentFeeIndex] = useState(_currentFeeIndexBackup);
+    const [currentFeeAverage, setCurrentFeeAverage] = useState(_currentFeeAverageBackup);
+    const [currentFeeEstimate, setCurrentFeeEstimate] = useState(_currentFeeEstimateBackup);
     const [feeIndexHistoryLastYear, setFeeIndexHistoryLastYear] = useState(_feeIndexHistoryLastYearBackup);
     const intervalIdRef = useRef(null);
 
 
-    const latestFeeIndex = async () => {
-        const latestIndex = await store.readLatest(ChartType.feeIndex);
-        if (latestFeeIndex instanceof Error || !latestFeeIndex) {
-            console.log(`Error fetching latest fee index: ${latestFeeIndex}`);
-        }
-        else {
-            return latestIndex;
-        }
-    };
 
 
     useEffect(() => {
@@ -154,12 +166,12 @@ const ChartPage = () => {
 
             try {
                 if (availableHistoryStartTime > requiredHistoryStartTime || isScheduled) {
-                    console.log(`Fetching data @ ${now}...`);
                     data = [...await handleDataFetchAndStore(chartType, isScheduled ? availableHistoryEndTime : requiredHistoryStartTime)];
                     if (!data) {
                         console.error(`Error fetching data to home page: ${data}`);
                         return;
                     }
+                    //current fee multiple
                     let currentFeeIndex = await store.readLatest(ChartType.feeIndex);
                     if (currentFeeIndex instanceof Error || !currentFeeIndex) {
                         console.log(`Error fetching latest fee index: ${currentFeeIndex}`);
@@ -168,6 +180,7 @@ const ChartPage = () => {
                     setCurrentFeeIndex(currentFeeIndex);
                     _currentFeeIndexBackup = currentFeeIndex;
 
+                    //fee multiple history last year
                     let feeIndexHistoryLastYear = await getFeeIndexHistoryLastYear();
                     if (feeIndexHistoryLastYear instanceof Error) {
                         console.error(`Error fetching feeIndexHistoryLastyear: ${feeIndexHistoryLastYear}`);
@@ -175,6 +188,48 @@ const ChartPage = () => {
                     }
                     setFeeIndexHistoryLastYear(feeIndexHistoryLastYear);
                     _feeIndexHistoryLastYearBackup = [...feeIndexHistoryLastYear];
+
+                    const latestIndexDetailed = await getLatestFeeIndexDetailed();
+
+                    if (latestIndexDetailed instanceof Error) {
+                        return;
+                    }
+
+                    const latestFeeAverage= latestIndexDetailed.movingAverage;
+                  
+                     setCurrentFeeAverage(latestFeeAverage as any);
+
+                     const latestFeeEstimate= latestIndexDetailed.currentFeeEstimate;
+                     
+                     setCurrentFeeEstimate(latestFeeEstimate as any);
+
+                    
+                    //reading current average and estimate values from chart data from store:
+                    // //current fee average
+                    // let currentFeeAverage = await store.readLatest(ChartType.movingAverage);
+                    // if (currentFeeAverage instanceof Error) {
+                    //     console.log(`Error reading latest fee average from store: ${currentFeeAverage}`);
+
+                    //     if (_currentFeeAverageBackup.last30Days != -1) {
+                    //         currentFeeAverage = await latestFeeIndexDetailed().
+                    //         _currentFeeAverageBackup = currentFeeAverage;
+                    //     }
+                    //     else {
+                    //         currentFeeAverage = _currentFeeAverageBackup;
+                    //     }
+
+                    // }
+                    // setCurrentFeeAverage(currentFeeAverage);
+                    // _currentFeeIndexBackup = currentFeeAverage;
+
+                    // //current fee estimate
+                    // let currentFeeEstimate = await store.readLatest(ChartType.feeEstimate);
+                    // if (currentFeeEstimate instanceof Error) {
+
+                    //     console.log(`Error reading latest fee estimate from store: ${currentFeeEstimate}`);
+                    //     currentFeeEstimate = _currentFeeEstimateBackup;
+                    // }
+
                 }
 
                 else {
@@ -203,7 +258,7 @@ const ChartPage = () => {
 
                 await fetchAndSetData(true);
 
-            }, ONE_MINUTE_MS) as any;
+            }, TEN_MINUTES_MS) as any;
 
             _currentIntervalId = intervalIdRef.current;
             console.log(`Data update scheduled with ID: ${intervalIdRef.current}`);
@@ -230,7 +285,7 @@ const ChartPage = () => {
             )}
             {!loading[chartType] && !errorLoading[chartType] && chartType === ChartType.feeIndex && chartData && (
                 <>
-                    <LiveIndexBanner currentFeeIndex={currentFeeIndex} feeIndexHistoryLastYear={feeIndexHistoryLastYear} />
+                    <LiveIndexBanner currentFeeIndex={currentFeeIndex} currentFeeAverage={currentFeeAverage} currentFeeEstimate={currentFeeEstimate} feeIndexHistoryLastYear={feeIndexHistoryLastYear} />
 
                     <LineChart dataset={chartData} chartType={chartType} selectedRange={selectedRange} setSelectedRange={setSelectedRange} />
                 </>

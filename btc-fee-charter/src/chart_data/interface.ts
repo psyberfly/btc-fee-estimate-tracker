@@ -6,7 +6,7 @@ export enum ChartType {
   feeEstimate = "feeEstimate",
 }
 
-export interface IndexResponse {
+export interface IndexDetailed {
   timestamp: Date;
   feeEstimateMovingAverageRatio: {
     last365Days: number;
@@ -23,17 +23,12 @@ export interface IndexResponse {
   };
 }
 
-export interface IndexDataResponse {
-  data: IndexResponse[];
-  lastUpdated: Date;
-}
-
 export interface IDataOp {
   fetchFeeIndexHistory(since: Date): Promise<FeeIndex[] | Error>;
   fetchMovingAverageHistory(since: Date): Promise<MovingAverage[] | Error>;
   fetchFeeEstimateHistory(since: Date): Promise<FeeEstimate[] | Error>;
-  //unused:
-  fetchIndexDetailedHistory(): Promise<IndexDataResponse | Error>; //unused
+  
+  fetchIndexDetailed(): Promise<IndexDetailed| Error>; //unused
 }
 
 export interface IChartDatasetOp {

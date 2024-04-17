@@ -17,8 +17,8 @@ export class IndexOp implements IIndexOp {
   private store = new FeeIndexPrismaStore();
   private movingAvgStore = new MovingAveragePrismaStore();
 
-  async readLatest(): Promise<FeeIndexDetailed | Error> {
-    const res = await this.store.fetchLatest();
+  async readLatestDetailed(): Promise<FeeIndexDetailed | Error> {
+    const res = await this.store.fetchLatestDetailed();
     if (res instanceof Error) {
       return handleError(res);
     }

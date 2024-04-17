@@ -9,12 +9,15 @@
     display: flex;
     justify-content: center;
     align-items: baseline;
+    position: relative;
   }
   
   .gauge-chart {
     text-align: center;
+  
   }
   
+
   .gauge-chart:first-child {
     padding-right: 60px;
   }

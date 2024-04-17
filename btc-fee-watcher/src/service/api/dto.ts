@@ -20,6 +20,21 @@ export async function handleGetIndex(req, res) {
   }
 }
 
+export async function handleGetIndexDetailed(req, res) {
+  const request = parseRequest(req);
+  try {
+    let index = await apiService.getIndexDetailed();
+
+    if (index instanceof Error) {
+      throw index;
+    }
+    await respond(200, index, res, request);
+  } catch (e) {
+    const result = filterError(e, r_500, request);
+    await respond(result.code, result.message, res, request);
+  }
+}
+
 export async function handleGetIndexHistory(req, res) {
   const request = parseRequest(req);
 

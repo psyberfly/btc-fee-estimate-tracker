@@ -20,7 +20,7 @@ export class LokiStore implements IStore {
         .data();
 
       if (results.length === 0) {
-        return null;
+        return Error(`LokiStore: Current latest ${chartType} is null`);
       }
 
       // Return the first element of the results array

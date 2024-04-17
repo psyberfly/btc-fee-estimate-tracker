@@ -35,7 +35,7 @@ export interface IIndexOp {
     movingAverage: MovingAverages,
   ): Promise<boolean | Error>;
   seed(since: Date): Promise<boolean | Error>;
-  readLatest(): Promise<FeeIndexDetailed | Error>;
+  readLatestDetailed(): Promise<FeeIndexDetailed | Error>;
   archiveData(
     from: Date,
     to: Date,

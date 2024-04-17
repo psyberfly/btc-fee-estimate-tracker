@@ -2,6 +2,7 @@ import { Router } from "express";
 import {
   handleGetFeeEstimateHistory,
   handleGetIndex,
+  handleGetIndexDetailed,
   handleGetIndexDetailedHistory,
   handleGetIndexHistory,
   handleGetMovingAverageHistory,
@@ -48,4 +49,10 @@ router.get(
   "/feeEstimateHistory",
   authenticateAPIKey,
   handleGetFeeEstimateHistory,
+);
+
+router.get(
+  "/indexDetailed",
+  authenticateAPIKey,
+  handleGetIndexDetailed,
 );

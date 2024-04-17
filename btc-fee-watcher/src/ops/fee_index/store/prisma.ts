@@ -3,7 +3,7 @@ import { handleError } from "../../../lib/errors/e";
 import { prisma } from "../../../main";
 import { FeeIndexDetailed, FeeIndexesArchiveBulkInsert } from "../interface";
 export class FeeIndexPrismaStore {
-  async fetchLatest(): Promise<FeeIndexDetailed | Error> {
+  async fetchLatestDetailed(): Promise<FeeIndexDetailed | Error> {
     try {
       const latestIndex = await prisma.feeIndexes.findFirst({
         orderBy: { time: "desc" },
