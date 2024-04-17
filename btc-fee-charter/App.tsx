@@ -12,14 +12,13 @@ const App = () => {
   return (
     <BrowserRouter>
       <div className="app-container">
-        <div className="title-bar">
+        <div className="title-bar" style={{ display: 'flex', alignItems: 'center' }}>
           <NavMenu />
           <img src={logo} alt="Logo" className="logo" />
-          <h1>Bull Bitcoin Fee Multiple</h1>
-          <p style={{ marginLeft: 'auto' }}>Updated every 10m</p>
+          <h1 style={{ marginRight: 'auto' }}>Bull Bitcoin Fee Multiple</h1>
         </div>
         <Routes>
-        <Route path="/" element={<Navigate to="/chart/index" replace />} />
+          <Route path="/" element={<Navigate to="/chart/index" replace />} />
           <Route path="/chart/:chartType" element={<ChartPage />} />
           <Route path="/api" element={<ApiDocs />} />
           <Route path="/faq" element={<FaqPage />} />
@@ -28,5 +27,6 @@ const App = () => {
     </BrowserRouter>
   );
 };
+
 export default App;
 

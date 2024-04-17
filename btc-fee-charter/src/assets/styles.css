@@ -21,7 +21,7 @@
 .logo {
   height: 32px;
   /* Adjust based on your needs */
-  margin-left:10px;
+  margin-left: 10px;
   /* Space between the logo and the title */
 }
 
@@ -29,7 +29,7 @@ body {
   font-family: var(--body-font);
   margin: 0;
   padding: 0;
-  color: var(--text-color); 
+  color: var(--text-color);
   background-color: var(--bg-color);
   font-size: 16px;
 }
@@ -64,9 +64,20 @@ h3 {
   padding: 5px;
 }
 
+.title-bar h1 {
+  font-family: var(--title-font);
+  font-size: 24px;
+  color: var(--text-color);
+  padding: 0px 0px;
+}
+
 @media (max-width: 768px) {
   h1 {
     font-size: 30px;
+  }
+
+  .title-bar h1 {
+    font-size: 20px;
   }
 
   h2 {
@@ -77,11 +88,11 @@ h3 {
     font-size: 12px;
   }
 
-  h4{
+  h4 {
     font-size: 14px;
   }
 
-  body{
+  body {
     font-size: 14px;
   }
 
@@ -230,18 +241,13 @@ button:hover {
   border-bottom: 1px solid var(--secondary-color-dark);
   display: flex;
   justify-content: space-between;
-  max-height:45px;
+  max-height: 45px;
   align-items: center;
   /* Aligns children vertically in the center */
   /* Aligns items to each end of the container */
 }
 
-.title-bar h1 {
-  font-family: var(--title-font);
-  font-size: 24px;
-  color: var(--text-color);
-  padding: 0px 0px;
-}
+
 
 .banner-error {
   position: absolute;
