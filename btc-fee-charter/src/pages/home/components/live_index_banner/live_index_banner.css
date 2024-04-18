@@ -36,8 +36,8 @@
   
   .gauge-chart h2 {
     font-family: var(--body-font);
-    font-size: 21px;
-    font-weight: normal;
+    font-size: 22px;
+    font-weight: bold;
     color: var(--text-color);
     padding: 0px 0px;
   }
@@ -71,7 +71,7 @@
     }
 
     .gauge-chart h2{
-      font-size: 18px;
+      font-size: 19px;
     }
 
     .gauge-chart h3{
