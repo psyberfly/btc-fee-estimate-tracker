@@ -189,20 +189,9 @@ const ChartPage = () => {
                     setFeeIndexHistoryLastYear(feeIndexHistoryLastYear);
                     _feeIndexHistoryLastYearBackup = [...feeIndexHistoryLastYear];
 
-                    const latestIndexDetailed = await getLatestFeeIndexDetailed();
 
-                    if (latestIndexDetailed instanceof Error) {
-                        return;
-                    }
 
-                    const latestFeeAverage= latestIndexDetailed.movingAverage;
-                     setCurrentFeeAverage(latestFeeAverage as any);
 
-                     const latestFeeEstimate= latestIndexDetailed.currentFeeEstimate;
-                     
-                     setCurrentFeeEstimate(latestFeeEstimate as any);
-
-                    
                     //reading current average and estimate values from chart data from store:
                     // //current fee average
                     // let currentFeeAverage = await store.readLatest(ChartType.movingAverage);
@@ -234,6 +223,22 @@ const ChartPage = () => {
                 else {
                     data = await store.readMany(chartType);
                 }
+
+                const latestIndexDetailed = await getLatestFeeIndexDetailed();
+
+                if (latestIndexDetailed instanceof Error) {
+                    return;
+                }
+
+                //current fee average
+
+                const latestFeeAverage = latestIndexDetailed.movingAverage;
+                setCurrentFeeAverage(latestFeeAverage as any);
+
+                //current fee est average
+                const latestFeeEstimate = latestIndexDetailed.currentFeeEstimate;
+
+                setCurrentFeeEstimate(latestFeeEstimate as any);
                 const chartDataset = chartDataOp.getFromData(data, chartType);
                 if (chartDataset instanceof Error) {
                     console.error(`Error getting chart data from data: ${chartDataset}`)
