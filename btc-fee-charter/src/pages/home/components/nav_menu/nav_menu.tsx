@@ -1,7 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import "./nav_menu.css";
 
-const NavMenu = () => {
+const NavMenu = ({versionNumber}) => {
   const [isNavOpen, setIsNavOpen] = useState(false);
   const navRef = useRef(null);
   const hamburgerRef = useRef(null);
@@ -53,23 +54,27 @@ const NavMenu = () => {
     navigate(path);
     setIsNavOpen(false);
   };
-
   return (
     <div>
       <button ref={hamburgerRef} className="hamburger" onClick={() => setIsNavOpen(!isNavOpen)}>
         <div /><div /><div />
       </button>
       <div ref={navRef} className={`nav ${isNavOpen ? 'nav-open' : ''}`}>
-        <h2>Charts</h2>
-        <button onClick={() => navigateTo('/chart/index')}>Index</button>
-        <button onClick={() => navigateTo('/chart/movingAverage')}>Moving Average</button>
-        <button onClick={() => navigateTo('/chart/feeEstimate')}>Fee Estimate</button>
-        <h2>API</h2>
-        <button onClick={() => navigateTo('/api')}>Docs</button>
-        <h2>About</h2>
-        <button onClick={() => navigateTo('/faq')}>FAQ</button>
+        <div className="nav-content"> {/* Container for nav items */}
+          <h2>Charts</h2>
+          <button onClick={() => navigateTo('/chart/index')}>Index</button>
+          <button onClick={() => navigateTo('/chart/movingAverage')}>Moving Average</button>
+          <button onClick={() => navigateTo('/chart/feeEstimate')}>Fee Estimate</button>
+          <h2>API</h2>
+          <button onClick={() => navigateTo('/api')}>Docs</button>
+          <h2>About</h2>
+          <button onClick={() => navigateTo('/faq')}>FAQ</button>
+        </div>
+     
+        <p style={{fontSize:15, color:"white"}} className="version-info">v.{versionNumber}</p> {/* Fixed to the bottom */}
       </div>
     </div>
   );
+  
 };
 export default NavMenu;

@@ -123,7 +123,96 @@ const ChartPage = () => {
     const [feeIndexHistoryLastYear, setFeeIndexHistoryLastYear] = useState(_feeIndexHistoryLastYearBackup);
     const intervalIdRef = useRef(null);
 
+    async function handleFetchAndSetData(isScheduled: boolean = false) {
+        let data: any[] = [];
+        const now = new Date().toLocaleTimeString();
+        setLoading(prev => ({ ...prev, [chartType]: true }));
+        const [requiredHistoryStart, requiredHistoryEnd] = ChartTimescale.getStartEndTimestampsFromTimerange(selectedRange);
+        const requiredHistoryStartTime = new Date(requiredHistoryStart);
+        const requiredHistoryEndTime = new Date(requiredHistoryEnd);
 
+
+        if (scrollableContentRef.current) {
+            scrollPositionRef.current = (scrollableContentRef.current as any).scrollTop;
+        }
+
+        let availableHistoryStartTime: Date;
+        let availableHistoryEndTime: Date = new Date();
+        const availableHistoryStart = await store.getHistoryStartTime(chartType);
+        if (availableHistoryStart instanceof Error || !availableHistoryStart) {
+            availableHistoryStartTime = new Date();
+        }
+        else {
+            availableHistoryStartTime = new Date(availableHistoryStart);
+        }
+        if (isScheduled) {
+            let availableHistoryEnd = await store.getHistoryEndTime(chartType);
+            if (!(availableHistoryEnd instanceof Error)) {
+                availableHistoryEndTime = new Date(availableHistoryEnd);
+            }
+
+        }
+
+        try {
+            if (availableHistoryStartTime > requiredHistoryStartTime || isScheduled) {
+                data = [...await handleDataFetchAndStore(chartType, isScheduled ? availableHistoryEndTime : requiredHistoryStartTime)];
+                if (!data) {
+                    console.error(`Error fetching data to home page: ${data}`);
+                    return;
+                }
+                //current fee multiple
+                let currentFeeIndex = await store.readLatest(ChartType.feeIndex);
+                if (currentFeeIndex instanceof Error || !currentFeeIndex) {
+                    console.log(`Error fetching latest fee index: ${currentFeeIndex}`);
+                    currentFeeIndex = _currentFeeIndexBackup;
+                }
+                setCurrentFeeIndex(currentFeeIndex);
+                _currentFeeIndexBackup = currentFeeIndex;
+
+                //fee multiple history last year
+                let feeIndexHistoryLastYear = await getFeeIndexHistoryLastYear();
+                if (feeIndexHistoryLastYear instanceof Error) {
+                    console.error(`Error fetching feeIndexHistoryLastyear: ${feeIndexHistoryLastYear}`);
+                    feeIndexHistoryLastYear = [..._feeIndexHistoryLastYearBackup];
+                }
+                setFeeIndexHistoryLastYear(feeIndexHistoryLastYear);
+                _feeIndexHistoryLastYearBackup = [...feeIndexHistoryLastYear];
+
+
+            }
+
+            else {
+                data = await store.readMany(chartType);
+            }
+
+            const latestIndexDetailed = await getLatestFeeIndexDetailed();
+
+            if (latestIndexDetailed instanceof Error) {
+                return;
+            }
+
+            //current fee average
+
+            const latestFeeAverage = latestIndexDetailed.movingAverage;
+            setCurrentFeeAverage(latestFeeAverage as any);
+
+            //current fee est average
+            const latestFeeEstimate = latestIndexDetailed.currentFeeEstimate;
+
+            setCurrentFeeEstimate(latestFeeEstimate as any);
+            const chartDataset = chartDataOp.getFromData(data, chartType);
+            if (chartDataset instanceof Error) {
+                console.error(`Error getting chart data from data: ${chartDataset}`)
+                return;
+            }
+            setChartData(chartDataset as any);
+        } catch (error) {
+            console.error("Error setting data:", error);
+            setErrorLoading(prev => ({ ...prev, [chartType]: true }));
+        } finally {
+            setLoading(prev => ({ ...prev, [chartType]: false }));
+        }
+    };
 
 
     useEffect(() => {
@@ -134,133 +223,42 @@ const ChartPage = () => {
 
     useEffect(() => {
 
-        const fetchAndSetData = async (isScheduled: boolean = false) => {
-            let data: any[] = [];
-            const now = new Date().toLocaleTimeString();
-            setLoading(prev => ({ ...prev, [chartType]: true }));
-            const [requiredHistoryStart, requiredHistoryEnd] = ChartTimescale.getStartEndTimestampsFromTimerange(selectedRange);
-            const requiredHistoryStartTime = new Date(requiredHistoryStart);
-            const requiredHistoryEndTime = new Date(requiredHistoryEnd);
-
-
-            if (scrollableContentRef.current) {
-                scrollPositionRef.current = (scrollableContentRef.current as any).scrollTop;
-            }
-
-            let availableHistoryStartTime: Date;
-            let availableHistoryEndTime: Date = new Date();
-            const availableHistoryStart = await store.getHistoryStartTime(chartType);
-            if (availableHistoryStart instanceof Error || !availableHistoryStart) {
-                availableHistoryStartTime = new Date();
-            }
-            else {
-                availableHistoryStartTime = new Date(availableHistoryStart);
-            }
-            if (isScheduled) {
-                let availableHistoryEnd = await store.getHistoryEndTime(chartType);
-                if (!(availableHistoryEnd instanceof Error)) {
-                    availableHistoryEndTime = new Date(availableHistoryEnd);
-                }
-
-            }
-
-            try {
-                if (availableHistoryStartTime > requiredHistoryStartTime || isScheduled) {
-                    data = [...await handleDataFetchAndStore(chartType, isScheduled ? availableHistoryEndTime : requiredHistoryStartTime)];
-                    if (!data) {
-                        console.error(`Error fetching data to home page: ${data}`);
-                        return;
-                    }
-                    //current fee multiple
-                    let currentFeeIndex = await store.readLatest(ChartType.feeIndex);
-                    if (currentFeeIndex instanceof Error || !currentFeeIndex) {
-                        console.log(`Error fetching latest fee index: ${currentFeeIndex}`);
-                        currentFeeIndex = _currentFeeIndexBackup;
-                    }
-                    setCurrentFeeIndex(currentFeeIndex);
-                    _currentFeeIndexBackup = currentFeeIndex;
-
-                    //fee multiple history last year
-                    let feeIndexHistoryLastYear = await getFeeIndexHistoryLastYear();
-                    if (feeIndexHistoryLastYear instanceof Error) {
-                        console.error(`Error fetching feeIndexHistoryLastyear: ${feeIndexHistoryLastYear}`);
-                        feeIndexHistoryLastYear = [..._feeIndexHistoryLastYearBackup];
-                    }
-                    setFeeIndexHistoryLastYear(feeIndexHistoryLastYear);
-                    _feeIndexHistoryLastYearBackup = [...feeIndexHistoryLastYear];
-
-
-
-
-                    //reading current average and estimate values from chart data from store:
-                    // //current fee average
-                    // let currentFeeAverage = await store.readLatest(ChartType.movingAverage);
-                    // if (currentFeeAverage instanceof Error) {
-                    //     console.log(`Error reading latest fee average from store: ${currentFeeAverage}`);
-
-                    //     if (_currentFeeAverageBackup.last30Days != -1) {
-                    //         currentFeeAverage = await latestFeeIndexDetailed().
-                    //         _currentFeeAverageBackup = currentFeeAverage;
-                    //     }
-                    //     else {
-                    //         currentFeeAverage = _currentFeeAverageBackup;
-                    //     }
-
-                    // }
-                    // setCurrentFeeAverage(currentFeeAverage);
-                    // _currentFeeIndexBackup = currentFeeAverage;
-
-                    // //current fee estimate
-                    // let currentFeeEstimate = await store.readLatest(ChartType.feeEstimate);
-                    // if (currentFeeEstimate instanceof Error) {
-
-                    //     console.log(`Error reading latest fee estimate from store: ${currentFeeEstimate}`);
-                    //     currentFeeEstimate = _currentFeeEstimateBackup;
-                    // }
-
-                }
-
-                else {
-                    data = await store.readMany(chartType);
-                }
-
-                const latestIndexDetailed = await getLatestFeeIndexDetailed();
-
-                if (latestIndexDetailed instanceof Error) {
-                    return;
-                }
-
-                //current fee average
-
-                const latestFeeAverage = latestIndexDetailed.movingAverage;
-                setCurrentFeeAverage(latestFeeAverage as any);
-
-                //current fee est average
-                const latestFeeEstimate = latestIndexDetailed.currentFeeEstimate;
-
-                setCurrentFeeEstimate(latestFeeEstimate as any);
-                const chartDataset = chartDataOp.getFromData(data, chartType);
-                if (chartDataset instanceof Error) {
-                    console.error(`Error getting chart data from data: ${chartDataset}`)
-                    return;
-                }
-                setChartData(chartDataset as any);
-            } catch (error) {
-                console.error("Error setting data:", error);
-                setErrorLoading(prev => ({ ...prev, [chartType]: true }));
-            } finally {
-                setLoading(prev => ({ ...prev, [chartType]: false }));
-            }
-        };
-
-        fetchAndSetData();
+        //if()
+        handleFetchAndSetData();
 
         if (!intervalIdRef.current) {
             //Used to clear interval across browser navigation because component unmounts on first navigation and intervalRef.current becomes null;
             clearInterval(_currentIntervalId);
             intervalIdRef.current = setInterval(async () => {
 
-                await fetchAndSetData(true);
+                await handleFetchAndSetData(true);
+
+            }, TEN_MINUTES_MS) as any;
+
+            _currentIntervalId = intervalIdRef.current;
+            // console.log(`Data update scheduled with ID: ${intervalIdRef.current}`);
+
+        }
+
+        // return () => {
+        //     if (intervalIdRef.current) {
+        //         clearInterval(intervalIdRef.current);
+        //         console.log(`Interval cleared: ${intervalIdRef.current}`);
+        //     }
+        // }
+
+    }, [chartType, selectedRange]);  // Ensure these dependencies are stable to avoid frequent interval resets.
+
+    useEffect(() => {
+
+       handleFetchAndSetData();
+
+        if (!intervalIdRef.current) {
+            //Used to clear interval across browser navigation because component unmounts on first navigation and intervalRef.current becomes null;
+            clearInterval(_currentIntervalId);
+            intervalIdRef.current = setInterval(async () => {
+
+                await handleFetchAndSetData(true);
 
             }, TEN_MINUTES_MS) as any;
 

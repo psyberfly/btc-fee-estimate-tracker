@@ -1,0 +1,90 @@
+
+.hamburger {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    width: 30px;
+    height: 30px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    z-index: 10;
+  }
+  
+  .hamburger div {
+    width: 30px;
+    height: 1.5px;
+    background: rgb(255, 255, 255);
+    /* Adjust color based on your theme */
+    border-radius: 10px;
+    transition: all 0.3s linear;
+  }
+  
+  .nav {
+    position: absolute;
+    width: 200px;
+    /* Adjust based on your preference */
+    padding-left: 10px;
+    padding-right: 5px;
+    /* Adds padding inside the nav container, affecting all child elements */
+    box-sizing: border-box;
+    /* Ensures the padding doesn't extend the nav container's width */
+    height: 100vh;
+    background: var(--bg-color);
+    border-right: 1.5px solid var(--secondary-color-dark);
+    transition: transform 0.3s ease;
+    transform: translateX(-100%);
+    overflow-y: auto;
+    left: 0;
+    top: 0;
+    z-index: 9;
+  }
+  
+  .nav h2 {
+    margin-top: 60px;
+    /* Adjust as needed */
+    margin-bottom: 10px;
+    /* Provides spacing between the heading and the first button */
+    margin-left: 0px;
+    text-align: left;
+    /* Centers the heading text, if desired */
+  }
+  
+  /* When nav is open, translate it into view */
+  .nav.nav-open {
+    transform: translateX(0);
+  }
+  
+  .nav button {
+    display: block;
+    width: calc(100% - 10px);
+    /* Adjust button width to account for left margin/padding */
+    padding: 12px;
+    /* Adjust padding as needed */
+    border-bottom: 1px solid var(--secondary-color-dark);
+    background: transparent;
+    cursor: pointer;
+    box-sizing: border-box;
+    text-align: left;
+  }
+  
+  /* Optional: Add styles for hover effect to improve user experience */
+  .nav button:hover {
+    background-color: var(--hover-bg-color);
+    /* Replace with your hover background color variable */
+  }
+
+  .nav-content {
+    overflow-y: auto; /* Enables scrolling for nav items if they overflow */
+    padding-bottom: 40px; /* Give enough space for the version at the bottom */
+  }
+
+  .version-info {
+    position: absolute; /* Position relative to its nearest positioned ancestor (.nav) */
+    bottom: 0; /* Align to the bottom */
+    width: 100%; /* Full width of the nav */
+    text-align: start; 
+    padding: 10px 0; /* Padding for visual spacing */
+    background-color: inherit; /* Optional: inherit the background color of the nav */
+  }

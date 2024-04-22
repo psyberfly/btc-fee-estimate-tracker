@@ -1,7 +1,11 @@
 {
+  "name": "Bull Bitcoin Fee Multiple",
+  "version": "1.0.1",
+  "description": "Bull Bitcoin Fee Multiple is a technical indicator measuring how expensive current BTC fee estimates (mempool.space, fastest/1-2 block) are relative to the month and year",
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "build": "npx vite build",
     "start": "npx vite preview"
   },
   "dependencies": {
