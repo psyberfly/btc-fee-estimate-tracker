@@ -63,8 +63,8 @@ const NavMenu = ({versionNumber}) => {
         <div className="nav-content"> {/* Container for nav items */}
           <h2>Charts</h2>
           <button onClick={() => navigateTo('/chart/index')}>Index</button>
-          <button onClick={() => navigateTo('/chart/movingAverage')}>Moving Average</button>
-          <button onClick={() => navigateTo('/chart/feeEstimate')}>Fee Estimate</button>
+          <button onClick={() => navigateTo('/chart/moving-average')}>Moving Average</button>
+          <button onClick={() => navigateTo('/chart/fee-estimate')}>Fee Estimate</button>
           <h2>API</h2>
           <button onClick={() => navigateTo('/api')}>Docs</button>
           <h2>About</h2>

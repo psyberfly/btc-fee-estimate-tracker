@@ -14,7 +14,7 @@ export class MovingAveragePrismaStore {
       if (since) {
         queryParameters.where = {
           day: {
-            gt: since, // Use the "gt" (greater than) operator to filter records after the "since" date
+            gte: since, // Use the "gt" (greater than) operator to filter records after the "since" date
           },
         };
       }
