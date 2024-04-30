@@ -24,7 +24,6 @@ const FeeEstimateChartPage = ({ refreshTrigger }) => {
 
     async function handleDataFetchAndStore(since: Date): Promise<boolean | Error> {
         try {
-            console.log(`Handling data fetch and store since: ${since}`)
             const data = await dataOp.fetchFeeEstimateHistory(since);
             if (data instanceof Error) return Error(`Error fetching fee estimate history from server: ${data}`);
             const isStored = await store.upsert(ChartType.feeEstimate, data);
@@ -62,7 +61,7 @@ const FeeEstimateChartPage = ({ refreshTrigger }) => {
 
             //if available data is not old enough:
             if (availableHistoryStartTime > requiredHistoryStartTime) {
-                console.log("data is not old enough")
+               
                 const isUpdated = await handleDataFetchAndStore(requiredHistoryStartTime);
                 if (isUpdated instanceof Error) {
                     throw (isUpdated);
@@ -71,7 +70,7 @@ const FeeEstimateChartPage = ({ refreshTrigger }) => {
 
             //if avilable data is not new enough:
             else if (availableHistoryEndTime.getTime() + refreshThresholdInMs < requiredHistoryEndTime.getTime()) {
-                console.log("data is not new enough")
+               
 
                 const isUpdated = await handleDataFetchAndStore(requiredHistoryEndTime);
                 if (isUpdated instanceof Error) {
