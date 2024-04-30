@@ -32,15 +32,10 @@ export interface IDataOp {
 }
 
 export interface IChartDatasetOp {
-  //getFromData<T>(data: T[], kind: ServiceChartType): object | Error;
-
   getFromData<T extends FeeIndex[] | MovingAverage[] | FeeEstimate[]>(
     data: T,
     kind: ChartType,
   ): object | Error;
 
-  //new
-  // getFeeIndex(data: FeeIndex[]): object | Error;
-  // getMovingAverage(data: MovingAverage[]): object | Error;
-  // getFeeEstimate(data: FeeEstimate[]): object | Error;
 }
+

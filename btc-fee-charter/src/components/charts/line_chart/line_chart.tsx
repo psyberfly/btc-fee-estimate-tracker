@@ -4,8 +4,8 @@ import "chartjs-adapter-date-fns";
 import gradient from "chartjs-plugin-gradient";
 Chart.register(gradient);
 import annotationPlugin from "chartjs-plugin-annotation";
-import { ChartType } from '../../../../../chart_data/interface';
-import { ChartTimescale, TimeRange, TimescaleOptions } from "../../../../../chart_data/chart_timescale";
+import { ChartType } from "../../../chart_data/interface";
+import { ChartTimescale, TimeRange, TimescaleOptions } from "../../../chart_data/chart_timescale";
 import "./line_chart.css";
 Chart.register(annotationPlugin);
 

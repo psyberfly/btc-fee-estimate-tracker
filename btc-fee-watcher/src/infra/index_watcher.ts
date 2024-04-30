@@ -1,6 +1,7 @@
 import { getFeeEstimateHistoryFromCsv } from "../lib/csv_parser/csv_parser";
 import { handleError } from "../lib/errors/e";
 import {
+  ONE_MINUTE_MS,
   SIX_HOURS_MS,
   TEN_MINUTES_MS,
   TWELVE_HOURS_MS,
@@ -10,7 +11,7 @@ import { IndexOp } from "../ops/fee_index/fee_index";
 import { MovingAverageOp } from "../ops/moving_average/moving_average";
 import { AlertStreamServer } from "./ws";
 
-export const indexWatchInterval = TEN_MINUTES_MS;
+export const indexWatchInterval = ONE_MINUTE_MS;
 const archivalStepSize = SIX_HOURS_MS;
 
 const movingAverageOp = new MovingAverageOp();

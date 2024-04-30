@@ -1,5 +1,6 @@
-export const TEN_MINUTES_MS = 10 * 60 * 1000;
 export const ONE_MINUTE_MS = 1 * 60 * 1000;
+export const TEN_MINUTES_MS = 10 * ONE_MINUTE_MS;
+export const ONE_DAY_MS = 24 * 60 * ONE_MINUTE_MS;
 
 
 export class TimeLib {

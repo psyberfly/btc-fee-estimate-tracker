@@ -35,7 +35,7 @@ export class LokiStore implements IStore {
         .simplesort("time").limit(1).data();
       if (earliestEntry.length > 0) {
         const date = earliestEntry[0]["time"]; // Assuming 'latestEntry' is not empty.
-        return date;
+        return new Date(date);
       } else {
         return new CustomError(
           "Error getting history start time: No entry found",
@@ -52,7 +52,7 @@ export class LokiStore implements IStore {
         .simplesort("time", true).limit(1).data();
       if (lastEntry.length > 0) {
         const date = lastEntry[0]["time"]; // Assuming 'latestEntry' is not empty.
-        return date;
+        return new Date(date);
       } else {
         return new CustomError(
           "Error getting history start time: No entry found",
