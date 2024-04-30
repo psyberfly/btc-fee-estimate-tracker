@@ -24,7 +24,7 @@
   .nav {
     position: absolute;
     width: 200px;
-    /* Adjust based on your preference */
+    height: 100vh; 
     padding-left: 10px;
     padding-right: 5px;
     /* Adds padding inside the nav container, affecting all child elements */

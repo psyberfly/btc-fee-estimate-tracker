@@ -5,7 +5,7 @@ import { GaugeComponentProps, GaugeType } from 'react-gauge-component/dist/lib/G
 import { PointerProps } from 'react-gauge-component/dist/lib/GaugeComponent/types/Pointer';
 import { Tick } from 'react-gauge-component/dist/lib/GaugeComponent/types/Tick';
 import "./gauge_chart.css";
-import { FeeIndex } from '../../../../../store/interface';
+import { FeeIndex } from '../../../store/interface';
 
 export enum GaugeChartType { monthly, yearly };
 
