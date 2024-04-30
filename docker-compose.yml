@@ -34,7 +34,7 @@ services:
     ports:
       - "${CHARTER_PORT}:3583"
     depends_on:
-      - postgres
+      - btc-fee-watcher
     healthcheck:
       test: ["CMD-SHELL", "curl -f http://localhost:3583 || exit 1"]
       interval: 30s
