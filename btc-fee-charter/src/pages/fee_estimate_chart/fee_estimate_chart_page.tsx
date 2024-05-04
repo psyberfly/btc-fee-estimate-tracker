@@ -41,7 +41,6 @@ const FeeEstimateChartPage = ({ refreshTrigger }) => {
     let availableHistoryEndTime: Date | Error;
 
     const setData = async () => {
-        setLoading(true);
         try {
             setLoading(true);
 
@@ -72,7 +71,7 @@ const FeeEstimateChartPage = ({ refreshTrigger }) => {
             else if (availableHistoryEndTime.getTime() + refreshThresholdInMs < requiredHistoryEndTime.getTime()) {
                
 
-                const isUpdated = await handleDataFetchAndStore(requiredHistoryEndTime);
+                const isUpdated = await handleDataFetchAndStore(availableHistoryEndTime);
                 if (isUpdated instanceof Error) {
                     console.error(`Failed to refresh fee estimate history: ${isUpdated}`);
                     return;

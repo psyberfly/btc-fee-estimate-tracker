@@ -435,8 +435,14 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
             chartInstance.current = newChartInstance as any;
         };
 
-        createChart();
-
+        if (dataset && dataset.datasets.length > 0) {
+            createChart();
+        }
+        else
+        {
+            console.error("LineChart: Error creating chart: Null dataset or dataset length zero.");
+            return;
+        }
         // Cleanup function to destroy the chart instance when the component unmounts
         return () => {
             if (chartInstance.current) {
@@ -455,7 +461,10 @@ const LineChart = ({ dataset, chartType, selectedRange, setSelectedRange }) => {
     return (
         <div className="chart-container">
             <div className="chart-wrapper">
-                <select value={selectedRange} onChange={handleScaleChange}>
+                <select 
+                 id="timeRangeSelect" // Unique identifier for the element
+                 name="timeRange" // Name used when sending data in a form submission
+                value={selectedRange} onChange={handleScaleChange}>
                     {timescales.map((timescale, index) => (
                         <option key={index} value={timescale}>
                             {timescale}

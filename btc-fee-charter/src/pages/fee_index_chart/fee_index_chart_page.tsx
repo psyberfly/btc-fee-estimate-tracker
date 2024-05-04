@@ -41,7 +41,6 @@ const FeeIndexChartPage = ({refreshTrigger}) => {
     let availableHistoryEndTime: Date | Error;
 
     const setData = async () => {
-        setLoading(true);
         try {
             setLoading(true);
 
@@ -70,7 +69,7 @@ const FeeIndexChartPage = ({refreshTrigger}) => {
             //if avilable data is not new enough:
             else if (availableHistoryEndTime.getTime() + refreshThresholdInMs < requiredHistoryEndTime.getTime()) {
                 
-                const isUpdated = await handleDataFetchAndStore(requiredHistoryEndTime);
+                const isUpdated = await handleDataFetchAndStore(availableHistoryEndTime);
                 if (isUpdated instanceof Error) {
                     console.error(`Failed to refresh fee index history: ${isUpdated}`);
                     return;

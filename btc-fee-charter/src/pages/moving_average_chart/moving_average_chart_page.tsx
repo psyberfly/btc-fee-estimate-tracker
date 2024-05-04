@@ -24,7 +24,9 @@ const MovingAverageChartPage = ({ refreshTrigger }) => {
 
     async function handleDataFetchAndStore(since: Date): Promise<boolean | Error> {
         try {
+            console.log(`fetching data since: ${since}`)
             const data = await dataOp.fetchMovingAverageHistory(since);
+            console.log({data})
             if (data instanceof Error) return Error(`Error fetching moving average history from server: ${data}`);
             const isStored = await store.upsert(ChartType.movingAverage, data);
             if (isStored instanceof Error) return Error(`Erroing storing fetched moving average history: ${isStored}`);
@@ -41,7 +43,6 @@ const MovingAverageChartPage = ({ refreshTrigger }) => {
     let availableHistoryEndTime: Date | Error;
 
     const setData = async () => {
-        setLoading(true);
         try {
             setLoading(true);
 
@@ -59,6 +60,11 @@ const MovingAverageChartPage = ({ refreshTrigger }) => {
                 availableHistoryEndTime = new Date("1900-01-01");
             }
 
+            console.log({availableHistoryEndTime})
+            console.log({requiredHistoryEndTime})
+            console.log(availableHistoryEndTime.getTime() + refreshThresholdInMs)
+            console.log(requiredHistoryEndTime.getTime())
+
             //if available data is not old enough:
             if (availableHistoryStartTime > requiredHistoryStartTime) {
                 const isUpdated = await handleDataFetchAndStore(requiredHistoryStartTime);
@@ -70,7 +76,7 @@ const MovingAverageChartPage = ({ refreshTrigger }) => {
             //if avilable data is not new enough:
             else if (availableHistoryEndTime.getTime() + refreshThresholdInMs < requiredHistoryEndTime.getTime()) {
 
-                const isUpdated = await handleDataFetchAndStore(requiredHistoryEndTime);
+                const isUpdated = await handleDataFetchAndStore(availableHistoryEndTime);
                 if (isUpdated instanceof Error) {
                     console.error(`Failed to refresh moving average history: ${isUpdated}`);
                     return;
@@ -87,6 +93,8 @@ const MovingAverageChartPage = ({ refreshTrigger }) => {
             if (chartData instanceof Error) {
                 throw chartData;
             }
+
+            console.log({chartData})
 
             setChartData(chartData as any);
             setLastUpdatedAt(new Date().toLocaleString())
