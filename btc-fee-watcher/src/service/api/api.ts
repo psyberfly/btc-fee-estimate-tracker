@@ -1,6 +1,11 @@
 import { handleError } from "../../lib/errors/e";
 import { IndexOp } from "../../ops/fee_index/fee_index";
-import { IApiService } from "./interface";
+import {
+  FeeEstimateHistory,
+  FeeIndexHistory,
+  IApiService,
+  MovingAverageHistory,
+} from "./interface";
 import { FeeIndexDetailed } from "../../ops/fee_index/interface";
 import { FeeEstimates, FeeIndexes, MovingAverages } from "@prisma/client";
 import { FeeOp } from "../../ops/fee_estimate/fee_estimate";
@@ -48,37 +53,39 @@ export class ApiService implements IApiService {
   //   }
   // }
 
-  async getFeeEstimateHistory(since: Date): Promise<Error | FeeEstimates[]> {
+  async getFeeEstimateHistory(
+    since: Date,
+  ): Promise<Error | FeeEstimateHistory> {
     try {
-      let res;
+      let res: FeeEstimateHistory = [];
       // Calculate the date 5 months ago from now
       const fiveMonthsAgo = new Date();
       fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 5);
 
       // Always fetch the uncompressed history for the last 5 months
-      const recentHistory = await this.feeOp.readAll(fiveMonthsAgo);
+      const recentHistory = await this.feeOp.readAll(fiveMonthsAgo, true);
       if (recentHistory instanceof Error) {
         return handleError(recentHistory);
       }
 
-      res = recentHistory;
-
       // If the 'since' date is more than 5 months ago, also fetch the compressed history
       if (since < fiveMonthsAgo) {
-        const feeEstArchivedHistory = await this.feeOp.readAllArchived(since);
+        const feeEstArchivedHistory = await this.feeOp.readAllArchived(
+          since,
+          true,
+        );
         if (feeEstArchivedHistory instanceof Error) {
           return handleError(feeEstArchivedHistory);
         }
         const feeEstsArchived = feeEstArchivedHistory.map((feeEst) => ({
-          id: feeEst.id,
           time: feeEst.startTime,
           satsPerByte: feeEst.avgSatsPerByte,
         }));
 
         // Prepend the compressed history to the uncompressed recent history
-        res = [...feeEstsArchived, ...res];
+        res.push(...feeEstsArchived);
       }
-
+      res.push(...recentHistory);
       return res;
     } catch (e) {
       return handleError(e);
@@ -118,25 +125,24 @@ export class ApiService implements IApiService {
   //   }
   // }
 
-  async getIndexHistory(since: Date): Promise<Error | FeeIndexes[]> {
+  async getIndexHistory(since: Date): Promise<Error | FeeIndexHistory> {
     try {
-      let res;
+      let res: FeeIndexHistory = [];
       // Calculate the date 5 months ago from now
       const fiveMonthsAgo = new Date();
       fiveMonthsAgo.setMonth(fiveMonthsAgo.getMonth() - 5);
 
       // Always fetch the uncompressed history for the last 5 months
-      const recentHistory = await this.indexOp.readAll(fiveMonthsAgo);
+      const recentHistory = await this.indexOp.readAll(fiveMonthsAgo, true);
       if (recentHistory instanceof Error) {
         return handleError(recentHistory);
       }
-
-      res = recentHistory;
 
       // If the 'since' date is more than 5 months ago, fetch the compressed history as well
       if (since < fiveMonthsAgo) {
         const feeIndexArchivedHistory = await this.indexOp.readAllArchived(
           since,
+          true,
         );
         if (feeIndexArchivedHistory instanceof Error) {
           return handleError(feeIndexArchivedHistory);
@@ -144,16 +150,16 @@ export class ApiService implements IApiService {
         const feeIndexesArchived = feeIndexArchivedHistory.map((
           feeIndexArchive,
         ) => ({
-          id: feeIndexArchive.id,
           time: feeIndexArchive.startTime,
           ratioLast30Days: feeIndexArchive.avgRatioLast30Days,
           ratioLast365Days: feeIndexArchive.avgRatioLast365Days,
-          createdAt: feeIndexArchive.createdAt,
         }));
 
         // Prepend the compressed history to the uncompressed history
-        res = [...feeIndexesArchived, ...res];
+        res.push(...feeIndexesArchived);
       }
+
+      res.push(...recentHistory);
 
       return res;
     } catch (e) {
@@ -163,9 +169,9 @@ export class ApiService implements IApiService {
 
   async getMovingAverageHistory(
     since: Date,
-  ): Promise<Error | MovingAverages[]> {
+  ): Promise<Error | MovingAverageHistory> {
     try {
-      const allFeeEst = await this.movingAverageOp.readAll(since);
+      const allFeeEst = await this.movingAverageOp.readAll(since, true);
       if (allFeeEst instanceof Error) {
         return handleError(allFeeEst);
       }
@@ -191,8 +197,7 @@ export class ApiService implements IApiService {
     }
   }
 
-  async getIndexDetailed(
-  ): Promise<Error | FeeIndexDetailed> {
+  async getIndexDetailed(): Promise<Error | FeeIndexDetailed> {
     try {
       const res = await this.indexOp.readLatestDetailed();
       if (res instanceof Error) {

@@ -25,15 +25,15 @@ NodeJs (Typescript), Postgres, Docker(optional)
 
 ## Usage:
 
-### Docker (recommended):
-1. Refer [btc-fee-estimate-tracker](../README.md)
+### Docker/Prod:
+1. Use with [btc-fee-estimate-tracker](../README.md)
 
-### Standalone/Dev:
-1. cp .example.env .env
+### Local/Dev:
+1. ``` cp .example.env .env
 2. Update .env
-3. download current last 1 year history of api specific fee estimates (1-2 block/fastest) for mempool.space as CSV from txstats and rename file as per Watcher ENV var CSV_FILE_PATH (default: fee_estimate_history.csv). Rename csv headers to "time", "satsPerByte" (ensure using CSV UTF-8 format to edit file or else expected and actual headers will give mismatch error even if same), and place in ./assets/
-4. Ensure your Postgres is running.
-5. npm install && npx prisma migrate deploy && npx prisma generate && npx tsc && npm start 
+3. Download current last 1 year history of api specific fee estimates (1-2 block/fastest) for mempool.space as CSV from [txstats](https://txstats.com/d/000000011/fee-estimation?orgId=1&viewPanel=2&var-source=mempool.space) and rename file as per Watcher ENV var CSV_FILE_PATH (default: fee_estimate_history.csv). Rename csv headers to "time", "satsPerByte" (ensure using CSV UTF-8 format to edit file or else expected and actual headers will give mismatch error even if they visually appear same), and place in ./btc-fee-watcher/assets/ 
+4. Ensure your Postgres is running and available at the address you set for ENV var DB_URL.
+5. npm install && npx prisma push && npm run dev 
 
 ## Testing:
 ### API: 
@@ -48,5 +48,3 @@ NodeJs (Typescript), Postgres, Docker(optional)
    Sample signature used for dev. Resolve issue for prod...
 2. 500 error response is wrong: {"error":"Internal Error. Contact support@satsbank.io"}
 
-### Improvements:
-1. Upgrade: Seeding of moving averages & fee index: use bulkUpsert instead of upsert/create.

@@ -57,13 +57,13 @@ export class FeeOp implements IFeeEstimateOp {
     return res;
   }
 
-  async readAll(since: Date): Promise<FeeEstimates[] | Error> {
-    const res = await this.store.readAll(since);
+  async readAll(since: Date, isHistoric?:boolean): Promise<FeeEstimates[]  | Error> {
+    const res = await this.store.readAll(since, isHistoric);
     return res;
   }
 
-  async readAllArchived(since: Date): Promise<FeeEstimatesArchive[] | Error> {
-    const res = await this.store.readAllArchived(since);
+  async readAllArchived(since: Date, isHistoric?:boolean): Promise<FeeEstimatesArchive[] | Error> {
+    const res = await this.store.readAllArchived(since, isHistoric);
     return res;
   }
 

@@ -28,7 +28,7 @@ export type FeeIndexesArchiveBulkInsert = Omit<
 >;
 
 export interface IIndexOp {
-  readAll(since: Date): Promise<FeeIndexes[] | Error>;
+  readAll(since: Date, isHistoric?:boolean): Promise<FeeIndexes[] | Error>;
   readAllDetailed(since: Date): Promise<FeeIndexDetailed[] | Error>;
   create(
     feeEstimate: FeeEstimates,
@@ -41,5 +41,5 @@ export interface IIndexOp {
     to: Date,
     stepSizeMs: number,
   ): Promise<boolean | Error>;
-  readAllArchived(since: Date): Promise<FeeIndexesArchive[] | Error>;
+  readAllArchived(since: Date, isHistoric?:boolean): Promise<FeeIndexesArchive[] | Error>;
 }

@@ -3,6 +3,7 @@ import { router as serviceRouter } from "../service/api/router";
 import helmet from "helmet";
 import cors from "cors";
 import * as dotenv from "dotenv";
+import compression from "compression";
 dotenv.config();
 
 const app = express();
@@ -13,6 +14,7 @@ export async function runServer() {
     const baseApiRoute = "/api/v1";
     //used for btc-fee-watcher
     app.use(cors());
+    app.use(compression({}));
     app.use(baseApiRoute, serviceRouter);
 
     app.get("/", (req: Request, res: Response) => {

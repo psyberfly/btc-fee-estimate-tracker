@@ -56,6 +56,7 @@ export async function handleGetIndexHistory(req, res) {
     if (indexHistory instanceof Error) {
       throw indexHistory;
     }
+
     await respond(200, indexHistory, res, request);
   } catch (e) {
     const result = filterError(e, r_500, request);
@@ -114,6 +115,7 @@ export async function handleGetFeeEstimateHistory(req, res) {
     if (feeEstHistory instanceof Error) {
       throw feeEstHistory;
     }
+
     //res.send(feeEstHistory);
     await respond(200, feeEstHistory, res, request);
   } catch (e) {

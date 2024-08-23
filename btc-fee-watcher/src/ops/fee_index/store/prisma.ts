@@ -48,7 +48,7 @@ export class FeeIndexPrismaStore {
   //   }
   // }
 
-  async fetchAll(since?: Date): Promise<FeeIndexes[] | Error> {
+  async fetchAll(since?: Date, isHistoric?:boolean): Promise<FeeIndexes[] | Error> {
     try {
       // Initialize the query parameters with orderBy
       let queryParameters: any = {
@@ -64,6 +64,11 @@ export class FeeIndexPrismaStore {
         };
       }
 
+      if(isHistoric)
+      {
+        queryParameters.select = {time:true, ratioLast30Days:true, ratioLast365Days:true};
+      }
+
       const allFeeIndexRes = await prisma.feeIndexes.findMany(queryParameters);
 
       return allFeeIndexRes;
@@ -72,7 +77,7 @@ export class FeeIndexPrismaStore {
     }
   }
 
-  async fetchAllArchived(since?: Date): Promise<FeeIndexesArchive[] | Error> {
+  async fetchAllArchived(since?: Date, isHistoric?:boolean): Promise<FeeIndexesArchive[] | Error> {
     try {
 
       let queryParameters: any = {
@@ -86,6 +91,12 @@ export class FeeIndexPrismaStore {
             gte: since, 
           },
         };
+      }
+
+
+      if(isHistoric)
+      {
+        queryParameters.select = {startTime:true, avgRatioLast30Days:true, avgRatioLast365Days:true};
       }
 
       const allFeeIndexRes = await prisma.feeIndexesArchive.findMany(

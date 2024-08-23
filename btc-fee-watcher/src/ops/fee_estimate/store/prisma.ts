@@ -65,7 +65,7 @@ export class FeeEstimatePrismaStore {
     }
   }
 
-  async readAll(since: Date): Promise<FeeEstimates[] | Error> {
+  async readAll(since: Date, isHistoric?:boolean): Promise<FeeEstimates[] | Error> {
     try {
       // Initialize the query parameters with orderBy
       let queryParameters: any = {
@@ -81,6 +81,11 @@ export class FeeEstimatePrismaStore {
         };
       }
 
+      if(isHistoric)
+      {
+        queryParameters.select = {time:true, satsPerByte:true};
+      }
+
       const allFeeEstRes = await prisma.feeEstimates.findMany(queryParameters);
 
       return allFeeEstRes;
@@ -89,7 +94,7 @@ export class FeeEstimatePrismaStore {
     }
   }
 
-  async readAllArchived(since: Date): Promise<FeeEstimatesArchive[] | Error> {
+  async readAllArchived(since: Date, isHistoric?:boolean): Promise<FeeEstimatesArchive[] | Error> {
     try {
       // Initialize the query parameters with orderBy
       let queryParameters: any = {
@@ -103,6 +108,11 @@ export class FeeEstimatePrismaStore {
             gte: since, // Use the "gt" (greater than) operator to filter records after the "since" date
           },
         };
+      }
+
+      if(isHistoric)
+      {
+        queryParameters.select = {startTime:true, avgSatsPerByte:true};
       }
 
       const allFeeEstRes = await prisma.feeEstimatesArchive.findMany(queryParameters);

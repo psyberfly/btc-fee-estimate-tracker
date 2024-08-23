@@ -35,8 +35,8 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
-  async readAll(since: Date): Promise<FeeIndexes[] | Error> {
-    const res = await this.store.fetchAll(since);
+  async readAll(since: Date, isHistoric?:boolean): Promise<FeeIndexes[] | Error> {
+    const res = await this.store.fetchAll(since, isHistoric);
     if (res instanceof Error) {
       return handleError(res);
     }
@@ -44,8 +44,8 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
-  async readAllArchived(since: Date): Promise<FeeIndexesArchive[] | Error> {
-    const res = await this.store.fetchAllArchived(since);
+  async readAllArchived(since: Date, isHistoric?:boolean): Promise<FeeIndexesArchive[] | Error> {
+    const res = await this.store.fetchAllArchived(since, isHistoric);
     if (res instanceof Error) {
       return handleError(res);
     }
@@ -62,7 +62,6 @@ export class IndexOp implements IIndexOp {
         console.error("Error reading fee estimates from DB!");
         throw feeEstimates;
       }
-      const feeEstToSeed = feeEstimates.length;
 
       for (const feeEstimate of feeEstimates) {
         const res = await this.create(feeEstimate);
