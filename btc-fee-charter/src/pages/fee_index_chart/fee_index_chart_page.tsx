@@ -4,10 +4,11 @@ import LiveIndexBanner from '../../components/live_index_banner/live_index_banne
 import CircularProgressIndicator from '../../components/loader/loader';
 import { ChartType} from '../../chart_data/interface';
 import { DataOp } from '../../chart_data/data_op';
-import { LokiStore } from '../../store/lokijs_store';
+//import { LokiStore } from '../../store/lokijs_store';
 import { ChartTimescale, TimeRange } from '../../chart_data/chart_timescale';
 import { ONE_MINUTE_MS, TEN_MINUTES_MS } from '../../lib/time';
 import { ChartDatasetOp } from '../../chart_data/chart_dataset_op';
+import { FeeIndex } from '../../store/interface';
 
 const FeeIndexChartPage = ({refreshTrigger}) => {
 
@@ -16,19 +17,19 @@ const FeeIndexChartPage = ({refreshTrigger}) => {
 
     const dataOp = new DataOp();
     const chartDatasetOp = new ChartDatasetOp();
-    const store = new LokiStore();
+   // const store = new LokiStore();
 
     const [selectedRange, setSelectedRange] = useState(TimeRange.Last1Year);
     const [chartData, setChartData] = useState([]);
     const [lastUpdatedAt, setLastUpdatedAt] = useState(new Date().toLocaleString());
 
-    async function handleDataFetchAndStore(since: Date): Promise<boolean | Error> {
+    async function handleDataFetch(since: Date): Promise<FeeIndex[] | Error> {
         try {
             const data = await dataOp.fetchFeeIndexHistory(since);
             if (data instanceof Error) return Error(`Error fetching fee index history from server: ${data}`);
-            const isStored = await store.upsert(ChartType.feeIndex, data);
-            if (isStored instanceof Error) return Error(`Erroing storing fetched fee index history: ${isStored}`);
-            return true;
+            //const isStored = await store.upsert(ChartType.feeIndex, data);
+            //if (isStored instanceof Error) return Error(`Erroing storing fetched fee index history: ${isStored}`);
+            return data;
         } catch (error) {
             return Error(`Error handling fee index history fetch and storage: ${error}`);
         }
@@ -44,39 +45,39 @@ const FeeIndexChartPage = ({refreshTrigger}) => {
         try {
             setLoading(true);
 
-            if (requiredHistoryStartTime < feeIndexDataStartDateInWatcher) {
-                requiredHistoryStartTime = feeIndexDataStartDateInWatcher;
-            }
+            // if (requiredHistoryStartTime < feeIndexDataStartDateInWatcher) {
+            //     requiredHistoryStartTime = feeIndexDataStartDateInWatcher;
+            // }
 
-            availableHistoryStartTime = await store.getHistoryStartTime(ChartType.feeIndex);
-            if (availableHistoryStartTime instanceof Error || !availableHistoryStartTime) {
-                availableHistoryStartTime = new Date();
-            }
+            // availableHistoryStartTime =  //await store.getHistoryStartTime(ChartType.feeIndex);
+            // if (availableHistoryStartTime instanceof Error || !availableHistoryStartTime) {
+            //     availableHistoryStartTime = new Date();
+            // }
 
-            availableHistoryEndTime = await store.getHistoryEndTime(ChartType.feeIndex);
-            if (availableHistoryEndTime instanceof Error || !availableHistoryEndTime) {
-                availableHistoryEndTime = new Date("1900-01-01");
-            }
+            // availableHistoryEndTime = await store.getHistoryEndTime(ChartType.feeIndex);
+            // if (availableHistoryEndTime instanceof Error || !availableHistoryEndTime) {
+            //     availableHistoryEndTime = new Date("1900-01-01");
+            // }
 
-            //if available data is not old enough:
-            if (availableHistoryStartTime > requiredHistoryStartTime) {
-                const isUpdated = await handleDataFetchAndStore(requiredHistoryStartTime);
-                if (isUpdated instanceof Error) {
-                    throw (isUpdated);
-                }
-            }
+            // //if available data is not old enough:
+            // if (availableHistoryStartTime > requiredHistoryStartTime) {
+            //     const isUpdated = await handleDataFetchAndStore(requiredHistoryStartTime);
+            //     if (isUpdated instanceof Error) {
+            //         throw (isUpdated);
+            //     }
+            // }
 
-            //if avilable data is not new enough:
-            else if (availableHistoryEndTime.getTime() + refreshThresholdInMs < requiredHistoryEndTime.getTime()) {
+            // //if avilable data is not new enough:
+            // else if (availableHistoryEndTime.getTime() + refreshThresholdInMs < requiredHistoryEndTime.getTime()) {
                 
-                const isUpdated = await handleDataFetchAndStore(availableHistoryEndTime);
-                if (isUpdated instanceof Error) {
-                    console.error(`Failed to refresh fee index history: ${isUpdated}`);
-                    return;
-                }
-            }
+            //     const isUpdated = await handleDataFetchAndStore(availableHistoryEndTime);
+            //     if (isUpdated instanceof Error) {
+            //         console.error(`Failed to refresh fee index history: ${isUpdated}`);
+            //         return;
+            //     }
+            // }
 
-            const data = await store.readMany(ChartType.feeIndex, requiredHistoryStartTime, requiredHistoryEndTime);
+            const data = await handleDataFetch(requiredHistoryStartTime); //store.readMany(ChartType.feeIndex, requiredHistoryStartTime, requiredHistoryEndTime);
 
             if (data instanceof Error) {
                 throw new Error(`Error reading fee index history from store: ${data}`);

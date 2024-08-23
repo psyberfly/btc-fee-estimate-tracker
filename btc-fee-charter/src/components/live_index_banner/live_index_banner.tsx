@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import GaugeChart, { GaugeChartType } from '../charts/gauge_chart/gauge_chart';
 import { DataOp } from '../../chart_data/data_op';
-import { LokiStore } from '../../store/lokijs_store';
+//import { LokiStore } from '../../store/lokijs_store';
 import "./live_index_banner.css";
 import { ChartType } from '../../chart_data/interface';
 import { FeeIndex } from '../../store/interface';
 import CircularProgressIndicator from '../loader/loader';
 import { ChartTimescale, TimeRange } from '../../chart_data/chart_timescale';
 
-const LiveIndexBanner = () => {
+const LiveIndexBanner = ({}) => {
 
     const dataOp = new DataOp();
-    const store = new LokiStore();
+    //const store = new LokiStore();
 
     const [loading, setLoading] = useState(true);
     const [errorLoading, setErrorLoading] = useState(false);
@@ -21,6 +21,19 @@ const LiveIndexBanner = () => {
     const [feeIndexHistoryLastYear, setFeeIndexHistoryLastYear] = useState([]);
     const [requiredHistoryStartTime, requiredHistoryEndTime] = ChartTimescale.getStartEndTimestampsFromTimerangeAsDate(TimeRange.Last1Year);
 
+
+
+    async function handleDataFetch(since: Date): Promise<FeeIndex[] | Error> {
+        try {
+            const data = await dataOp.fetchFeeIndexHistory(since);
+            if (data instanceof Error) return Error(`Error fetching fee estimate history from server: ${data}`);
+            //const isStored = await store.upsert(ChartType.feeEstimate, data);
+            //if (isStored instanceof Error) return Error(`Erroing storing fetched fee estimate history: ${isStored}`);
+            return data;
+        } catch (error) {
+            return Error(`Error handling fee estimate history fetch and storage: ${error}`);
+        }
+    };
     const setData = async () => {
         setLoading(true);
         try {
@@ -42,9 +55,14 @@ const LiveIndexBanner = () => {
             } as FeeIndex;
             setCurrentFeeIndex(latestFeeIndex as any);
 
-            const feeIndexHistoryLastYear = await store.readMany(ChartType.feeIndex, requiredHistoryStartTime, requiredHistoryEndTime);
-
-            setFeeIndexHistoryLastYear(feeIndexHistoryLastYear);
+            const oneYearAgo = new Date();
+            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+            const feeIndexHistoryLastYear = await handleDataFetch(oneYearAgo); //store.readMany(ChartType.feeIndex, requiredHistoryStartTime, requiredHistoryEndTime);
+            if(feeIndexHistoryLastYear instanceof Error)
+            {
+                throw feeIndexHistoryLastYear;
+            }
+            setFeeIndexHistoryLastYear(feeIndexHistoryLastYear as []);
 
         } catch (error) {
             console.error('Error fetching data:', error);
