@@ -63,7 +63,8 @@ COPY --from=build --chown=node:node /home/node/app/dist ./dist
 COPY --from=build --chown=node:node /home/node/app/package*.json ./
 COPY --from=build --chown=node:node /home/node/app/assets ./assets
 COPY --from=build --chown=node:node /home/node/app/prisma ./prisma
-COPY --chown=node:node ./entrypoint.sh ./entrypoint.shRUN chmod +x ./entrypoint.sh
+COPY --chown=node:node ./entrypoint.sh ./entrypoint.sh
+RUN chmod +x ./entrypoint.sh
 
 # Set environment variables for production
 ENV NODE_ENV=production
