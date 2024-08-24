@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker compose --env-file ../config/config.sample.local start 
+docker compose --env-file ../config/.env.local start 

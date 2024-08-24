@@ -1,3 +1,3 @@
 #!/bin/bash
 
-docker compose start
+docker compose --env-file ../config/.env.prod start 
