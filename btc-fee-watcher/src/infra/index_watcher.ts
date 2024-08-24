@@ -1,10 +1,6 @@
 import { getFeeEstimateHistoryFromCsv } from "../lib/csv_parser/csv_parser";
 import { handleError } from "../lib/errors/e";
-import {
-  ONE_HOUR_MS,
-  ONE_MINUTE_MS,
-  TEN_MINUTES_MS,
-} from "../lib/time/time";
+import { ONE_HOUR_MS, ONE_MINUTE_MS, TEN_MINUTES_MS } from "../lib/time/time";
 import { FeeOp } from "../ops/fee_estimate/fee_estimate";
 import { IndexOp } from "../ops/fee_index/fee_index";
 import { MovingAverageOp } from "../ops/moving_average/moving_average";
@@ -21,32 +17,36 @@ let archiveEndTime: Date;
 let indexStartDates = { "30Day": new Date(), "365Day": new Date() };
 
 async function seedIndexes() {
-  console.log(`Seeding indexes since ${indexStartDates["365Day"]}...`);
-  console.log("Seeding moving averages...");
-  const isMovingAvgSeeded = await movingAverageOp.seed(
-    indexStartDates["365Day"],
-  );
-  if (isMovingAvgSeeded instanceof Error) {
-    console.error(`Error seeding moving averages: ${isMovingAvgSeeded}`);
-    return;
-  }
-  console.log("Seeding indexes...");
-  const isIndexesSeeded = await indexOp.seed(indexStartDates["365Day"]);
-  if (isIndexesSeeded instanceof Error) {
-    console.error(`Error seeding indexes: ${isIndexesSeeded}`);
-    return;
-  }
-  const isHistoryArchived = await indexOp.archiveData(
-    archiveStartTime,
-    archiveEndTime,
-    archivalStepSize,
-  );
+  try {
+    console.log(`Seeding indexes since ${indexStartDates["365Day"]}...`);
+    console.log("Seeding moving averages...");
+    const isMovingAvgSeeded = await movingAverageOp.seed(
+      indexStartDates["365Day"],
+    );
+    if (isMovingAvgSeeded instanceof Error) {
+      console.error(`Error seeding moving averages: ${isMovingAvgSeeded}`);
+      return;
+    }
+    console.log("Seeding indexes...");
+    const isIndexesSeeded = await indexOp.seed(indexStartDates["365Day"]);
+    if (isIndexesSeeded instanceof Error) {
+      console.error(`Error seeding indexes: ${isIndexesSeeded}`);
+      return;
+    }
+    const isHistoryArchived = await indexOp.archiveData(
+      archiveStartTime,
+      archiveEndTime,
+      archivalStepSize,
+    );
 
-  if (isHistoryArchived instanceof Error) {
-    console.error(`Error archiving history: ${isHistoryArchived}`);
-    return;
+    if (isHistoryArchived instanceof Error) {
+      console.error(`Error archiving history: ${isHistoryArchived}`);
+      return;
+    }
+    console.log("Fee Index History archived.");
+  } catch (e) {
+    console.error(`Error in seedIndex: ${e}`);
   }
-  console.log("Fee Index History archived.");
 }
 
 async function scheduleMovingAverageUpdate() {
