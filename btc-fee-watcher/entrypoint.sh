@@ -1,5 +1,5 @@
 #!/bin/sh
 
-npx prisma db migrate && \
+npx prisma migrate deploy && \
 npm run start
  
