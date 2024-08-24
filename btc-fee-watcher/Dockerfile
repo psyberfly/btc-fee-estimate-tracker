@@ -17,7 +17,7 @@ COPY . .
 FROM base AS development
 
 # Copy the entry point for development
-COPY ./entrypoint.dev.sh ./entrypoint.sh
+COPY --chown=node:node ./entrypoint.dev.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 # Set environment variables for development
 ENV NODE_ENV=development
@@ -63,8 +63,7 @@ COPY --from=build --chown=node:node /home/node/app/dist ./dist
 COPY --from=build --chown=node:node /home/node/app/package*.json ./
 COPY --from=build --chown=node:node /home/node/app/assets ./assets
 COPY --from=build --chown=node:node /home/node/app/prisma ./prisma
-COPY ./entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh
+COPY --chown=node:node ./entrypoint.sh ./entrypoint.shRUN chmod +x ./entrypoint.sh
 
 # Set environment variables for production
 ENV NODE_ENV=production
