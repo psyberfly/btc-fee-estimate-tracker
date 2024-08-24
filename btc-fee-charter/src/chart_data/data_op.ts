@@ -1,4 +1,4 @@
-import { AxiosHeaders } from "axios";
+import { AxiosHeaders, AxiosRequestHeaders } from "axios";
 import { makeApiCall } from "../lib/network";
 import { IDataOp, IndexDetailed } from "./interface";
 import { FeeEstimate, FeeIndex, MovingAverage } from "../store/interface";
@@ -11,11 +11,15 @@ export class DataOp implements IDataOp {
   async fetchIndexDetailed(): Promise<Error | IndexDetailed> {
     try {
       const url = this.baseUrl + `/indexDetailed`;
+      const headers: AxiosHeaders = AxiosHeaders.from({
+        'x-api-key': this.apiKey,
+        //'Accept-Encoding': 'gzip',
+      });
       const res = await makeApiCall(
         url,
         "GET",
-        AxiosHeaders.from(`x-api-key: ${this.apiKey}`),
-      );
+      headers
+        );
 
       if (res instanceof Error) {
         console.error(res);

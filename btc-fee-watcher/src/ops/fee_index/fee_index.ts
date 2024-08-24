@@ -11,6 +11,7 @@ import { MovingAveragePrismaStore } from "../moving_average/store/prisma";
 import { FeeEstimatePrismaStore } from "../fee_estimate/store/prisma";
 import { Decimal } from "@prisma/client/runtime/library";
 import { calculateFeeIndexWeightedAverage } from "../../lib/math/average";
+import { FeeIndexHistory } from "../../service/api/interface";
 
 export class IndexOp implements IIndexOp {
   private feeOp = new FeeOp();
@@ -35,21 +36,32 @@ export class IndexOp implements IIndexOp {
     return res;
   }
 
-  async readAll(since: Date): Promise<FeeIndexes[] | Error> {
-    const res = await this.store.fetchAll(since);
+  async readAll(
+    since: Date,
+    isHistoric?: boolean,
+  ): Promise<FeeIndexes[] | FeeIndexHistory | Error> {
+    const res = await this.store.fetchAll(since, isHistoric);
     if (res instanceof Error) {
       return handleError(res);
     }
 
+    if (isHistoric) {
+      return res as FeeIndexHistory;
+    }
     return res;
   }
 
-  async readAllArchived(since: Date): Promise<FeeIndexesArchive[] | Error> {
-    const res = await this.store.fetchAllArchived(since);
+  async readAllArchived(
+    since: Date,
+    isHistoric?: boolean,
+  ): Promise<FeeIndexesArchive[] | FeeIndexHistory | Error> {
+    const res = await this.store.fetchAllArchived(since, isHistoric);
     if (res instanceof Error) {
       return handleError(res);
     }
-
+    if (isHistoric) {
+      return res as FeeIndexHistory;
+    }
     return res;
   }
 
@@ -62,7 +74,6 @@ export class IndexOp implements IIndexOp {
         console.error("Error reading fee estimates from DB!");
         throw feeEstimates;
       }
-      const feeEstToSeed = feeEstimates.length;
 
       for (const feeEstimate of feeEstimates) {
         const res = await this.create(feeEstimate);

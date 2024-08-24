@@ -1,10 +1,9 @@
 import { getFeeEstimateHistoryFromCsv } from "../lib/csv_parser/csv_parser";
 import { handleError } from "../lib/errors/e";
 import {
+  ONE_HOUR_MS,
   ONE_MINUTE_MS,
-  SIX_HOURS_MS,
   TEN_MINUTES_MS,
-  TWELVE_HOURS_MS,
 } from "../lib/time/time";
 import { FeeOp } from "../ops/fee_estimate/fee_estimate";
 import { IndexOp } from "../ops/fee_index/fee_index";
@@ -12,7 +11,7 @@ import { MovingAverageOp } from "../ops/moving_average/moving_average";
 import { AlertStreamServer } from "./ws";
 
 export const indexWatchInterval = ONE_MINUTE_MS;
-const archivalStepSize = SIX_HOURS_MS;
+export const archivalStepSize = 6 * ONE_HOUR_MS;
 
 const movingAverageOp = new MovingAverageOp();
 const feeOp = new FeeOp();
@@ -74,7 +73,7 @@ async function scheduleDataArchive() {
   // Set delay for 6 hours in milliseconds (6 hours * 60 minutes * 60 seconds * 1000 milliseconds)
   const interval = archivalStepSize;
 
-  // Schedule the updateMovingAverage to run every 6 hours
+  // Schedule to run every 6 hours
   setTimeout(async () => {
     await archiveData();
     // After running, schedule the next execution

@@ -3,20 +3,22 @@
 #Watcher
 WATCHER_SERVER_PORT=3561
 WATCHER_WSS_PORT=3572
+FEE_CHARTER_ORIGIN="https://feemultiple.my-domain.com"
+
 
 #Charter
 CHARTER_PORT=3583
-FEE_WATCHER_PUBLIC_API_URL="https://my-fee-watcher-host/api/v1"
+FEE_WATCHER_PUBLIC_API_URL="https://feemultiple.my-domain.com/api/v1"
 
 #Auth
 FEE_WATCHER_API_KEY=watchboaticywaters
 
 #Database
 POSTGRES_USER=postgres
-POSTGRES_PASSWORD=postgres
+POSTGRES_PASSWORD=CHANGEME
 POSTGRES_DB=btcfee
 POSTGRES_PORT=5436
-POSTGRES_VOLUME_PATH="/home/user/btc-fee-estimate-tracker/volume"
+POSTGRES_VOLUME_PATH="/path/to/storage/volume"
 
 #Logs
 FLUENTD_ADDRESS=fluentd-host

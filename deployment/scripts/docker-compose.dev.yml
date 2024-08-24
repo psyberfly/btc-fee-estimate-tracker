@@ -1,0 +1,11 @@
+version: "3.7"
+services:
+  btc-fee-watcher:
+    volumes:
+      - ../../btc-fee-watcher/src:/home/node/app/src  # Mount the src directory in development
+  btc-fee-charter:
+    volumes:
+      - ../../btc-fee-charter:/home/node/app  # Mount the src directory in development
+    environment:
+      VITE_FEE_WATCHER_PUBLIC_API_URL: ${FEE_WATCHER_PUBLIC_API_URL}
+      VITE_FEE_WATCHER_API_KEY: ${FEE_WATCHER_API_KEY}

@@ -1,4 +1,4 @@
-import { ChartType } from "../chart_data/interface";
+// import { ChartType } from "../chart_data/interface";
 
 export interface FeeIndex {
   time: Date;
@@ -17,12 +17,12 @@ export interface FeeEstimate {
   satsPerByte: number;
 }
 
-export interface IStore {
-  //create(chartType: ChartType, data: any): Promise<boolean | Error>;
-  getHistoryStartTime(chartType: ChartType): Promise<Date | Error>;
-  getHistoryEndTime(chartType: ChartType): Promise<Date | Error>;
-  readMany(chartType: ChartType// from: Date, to: Date
-  ): Promise<any | Error>;
-  readLatest(chartType: ChartType): Promise<any | Error>;
-  upsert(chartType: ChartType, data: any): Promise<boolean | Error>;
-}
+// export interface IStore {
+//   //create(chartType: ChartType, data: any): Promise<boolean | Error>;
+//   getHistoryStartTime(chartType: ChartType): Promise<Date | Error>;
+//   getHistoryEndTime(chartType: ChartType): Promise<Date | Error>;
+//   readMany(chartType: ChartType// from: Date, to: Date
+//   ): Promise<any | Error>;
+//   readLatest(chartType: ChartType): Promise<any | Error>;
+//   upsert(chartType: ChartType, data: any): Promise<boolean | Error>;
+// }
