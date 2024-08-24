@@ -1,39 +1,33 @@
 import React, { useEffect, useState } from 'react';
 import GaugeChart, { GaugeChartType } from '../charts/gauge_chart/gauge_chart';
 import { DataOp } from '../../chart_data/data_op';
-//import { LokiStore } from '../../store/lokijs_store';
 import "./live_index_banner.css";
 import { ChartType } from '../../chart_data/interface';
 import { FeeIndex } from '../../store/interface';
 import CircularProgressIndicator from '../loader/loader';
 import { ChartTimescale, TimeRange } from '../../chart_data/chart_timescale';
 
-const LiveIndexBanner = ({}) => {
-
+const LiveIndexBanner = ({ feeHistory }: { feeHistory?: FeeIndex[] }) => {
     const dataOp = new DataOp();
-    //const store = new LokiStore();
 
     const [loading, setLoading] = useState(true);
     const [errorLoading, setErrorLoading] = useState(false);
     const [currentFeeEstimate, setCurrentFeeEstimate] = useState(null);
     const [currentFeeAverage, setCurrentFeeAverage] = useState(null);
     const [currentFeeIndex, setCurrentFeeIndex] = useState();
-    const [feeIndexHistoryLastYear, setFeeIndexHistoryLastYear] = useState([]);
+    const [feeIndexHistoryLastYear, setFeeIndexHistoryLastYear] = useState<FeeIndex[]>(feeHistory || []);
     const [requiredHistoryStartTime, requiredHistoryEndTime] = ChartTimescale.getStartEndTimestampsFromTimerangeAsDate(TimeRange.Last1Year);
-
-
 
     async function handleDataFetch(since: Date): Promise<FeeIndex[] | Error> {
         try {
             const data = await dataOp.fetchFeeIndexHistory(since);
             if (data instanceof Error) return Error(`Error fetching fee estimate history from server: ${data}`);
-            //const isStored = await store.upsert(ChartType.feeEstimate, data);
-            //if (isStored instanceof Error) return Error(`Erroing storing fetched fee estimate history: ${isStored}`);
             return data;
         } catch (error) {
             return Error(`Error handling fee estimate history fetch and storage: ${error}`);
         }
     };
+
     const setData = async () => {
         setLoading(true);
         try {
@@ -45,24 +39,25 @@ const LiveIndexBanner = ({}) => {
             }
 
             const latestFeeEstimate = latestIndexDetailed.currentFeeEstimate;
-            setCurrentFeeEstimate(latestFeeEstimate as any);
+            setCurrentFeeEstimate(latestFeeEstimate);
             const latestFeeAverage = latestIndexDetailed.movingAverage;
-            setCurrentFeeAverage(latestFeeAverage as any);
+            setCurrentFeeAverage(latestFeeAverage);
             const latestFeeIndex = {
                 time: latestIndexDetailed.timestamp,
                 ratioLast365Days: latestIndexDetailed.feeEstimateMovingAverageRatio.last365Days,
                 ratioLast30Days: latestIndexDetailed.feeEstimateMovingAverageRatio.last30Days
             } as FeeIndex;
-            setCurrentFeeIndex(latestFeeIndex as any);
+            setCurrentFeeIndex(latestFeeIndex);
 
-            const oneYearAgo = new Date();
-            oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
-            const feeIndexHistoryLastYear = await handleDataFetch(oneYearAgo); //store.readMany(ChartType.feeIndex, requiredHistoryStartTime, requiredHistoryEndTime);
-            if(feeIndexHistoryLastYear instanceof Error)
-            {
-                throw feeIndexHistoryLastYear;
+            if (!feeHistory) {
+                const oneYearAgo = new Date();
+                oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+                const fetchedFeeIndexHistory = await handleDataFetch(oneYearAgo);
+                if (fetchedFeeIndexHistory instanceof Error) {
+                    throw fetchedFeeIndexHistory;
+                }
+                setFeeIndexHistoryLastYear(fetchedFeeIndexHistory);
             }
-            setFeeIndexHistoryLastYear(feeIndexHistoryLastYear as []);
 
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -75,8 +70,7 @@ const LiveIndexBanner = ({}) => {
 
     useEffect(() => {
         setData();
-    }, []);
-
+    }, [feeHistory]);
 
     return (
         <>
@@ -107,7 +101,8 @@ const LiveIndexBanner = ({}) => {
                         </div>
                     </div>
                 </div>
-            )} </>
+            )}
+        </>
     );
 };
 
