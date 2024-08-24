@@ -32,7 +32,6 @@ FROM base AS build
 # Copy the application source code for building
 COPY . .
 
-
 # Build the application
 
 ARG VITE_FEE_WATCHER_PUBLIC_API_URL

@@ -8,7 +8,7 @@ services:
       target: ${BUILD_TARGET:-production}  # Use environment variable to switch between development and production
     image: btc-fee-watcher
     container_name: btc-fee-watcher
-    restart: no
+    restart: unless-stopped
     ports:
       - "${WATCHER_SERVER_PORT}:3561"
       - "${WATCHER_WSS_PORT}:3572"
@@ -33,8 +33,12 @@ services:
       context: ../../btc-fee-charter
       dockerfile: Dockerfile
       target: ${BUILD_TARGET:-production}  # Use environment variable to switch between development and production
+      args:
+        VITE_FEE_WATCHER_PUBLIC_API_URL: ${FEE_WATCHER_PUBLIC_API_URL}
+        VITE_FEE_WATCHER_API_KEY: ${FEE_WATCHER_API_KEY}
     image: btc-fee-charter
     container_name: btc-fee-charter
+    restart: unless-stopped
     ports:
       - "${CHARTER_PORT}:3583"
     depends_on:
@@ -46,9 +50,7 @@ services:
       start_period: 10s 
       retries: 3
     env_file: ../config/.env.prod
-    environment:
-      VITE_FEE_WATCHER_PUBLIC_API_URL: ${FEE_WATCHER_PUBLIC_API_URL}
-      VITE_FEE_WATCHER_API_KEY: ${FEE_WATCHER_API_KEY}
+
  
   postgres:
     image: postgres:16.1-alpine
