@@ -4,6 +4,7 @@ import {
   FeeIndexesArchive,
   MovingAverages,
 } from "@prisma/client";
+import { FeeIndexHistory } from "../../service/api/interface";
 
 export interface FeeIndexDetailed {
   time: Date;
@@ -28,7 +29,7 @@ export type FeeIndexesArchiveBulkInsert = Omit<
 >;
 
 export interface IIndexOp {
-  readAll(since: Date, isHistoric?:boolean): Promise<FeeIndexes[] | Error>;
+  readAll(since: Date, isHistoric?:boolean): Promise<FeeIndexes[] | FeeIndexHistory | Error>;
   readAllDetailed(since: Date): Promise<FeeIndexDetailed[] | Error>;
   create(
     feeEstimate: FeeEstimates,
@@ -41,5 +42,5 @@ export interface IIndexOp {
     to: Date,
     stepSizeMs: number,
   ): Promise<boolean | Error>;
-  readAllArchived(since: Date, isHistoric?:boolean): Promise<FeeIndexesArchive[] | Error>;
+  readAllArchived(since: Date, isHistoric?:boolean): Promise<FeeIndexesArchive[] | FeeIndexHistory | Error>;
 }

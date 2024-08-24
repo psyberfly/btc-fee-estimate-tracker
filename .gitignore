@@ -2,6 +2,7 @@
 **/node_modules/
 **/dist/
 volume
+dev_volume
 nginx_conf
 faq.md
 nginx-config

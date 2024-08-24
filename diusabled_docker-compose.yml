@@ -1,0 +1,70 @@
+# version: "3.7"
+# services:
+ 
+#   btc-fee-watcher:
+#     build:
+#       context: ./btc-fee-watcher
+#       dockerfile: Dockerfile
+#       target: ${BUILD_TARGET:-production}  # Use environment variable to switch between development and production
+#     image: btc-fee-watcher
+#     container_name: btc-fee-watcher
+#     restart: no
+#     ports:
+#       - "${WATCHER_SERVER_PORT}:3561"
+#       - "${WATCHER_WSS_PORT}:3572"
+#     depends_on:
+#       - postgres
+#     healthcheck:
+#       test: ["CMD-SHELL", "wget -q --spider http://localhost:3561/api/v1 || exit 1"]
+#       interval: 30s
+#       start_period: 10s 
+#       timeout: 10s     
+#       retries: 3
+#     environment:
+#       DB_URL: "postgresql://${POSTGRES_PASSWORD}:${POSTGRES_USER}@postgres:5432/${POSTGRES_DB}?schema=public"
+#       FLUENTD_ADDRESS: ${FLUENTD_ADDRESS}
+#       FLUENTD_PORT: ${FLUENTD_PORT}
+#       FLUENTD_PATH: ${FLUENTD_PATH}
+#       API_KEY: ${FEE_WATCHER_API_KEY}
+  
+#   btc-fee-charter:
+#     build:
+#       context: ./btc-fee-charter
+#       dockerfile: Dockerfile
+#       target: ${BUILD_TARGET:-production}  # Use environment variable to switch between development and production
+#     image: btc-fee-charter
+#     container_name: btc-fee-charter
+#     ports:
+#       - "${CHARTER_PORT}:3583"
+#     depends_on:
+#       - btc-fee-watcher
+#     healthcheck:
+#       test: ["CMD-SHELL", "wget -q --spider http://localhost:3583 || exit 1"]
+#       interval: 30s
+#       timeout: 10s
+#       start_period: 10s 
+#       retries: 3
+#     environment:
+#       VITE_FEE_WATCHER_PUBLIC_API_URL: ${FEE_WATCHER_PUBLIC_API_URL}
+#       VITE_FEE_WATCHER_API_KEY: ${FEE_WATCHER_API_KEY}
+ 
+#   postgres:
+#     image: postgres:16.1-alpine
+#     container_name: btc-fee-tracker-postgres
+#     restart: always
+#     ports:
+#       - "${POSTGRES_PORT}:5432"
+#     volumes:
+#       - btc-fee-watcher-data:/var/lib/postgresql/data
+#     environment:
+#       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#       POSTGRES_USER: ${POSTGRES_USER}
+#       POSTGRES_DB: ${POSTGRES_DB}
+   
+# volumes:
+#   btc-fee-watcher-data:
+#     driver: local
+#     driver_opts:
+#       type: none
+#       device: $POSTGRES_VOLUME_PATH
+#       o: bind

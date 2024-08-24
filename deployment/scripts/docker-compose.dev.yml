@@ -1,0 +1,8 @@
+version: "3.7"
+services:
+  btc-fee-watcher:
+    volumes:
+      - ../../btc-fee-watcher/src:/home/node/app/src  # Mount the src directory in development
+  btc-fee-charter:
+    volumes:
+      - ../../btc-fee-charter:/home/node/app  # Mount the src directory in development

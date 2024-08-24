@@ -11,9 +11,17 @@ const app = express();
 export async function runServer() {
   try {
     const port: string = process.env.SERVER_PORT;
+    const feeCharterOrigin = process.env.FEE_CHARTER_ORIGIN;
     const baseApiRoute = "/api/v1";
     //used for btc-fee-watcher
-    app.use(cors());
+    const corsOptions = {
+      origin: feeCharterOrigin,
+      methods: 'GET,HEAD,PUT,PATCH,POST',
+      credentials: false, // if you need to support credentials (cookies, etc.)
+      optionsSuccessStatus: 204
+    };
+    
+    app.use(cors(corsOptions));
     app.use(compression({}));
     app.use(baseApiRoute, serviceRouter);
 
