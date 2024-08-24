@@ -150,7 +150,7 @@ async function updateAndBroadcastIndex(alertStreamServer: AlertStreamServer) {
   }
 }
 
-async function seedHistory() {
+async function seedHistory(): Promise<boolean> {
   console.log("Seeding Fee Estimates history from .csv...");
   //Fee Estimate:
   //csv should be read AFTER checking row count (feeOp.seedHistory) in DB!
@@ -162,7 +162,7 @@ async function seedHistory() {
     console.error(
       `Error reading Fee Estimate history from .csv!: ${feeHistory}`,
     );
-    return;
+    return false;
   }
 
   const feeHistoryStartDate = feeHistory[0].time;
@@ -174,7 +174,7 @@ async function seedHistory() {
     console.error(
       `Error seeding Fee Estimate history to DB!: ${isHistorySeeded}`,
     );
-    return;
+    return false;
   }
 
   console.log("Fee Estimate History seeded from .csv.");
@@ -192,6 +192,7 @@ async function seedHistory() {
     return;
   }
   console.log("Fee Estimate History archived.");
+  return true;
 }
 
 function setIndexStartDates(feeHistoryStartDate: Date) {
@@ -212,10 +213,11 @@ export async function runIndexWatcher() {
     const baseApiRoute = "/api/v1";
     const alertStreamServer = new AlertStreamServer(port, baseApiRoute);
 
-    await seedHistory();
+    const isHistorySeeded = await seedHistory();
 
-    await seedIndexes();
-
+    if (isHistorySeeded) {
+      await seedIndexes();
+    }
     await updateMovingAverage();
 
     await updateAndBroadcastIndex(alertStreamServer);
