@@ -6,6 +6,8 @@ import {
   handleGetIndexDetailedHistory,
   handleGetIndexHistory,
   handleGetMovingAverageHistory,
+  handleGetGaugeStats,
+  handleGetSummary,
 } from "./dto";
 import * as dotenv from "dotenv";
 dotenv.config();
@@ -55,4 +57,16 @@ router.get(
   "/indexDetailed",
   authenticateAPIKey,
   handleGetIndexDetailed,
+);
+
+router.get(
+  "/gaugeStats",
+  authenticateAPIKey,
+  handleGetGaugeStats,
+);
+
+router.get(
+  "/summary",
+  authenticateAPIKey,
+  handleGetSummary,
 );
