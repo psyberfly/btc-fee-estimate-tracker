@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import GaugeComponent from 'react-gauge-component'; // Adjust with the correct import based on actual package
+import GaugeComponent from 'react-gauge-component';
 import { Arc, SubArc } from 'react-gauge-component/dist/lib/GaugeComponent/types/Arc';
 import { GaugeComponentProps, GaugeType } from 'react-gauge-component/dist/lib/GaugeComponent/types/GaugeComponentProps';
 import { PointerProps } from 'react-gauge-component/dist/lib/GaugeComponent/types/Pointer';
@@ -9,161 +9,184 @@ import { FeeIndex } from '../../../store/interface';
 
 export enum GaugeChartType { monthly, yearly };
 
-const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear, gaugeChartType }) => {
+const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear, feeEstimateHistoryLastYear, currentFeeSatsPerVb, gaugeChartType }) => {
+    // Aggregate daily ratios (UTC) for the selected gauge type
+    function aggregateDailyRatios(history: FeeIndex[], type: GaugeChartType): { time: Date, ratio: number }[] {
+        const aggregates: { [dateKey: string]: { sum: number, count: number, date: Date } } = {};
 
-    function aggregateByDay(feeIndexHistory: FeeIndex[]): FeeIndex[] {
-        // Object to hold the sum and count for each date
-        const aggregates: { [dateKey: string]: { sum365: number, sum30: number, count: number } } = {};
-
-        // Iterate over each entry in the fee index history
-        feeIndexHistory.forEach(entry => {
-            // Ensure time is a Date object
+        history.forEach(entry => {
             const entryTime = entry.time instanceof Date ? entry.time : new Date(entry.time);
-            // Convert time to a string key (YYYY-MM-DD)
-            const dateKey = entryTime.toISOString().split('T')[0];
+            const dateKey = entryTime.toISOString().split('T')[0]; // YYYY-MM-DD (UTC)
 
-            // Initialize the date key in aggregates if not present
             if (!aggregates[dateKey]) {
-                aggregates[dateKey] = { sum365: 0, sum30: 0, count: 0 };
+                aggregates[dateKey] = { sum: 0, count: 0, date: new Date(dateKey) };
             }
 
-            // Accumulate sums and increment count
-            if (gaugeChartType === GaugeChartType.yearly) {
-                aggregates[dateKey].sum365 += Number(entry.ratioLast365Days);
+            const r = (type === GaugeChartType.yearly)
+                ? Number(entry.ratioLast365Days)
+                : Number(entry.ratioLast30Days);
 
-            }
-            else if (gaugeChartType === GaugeChartType.monthly) {
-                aggregates[dateKey].sum30 += Number(entry.ratioLast30Days);
-
-            }
+            if (!Number.isFinite(r)) return;
+            aggregates[dateKey].sum += r;
             aggregates[dateKey].count++;
         });
 
-        // Convert the aggregates object into an array of FeeIndex
-        return Object.keys(aggregates).map(date => ({
-            time: new Date(date),
-            ratioLast365Days: aggregates[date].sum365 / aggregates[date].count,
-            ratioLast30Days: aggregates[date].sum30 / aggregates[date].count,
+        return Object.keys(aggregates).map(k => ({
+            time: aggregates[k].date,
+            ratio: aggregates[k].sum / Math.max(1, aggregates[k].count),
+        })).sort((a, b) => a.time.getTime() - b.time.getTime());
+    }
+
+    // Aggregate daily fees (UTC)
+    function aggregateDailyFees(history: { time: Date | string, satsPerByte: number }[]): { time: Date, fee: number }[] {
+        const aggregates: { [dateKey: string]: { sum: number, count: number, date: Date } } = {};
+        history.forEach(entry => {
+            const entryTime = entry.time instanceof Date ? entry.time : new Date(entry.time);
+            const dateKey = entryTime.toISOString().split('T')[0];
+            if (!aggregates[dateKey]) {
+                aggregates[dateKey] = { sum: 0, count: 0, date: new Date(dateKey) };
+            }
+            const val = Number(entry.satsPerByte);
+            if (!Number.isFinite(val)) return;
+            aggregates[dateKey].sum += val;
+            aggregates[dateKey].count++;
+        });
+        return Object.keys(aggregates).map(k => ({
+            time: aggregates[k].date,
+            fee: aggregates[k].sum / Math.max(1, aggregates[k].count),
+        })).sort((a, b) => a.time.getTime() - b.time.getTime());
+    }
+
+    // Window series to last 365 days or last 30 days
+    function windowSeries(series: { time: Date, ratio: number }[], type: GaugeChartType): number[] {
+        const now = new Date();
+        const days = type === GaugeChartType.yearly ? 365 : 30;
+        const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        return series.filter(p => p.time >= cutoff).map(p => p.ratio);
+    }
+    function windowFeeSeries(series: { time: Date, fee: number }[], type: GaugeChartType): number[] {
+        const now = new Date();
+        const days = type === GaugeChartType.yearly ? 365 : 30;
+        const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        return series.filter(p => p.time >= cutoff).map(p => p.fee);
+    }
+
+    // Percentile rank (<= x) in percent [0,100]
+    function percentileRank(values: number[], x: number): number {
+        if (!values.length) return 0;
+        const k = values.filter(v => v <= x).length;
+        return (k / values.length) * 100;
+    }
+
+    // Compute p-quantile (0..1) with linear interpolation
+    function quantile(values: number[], p: number): number {
+        if (!values.length) return NaN;
+        const arr = [...values].sort((a, b) => a - b);
+        const idx = (arr.length - 1) * Math.min(1, Math.max(0, p));
+        const lo = Math.floor(idx);
+        const hi = Math.ceil(idx);
+        if (lo === hi) return arr[lo];
+        const t = idx - lo;
+        return arr[lo] * (1 - t) + arr[hi] * t;
+    }
+
+    // Winsorize array by clamping to [qLow, qHigh]
+    function winsorize(values: number[], lowP = 0.01, highP = 0.99): { data: number[], qLow: number, qHigh: number } {
+        if (!values.length) return { data: [], qLow: NaN, qHigh: NaN };
+        const qLow = quantile(values, lowP);
+        const qHigh = quantile(values, highP);
+        const data = values.map(v => Math.min(qHigh, Math.max(qLow, v)));
+        return { data, qLow, qHigh };
+    }
+
+    // Percentage of observations greater than x
+    function percentHigher(values: number[], x: number): number {
+        if (!values.length) return 0;
+        const k = values.filter(v => v > x).length;
+        return (k / values.length) * 100;
+    }
+
+    // 10 descriptive labels based on absolute multiple R around 1.0
+    type Category =
+        | "extremely low"
+        | "very low"
+        | "low"
+        | "moderately low"
+        | "slightly below average"
+        | "slightly above average"
+        | "moderately high"
+        | "high"
+        | "very high"
+        | "extremely high";
+
+    function categorizeAbsolute10(R: number): Category {
+        if (R < 0.4) return "extremely low";
+        if (R < 0.6) return "very low";
+        if (R < 0.8) return "low";
+        if (R < 0.9) return "moderately low";
+        if (R < 1.0) return "slightly below average";
+        if (R < 1.1) return "slightly above average";
+        if (R < 1.25) return "moderately high";
+        if (R < 1.5) return "high";
+        if (R < 2.0) return "very high";
+        return "extremely high";
+    }
+
+    // Build series and window it to the selected horizon
+    const dailyRatios = aggregateDailyRatios(feeIndexHistoryLastYear, gaugeChartType);
+    const windowedRatios = windowSeries(dailyRatios, gaugeChartType);
+    const dailyFees = aggregateDailyFees(feeEstimateHistoryLastYear || []);
+    const windowedFees = windowFeeSeries(dailyFees, gaugeChartType);
+
+    const R_today_raw = Number(currentFeeIndex);
+    const { data: ratiosWins, qLow: rLow, qHigh: rHigh } = winsorize(windowedRatios);
+    const R_today = Math.min(rHigh ?? R_today_raw, Math.max(rLow ?? R_today_raw, R_today_raw));
+
+    const gaugePercentile = percentileRank(ratiosWins, R_today); // 0..100
+    const higherPct = percentHigher(ratiosWins, R_today);
+
+    const { data: feesWins, qLow: fLow, qHigh: fHigh } = winsorize(windowedFees);
+    const feeTodayRaw = Number(currentFeeSatsPerVb);
+    const feeToday = Math.min(fHigh ?? feeTodayRaw, Math.max(fLow ?? feeTodayRaw, feeTodayRaw));
+    const rawFeeHigherPct = percentHigher(feesWins, feeToday);
+
+    // Percentile-based labels using two-bucket scheme (<=1, >1)
+    function categorizeByTwoBucketPercentile(R: number, S: number[]): Category {
+        if (!S.length || !Number.isFinite(R)) return "slightly below average";
+        const S_low = S.filter(v => v <= 1);
+        const S_high = S.filter(v => v > 1);
+
+        if (R <= 1 && S_low.length >= 10) {
+            const p = percentileRank(S_low, R);
+            if (p < 20) return "extremely low";
+            if (p < 40) return "very low";
+            if (p < 60) return "low";
+            if (p < 80) return "moderately low";
+            return "slightly below average";
+        }
+        if (R > 1 && S_high.length >= 10) {
+            const p = percentileRank(S_high, R);
+            if (p < 20) return "slightly above average";
+            if (p < 40) return "moderately high";
+            if (p < 60) return "high";
+            if (p < 80) return "very high";
+            return "extremely high";
+        }
+        // Fallbacks when insufficient samples per side
+        return R <= 1 ? "slightly below average" : "slightly above average";
+    }
+
+    const currentCategory: Category = categorizeByTwoBucketPercentile(R_today, ratiosWins);
+
+    function getScaleValues(): number[] { return Array.from({ length: 11 }, (_, i) => i * 10); }
+    function getTicks(values: number[]): Tick[] {
+        return values.map(value => ({
+            value,
+            valueConfig: { maxDecimalDigits: 0, hide: false }
         }));
     }
-
-    const indexPercentageHigher = (): number => {
-
-        const aggregatedHistory = aggregateByDay(feeIndexHistoryLastYear);
-
-        let percentageHigher: number;
-
-        if (gaugeChartType === GaugeChartType.yearly) {
-            const percentageHigherLastYear = aggregatedHistory.filter(index => index.ratioLast365Days > currentFeeIndex).length / aggregatedHistory.length * 100;
-            percentageHigher = percentageHigherLastYear;
-        }
-
-        else {
-            const percentageHigherLastMonth = (aggregatedHistory.filter(index => index.ratioLast30Days > currentFeeIndex).length / aggregatedHistory.length) * 100;
-            percentageHigher = percentageHigherLastMonth;
-
-        }
-
-        return percentageHigher;
-    }
-
-    const currentGaugeValue = (): number => {
-        const percentageHigherLastYear = indexPercentageHigher();
-
-        if (percentageHigherLastYear >= 90) {
-            return 1; // "Fees are at extremely low"
-        } else if (percentageHigherLastYear >= 80) {
-            return 2; // "Fees are very low"
-        } else if (percentageHigherLastYear >= 70) {
-            return 3; // "Fees are low"
-        } else if (percentageHigherLastYear >= 60) {
-            return 4; // "Fees are average-low"
-        } else if (percentageHigherLastYear >= 50) {
-            return 5; // "Fees average"
-        } else if (percentageHigherLastYear >= 40) {
-            return 6; // "Fees are average-high"
-        } else if (percentageHigherLastYear >= 30) {
-            return 7; // "Fees are high"
-        } else if (percentageHigherLastYear >= 20) {
-            return 8; // "Fees are very high"
-        } else if (percentageHigherLastYear >= 10) {
-            return 9; // "Fees are extremely high"
-        } else {
-            return 10; // "Warning: fees are at their highest"
-        }
-    };
-
-    const currentGaugeValueLabel = (value: number): string => {
-        switch (value) {
-            case 1:
-                return "extremely low";
-            case 2:
-                return "very low";
-            case 3:
-                return "low";
-            case 4:
-                return "average-low";
-            case 5:
-                return "average";
-            case 6:
-                return "average-high";
-            case 7:
-                return "high";
-            case 8:
-                return "very high";
-            case 9:
-                return "extremely high";
-            case 10:
-                return "at their highest";
-            default:
-                return "Invalid value";
-        }
-    };
-
-    const adjustFontSizeForLabel = (label) => {
-        const baseSize = 18; // Starting font size for very short strings
-        const growthFactor = 2; // How much the font size increases with each additional character
-
-        // Calculate the adjusted font size based on the length of the label
-        const adjustedFontSize = baseSize + (label.length * growthFactor);
-
-        // Optionally, you can set a maximum font size
-        const maxFontSize = 60;
-
-        // Clamp the adjusted font size to not exceed the maximum font size
-        const clampedFontSize = Math.min(adjustedFontSize, maxFontSize);
-
-        return `${clampedFontSize}px`;
-    };
-
-    function getScaleValues(): number[] {
-        return [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
-    }
-
-    function getTicks(values: number[]): Tick[] {
-        let ticks: Tick[] = [];
-        values.forEach((value) => {
-            ticks.push({
-                value: value, valueConfig: {
-                    maxDecimalDigits: 2,
-                    hide: false
-
-                }
-            })
-        });
-
-        return ticks;
-    }
-
-
     function getSubArcs(values: number[]): SubArc[] {
-        let subArcs: SubArc[] = [];
-        values.forEach((value) => {
-            subArcs.push({ limit: value, })
-        });
-
-        return subArcs as SubArc[];
-
+        return values.map(value => ({ limit: value })) as SubArc[];
     }
 
     const pointerProps: PointerProps = {
@@ -171,52 +194,44 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear, gaugeChartType }
         color: "rgba(180,180,180,0.85)",
         baseColor: "rgba(190,190,190,1)",
         animate: true,
-    }
+    };
 
     const scaleValues = getScaleValues();
-
     const subArcs = getSubArcs(scaleValues);
     const tickValues = getTicks(scaleValues);
-    const minValue = scaleValues[0];
-    const maxValue = scaleValues[scaleValues.length - 1]
+    const minValue = 0;
+    const maxValue = 100;
     const fontFamily = 'Helvetica, sans-serif';
 
     const arc: Arc = {
-        //        gradient: true,
         width: 0.15,
         colorArray: [
             "rgb(0, 255, 0)",
-            "rgb(255, 255, 0)",  // Yellow
-            "rgb(255, 0, 0)"     // Red
+            "rgb(255, 255, 0)",
+            "rgb(255, 0, 0)"
         ],
-        subArcs: subArcs,
+        subArcs,
         cornerRadius: 1,
-    }
+    };
 
-    const currentValue = currentGaugeValue();
-    const currentValueLabel = currentGaugeValueLabel(currentValue);
-    const currentValueLabelSize = adjustFontSizeForLabel(currentValueLabel);
     const chartId = gaugeChartType === GaugeChartType.yearly ? "gaugeChartContainerYearly" : "gaugeChartContainerMonthly";
     const gaugeProps: GaugeComponentProps = {
         id: chartId,
-        value: currentValue,
-        minValue: minValue,
-        maxValue: maxValue,
+        value: gaugePercentile,
+        minValue,
+        maxValue,
         type: GaugeType.Radial,
         pointer: pointerProps,
         labels: {
             valueLabel: {
                 style: {
-                    fontSize: currentValueLabelSize,
+                    fontSize: "24px",
                     fontFamily: fontFamily,
                     backgroundColor: "rgb(255,255,255)"
-
                 },
                 matchColorWithArc: true,
-                maxDecimalDigits: 2,
-                formatTextValue: (value) =>
-                    currentValueLabel
-
+                maxDecimalDigits: 0,
+                formatTextValue: () => currentCategory,
             },
             tickLabels: {
                 type: "inner",
@@ -231,9 +246,7 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear, gaugeChartType }
                 ticks: tickValues,
             }
         },
-
-        arc: arc,
-
+        arc,
     };
 
     const addAdditionalLabel = (svg, content, x, y, fillColor = "white") => {
@@ -249,35 +262,23 @@ const GaugeChart = ({ currentFeeIndex, feeIndexHistoryLastYear, gaugeChartType }
     };
 
     useEffect(() => {
-        // This effect runs after the component mounts and whenever currentValue changes
         const chartContainer = document.getElementById(chartId);
-
-        let xPos: string = "50%";
-        let yPos: string = "77.5%";
-
-              if (chartContainer) {
+        if (chartContainer) {
             const svg = chartContainer.querySelector('svg');
             if (svg) {
-                if (svg) {
-                    addAdditionalLabel(svg, "fees are", xPos, yPos);
-                }
-
+                addAdditionalLabel(svg, "fees are", "50%", "77.5%");
             }
         }
-    }, [currentFeeIndex]);
-
+    }, [currentFeeIndex, feeIndexHistoryLastYear, feeEstimateHistoryLastYear, gaugeChartType]);
 
     return (
         <>
             <p style={{ paddingTop: "0px", paddingBottom: "0vh", textAlign: "center" }}>
-                The multiple has been higher {indexPercentageHigher().toFixed(2)}% of the time last {gaugeChartType === GaugeChartType.yearly? "year" : "month"}
+                Multiple R={R_today.toFixed(2)}. Higher than {higherPct.toFixed(2)}% of the last {gaugeChartType === GaugeChartType.yearly ? "365 days" : "30 days"}. Raw fee higher than {rawFeeHigherPct.toFixed(2)}%.
             </p>
             <GaugeComponent {...gaugeProps} />
         </>
     );
-
 };
-
-
 
 export default GaugeChart;

@@ -16,6 +16,7 @@ const LiveIndexBanner = ({ feeHistory }: { feeHistory?: FeeIndex[] }) => {
     const [currentFeeAverage, setCurrentFeeAverage] = useState(null);
     const [currentFeeIndex, setCurrentFeeIndex] = useState();
     const [feeIndexHistoryLastYear, setFeeIndexHistoryLastYear] = useState<FeeIndex[]>(feeHistory || []);
+    const [feeEstimateHistoryLastYear, setFeeEstimateHistoryLastYear] = useState<{ time: Date | string, satsPerByte: number }[]>([]);
     const [requiredHistoryStartTime, requiredHistoryEndTime] = ChartTimescale.getStartEndTimestampsFromTimerangeAsDate(TimeRange.Last1Year);
 
     async function handleDataFetch(since: Date): Promise<FeeIndex[] | Error> {
@@ -57,6 +58,12 @@ const LiveIndexBanner = ({ feeHistory }: { feeHistory?: FeeIndex[] }) => {
                     throw fetchedFeeIndexHistory;
                 }
                 setFeeIndexHistoryLastYear(fetchedFeeIndexHistory);
+
+                // Fetch fee estimate history for raw fee percentile context
+                const fetchedFeeEstimateHistory = await dataOp.fetchFeeEstimateHistory(oneYearAgo);
+                if (!(fetchedFeeEstimateHistory instanceof Error)) {
+                    setFeeEstimateHistoryLastYear(fetchedFeeEstimateHistory as any);
+                }
             }
 
         } catch (error) {
@@ -87,7 +94,13 @@ const LiveIndexBanner = ({ feeHistory }: { feeHistory?: FeeIndex[] }) => {
                             <h3>Average Fee: {Number((currentFeeAverage as any).last365Days).toFixed(2)} sats/vb</h3>
 
                             <div className="gauge-container">
-                                <GaugeChart currentFeeIndex={(currentFeeIndex as any).ratioLast365Days} feeIndexHistoryLastYear={feeIndexHistoryLastYear} gaugeChartType={GaugeChartType.yearly} />
+                                <GaugeChart
+                                    currentFeeIndex={(currentFeeIndex as any).ratioLast365Days}
+                                    feeIndexHistoryLastYear={feeIndexHistoryLastYear}
+                                    feeEstimateHistoryLastYear={feeEstimateHistoryLastYear}
+                                    currentFeeSatsPerVb={Number((currentFeeEstimate as any).satsPerByte)}
+                                    gaugeChartType={GaugeChartType.yearly}
+                                />
                             </div>
                         </div>
                         <div className="gauge-chart">
@@ -96,7 +109,13 @@ const LiveIndexBanner = ({ feeHistory }: { feeHistory?: FeeIndex[] }) => {
                             <h3>Current Fee: {Number((currentFeeEstimate as any).satsPerByte).toFixed(2)} sats/vb</h3>
                             <h3>Average Fee: {Number((currentFeeAverage as any).last30Days).toFixed(2)} sats/vb</h3>
                             <div className="gauge-container">
-                                <GaugeChart currentFeeIndex={(currentFeeIndex as any).ratioLast30Days} feeIndexHistoryLastYear={feeIndexHistoryLastYear} gaugeChartType={GaugeChartType.monthly} />
+                                <GaugeChart
+                                    currentFeeIndex={(currentFeeIndex as any).ratioLast30Days}
+                                    feeIndexHistoryLastYear={feeIndexHistoryLastYear}
+                                    feeEstimateHistoryLastYear={feeEstimateHistoryLastYear}
+                                    currentFeeSatsPerVb={Number((currentFeeEstimate as any).satsPerByte)}
+                                    gaugeChartType={GaugeChartType.monthly}
+                                />
                             </div>
                         </div>
                     </div>

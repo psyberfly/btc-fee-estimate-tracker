@@ -52,7 +52,7 @@ services:
       start_period: 10s 
       retries: 3
     environment:   
-      SERVER_PORT: ${CHARTER_PORT}
+      SERVER_PORT: 3583
     volumes:
       - ../../btc-fee-charter:/home/node/app  # Mount the src directory in development
 
